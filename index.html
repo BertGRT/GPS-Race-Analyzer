@@ -1556,11 +1556,11 @@ const allCircuits = CIRCUITS_DATABASE;
             if (tabName === 'track' && sessionData && sessionData.gpsTrack) {
     setTimeout(() => {
         if (!map) {
-            initMap();
-            showCircuitDetection(); // ← AJOUTER CETTE LIGNE
+            initMap(); // Initialise la carte ET affiche le tracé
         } else {
             map.invalidateSize();
         }
+        showCircuitDetection(); // Détection circuit séparée (info bonus)
     }, 100);
 }
             
