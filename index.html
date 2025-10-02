@@ -4,7 +4,7 @@
 
    
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
      <!-- PWA Support -->
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#1976d2">
@@ -113,30 +113,27 @@ if ('serviceWorker' in navigator) {
         }
         
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-            transition: transform 0.3s ease;
-        }
-        
-        .stat-card:hover { transform: translateY(-5px); }
-        
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        
-        .stat-label {
-            font-size: 0.85rem;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
         .tabs {
             display: flex;
             gap: 10px;
@@ -456,12 +453,125 @@ if ('serviceWorker' in navigator) {
         }
         
         @media (max-width: 768px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .session-header { flex-direction: column; text-align: center; }
-            .header h1 { font-size: 1.8rem; }
-            .container { padding: 20px; }
-            .map-container, #map { height: 400px; min-height: 400px; }
-        }
+            .stats-grid { 
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px; /* Réduire l'espace */
+    }
+    
+    .stat-card {
+        padding: 15px; /* Réduire le padding */
+    }
+    
+    .stat-value {
+        font-size: 1.5rem; /* Réduire la taille */
+    }
+    
+    .stat-label {
+        font-size: 0.7rem; /* Réduire la taille */
+    }
+    
+    .session-header { 
+        flex-direction: column; 
+        text-align: center; 
+    }
+    
+    .session-info h2 {
+        font-size: 1.2rem; /* Réduire le titre */
+    }
+    
+    .header h1 { 
+        font-size: 1.8rem; 
+    }
+    
+    .container { 
+        padding: 15px; /* Réduire les marges */
+    }
+    
+    .map-container, #map { 
+        height: 400px; 
+        min-height: 400px; 
+    }
+    
+    /* Tableaux responsive */
+    table {
+        font-size: 0.75rem;
+    }
+    
+    table th, table td {
+        padding: 6px 4px;
+    }
+    
+    /* Onglets plus compacts */
+    .tab {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+    
+    /* Cartes d'analyse plus petites */
+    .analysis-card {
+        padding: 15px;
+    }
+    
+    .analysis-card h4 {
+        font-size: 1rem;
+    }
+    
+    /* Grilles en 1 colonne sur mobile */
+    .analysis-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .track-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .turns-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mode paysage mobile */
+@media (max-width: 900px) and (orientation: landscape) {
+    .container {
+        padding: 10px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    
+    .stat-card {
+        padding: 10px;
+    }
+    
+    .stat-value {
+        font-size: 1.3rem;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem;
+    }
+    
+    .map-container, #map {
+        height: 300px;
+        min-height: 300px;
+    }
+    
+    .header {
+        padding: 15px;
+    }
+    
+    .header h1 {
+        font-size: 1.5rem;
+    }
+    
+    table {
+        font-size: 0.7rem;
+    }
+}
+            
     </style>
 </head>
 <body>
@@ -1253,8 +1363,29 @@ console.log(`- Moto: ${CIRCUITS_DATABASE.filter(c => c.type === 'moto').length}`
             document.getElementById('session-content').style.display = 'block';
             
             document.getElementById('session-title').textContent = 'Session Circuit - Analyse GPS';
-            const date = new Date(sessionData.start);
-            document.getElementById('session-date').textContent = date.toLocaleString('fr-FR');
+            // Correction parsing date
+let date;
+if (sessionData.start && sessionData.start > 0) {
+    date = new Date(sessionData.start);
+} else if (sessionData.id) {
+    // Extraire la date depuis l'ID (format: 01102025-1430)
+    const parts = sessionData.id.split('-');
+    if (parts.length === 2) {
+        const dateStr = parts[0]; // "01102025"
+        const timeStr = parts[1]; // "1430"
+        const day = dateStr.substring(0, 2);
+        const month = dateStr.substring(2, 4);
+        const year = dateStr.substring(4, 8);
+        const hour = timeStr.substring(0, 2);
+        const minute = timeStr.substring(2, 4);
+        date = new Date(year, month - 1, day, hour, minute);
+    } else {
+        date = new Date();
+    }
+} else {
+    date = new Date();
+}
+document.getElementById('session-date').textContent = date.toLocaleString('fr-FR');
             
             const trackLength = sessionData.trackLength || 1.814;
             document.getElementById('session-badge').textContent = `${trackLength} km - ${sessionData.laps} tours`;
