@@ -1359,33 +1359,35 @@ console.log(`- Moto: ${CIRCUITS_DATABASE.filter(c => c.type === 'moto').length}`
         }
         
         function displaySession() {
-            document.getElementById('upload-area').style.display = 'none';
-            document.getElementById('session-content').style.display = 'block';
+    document.getElementById('upload-area').style.display = 'none';
+    document.getElementById('session-content').style.display = 'block';
+    
+    document.getElementById('session-title').textContent = 'Session Circuit - Analyse GPS';
+    
+    // === CORRECTION DATE : Extraire depuis l'ID ===
+    let dateText = "Date inconnue";
+    
+    if (sessionData.id) {
+        // Format ID: "01102025-1430" ou "ddmmyyyy-hhmm"
+        const parts = sessionData.id.split('-');
+        if (parts.length === 2) {
+            const dateStr = parts[0]; // "01102025"
+            const timeStr = parts[1]; // "1430"
             
-            document.getElementById('session-title').textContent = 'Session Circuit - Analyse GPS';
-            // Correction parsing date
-let date;
-if (sessionData.start && sessionData.start > 0) {
-    date = new Date(sessionData.start);
-} else if (sessionData.id) {
-    // Extraire la date depuis l'ID (format: 01102025-1430)
-    const parts = sessionData.id.split('-');
-    if (parts.length === 2) {
-        const dateStr = parts[0]; // "01102025"
-        const timeStr = parts[1]; // "1430"
-        const day = dateStr.substring(0, 2);
-        const month = dateStr.substring(2, 4);
-        const year = dateStr.substring(4, 8);
-        const hour = timeStr.substring(0, 2);
-        const minute = timeStr.substring(2, 4);
-        date = new Date(year, month - 1, day, hour, minute);
-    } else {
-        date = new Date();
+            const day = dateStr.substring(0, 2);
+            const month = dateStr.substring(2, 4);
+            const year = dateStr.substring(4, 8);
+            const hour = timeStr.substring(0, 2);
+            const minute = timeStr.substring(2, 4);
+            
+            // Créer un texte lisible
+            dateText = `${day}/${month}/${year} à ${hour}:${minute}`;
+        } else {
+            dateText = sessionData.id; // Afficher l'ID brut si format inconnu
+        }
     }
-} else {
-    date = new Date();
-}
-document.getElementById('session-date').textContent = date.toLocaleString('fr-FR');
+    
+    document.getElementById('session-date').textContent = dateText;
             
             const trackLength = sessionData.trackLength || 1.814;
             document.getElementById('session-badge').textContent = `${trackLength} km - ${sessionData.laps} tours`;
