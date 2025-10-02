@@ -687,12 +687,7 @@ if ('serviceWorker' in navigator) {
                     </div>
                 </div>
                 
-                <div class="auto-detect-box" id="circuit-unknown" style="display: none;">
-    <h4 style="margin-bottom: 10px;">Circuit Non Identifié</h4>
-    <p style="margin-bottom: 15px;">Ce circuit n'est pas dans la base de données des 155 circuits français.</p>
-    <button class="replay-btn" style="background: linear-gradient(45deg, #9c27b0, #ba68c8);" 
-            onclick="showAllCircuits()">Sélectionner manuellement</button>
-</div>
+                
                 
                 <div class="map-controls">
                     <button style="background: #2196f3; color: white;" onclick="switchMapView('satellite')">Vue Satellite</button>
@@ -1246,7 +1241,7 @@ function showCircuitDetection() {
             `${detectedCircuit.location} - ${detectedCircuit.length} km`;
     } else {
         circuitInfo.style.display = 'none';
-        circuitUnknown.style.display = 'block';
+        
     }
 }
 
