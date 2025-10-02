@@ -1340,15 +1340,7 @@ console.log(`- Moto: ${CIRCUITS_DATABASE.filter(c => c.type === 'moto').length}`
             const totalTime = sessionData.times.reduce((a, b) => a + b, 0);
             document.getElementById('stat-total').textContent = formatTime(totalTime);
 
-            document.getElementById('circuit-unknown').innerHTML = `
-    <h4 style="margin-bottom: 10px;">Circuit Non Identifié</h4>
-    <p style="margin-bottom: 15px;">Ce circuit n'est pas dans la base de données. Voulez-vous l'enregistrer ?</p>
-    <input type="text" id="new-circuit-name" placeholder="Nom du circuit (ex: Karting Lyon Est)" 
-           style="width: 100%; padding: 10px; border: 2px solid #1976d2; border-radius: 8px; margin-bottom: 10px;">
-    <button class="replay-btn" onclick="saveDetectedCircuit()">Enregistrer ce Circuit</button>
-    <button class="replay-btn" style="background: linear-gradient(45deg, #9c27b0, #ba68c8);" 
-            onclick="showAllCircuits()">Voir tous les circuits</button>
-`;
+            
             
             displayLapsTable();
             displayAnalysis();
