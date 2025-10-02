@@ -688,12 +688,11 @@ if ('serviceWorker' in navigator) {
                 </div>
                 
                 <div class="auto-detect-box" id="circuit-unknown" style="display: none;">
-                    <h4 style="margin-bottom: 10px;">Circuit Non Identifie</h4>
-                    <p style="margin-bottom: 15px;">Ce circuit n'est pas dans la base de donnees. Voulez-vous l'enregistrer ?</p>
-                    <input type="text" id="new-circuit-name" placeholder="Nom du circuit (ex: Karting Lyon Est)" 
-                           style="width: 100%; padding: 10px; border: 2px solid #1976d2; border-radius: 8px; margin-bottom: 10px;">
-                    <button class="replay-btn" onclick="saveDetectedCircuit()">Enregistrer ce Circuit</button>
-                </div>
+    <h4 style="margin-bottom: 10px;">Circuit Non Identifié</h4>
+    <p style="margin-bottom: 15px;">Ce circuit n'est pas dans la base de données des 155 circuits français.</p>
+    <button class="replay-btn" style="background: linear-gradient(45deg, #9c27b0, #ba68c8);" 
+            onclick="showAllCircuits()">Sélectionner manuellement</button>
+</div>
                 
                 <div class="map-controls">
                     <button style="background: #2196f3; color: white;" onclick="switchMapView('satellite')">Vue Satellite</button>
@@ -1192,16 +1191,9 @@ const CIRCUITS_DATABASE = [
 ];
 
 let detectedCircuit = null;
-let customCircuits = []; // Circuits ajoutés par l'utilisateur
 
-// Charger circuits personnalisés depuis localStorage
-function loadCustomCircuits() {
-    const stored = localStorage.getItem('customCircuits');
-    if (stored) {
-        customCircuits = JSON.parse(stored);
-        console.log(`${customCircuits.length} circuits personnalisés chargés`);
-    }
-}
+
+
 
 function detectCircuitFromGPS() {
     if (!sessionData || !sessionData.gpsTrack || sessionData.gpsTrack.length === 0) {
@@ -1216,7 +1208,8 @@ function detectCircuitFromGPS() {
     console.log(`Centre GPS: ${centerLat.toFixed(6)}, ${centerLng.toFixed(6)}`);
     
     // Chercher dans tous les circuits (base + custom)
-    const allCircuits = [...CIRCUITS_DATABASE, ...customCircuits];
+    // Chercher uniquement dans la base de données
+const allCircuits = CIRCUITS_DATABASE;
     
     for (const circuit of allCircuits) {
         const distance = calculateDistance(
@@ -1257,67 +1250,9 @@ function showCircuitDetection() {
     }
 }
 
-function saveDetectedCircuit() {
-    const name = document.getElementById('new-circuit-name').value.trim();
-    
-    if (!name) {
-        alert('Veuillez entrer un nom de circuit');
-        return;
-    }
-    
-    if (!sessionData || !sessionData.gpsTrack || sessionData.gpsTrack.length === 0) {
-        alert('Aucune donnée GPS disponible');
-        return;
-    }
-    
-    // Calculer centre et rayon du tracé
-    const track = sessionData.gpsTrack;
-    const centerLat = track.reduce((sum, p) => sum + p.lat, 0) / track.length;
-    const centerLng = track.reduce((sum, p) => sum + p.lng, 0) / track.length;
-    
-    // Calculer rayon (distance max depuis le centre)
-    let maxDist = 0;
-    track.forEach(p => {
-        const dist = calculateDistance(
-            { lat: centerLat, lng: centerLng },
-            { lat: p.lat, lng: p.lng }
-        );
-        if (dist > maxDist) maxDist = dist;
-    });
-    
-    // Calculer longueur du circuit (approximation)
-    let totalDist = 0;
-    for (let i = 0; i < track.length - 1; i++) {
-        totalDist += calculateDistance(track[i], track[i + 1]);
-    }
-    const length = (totalDist / 1000).toFixed(3);
-    
-    const newCircuit = {
-        name: name,
-        location: "Circuit personnalisé",
-        lat: centerLat,
-        lng: centerLng,
-        radius: Math.ceil(maxDist * 1.2), // +20% de marge
-        length: parseFloat(length),
-        type: "custom",
-        dateAdded: new Date().toISOString()
-    };
-    
-    customCircuits.push(newCircuit);
-    saveCustomCircuits();
-    
-    console.log('Circuit sauvegardé:', newCircuit);
-    
-    // Mettre à jour l'affichage
-    detectedCircuit = newCircuit;
-    showCircuitDetection();
-    
-    alert(`Circuit "${name}" enregistré avec succès!\nLongueur: ${length} km\nRayon: ${newCircuit.radius}m`);
-}
 
-function saveCustomCircuits() {
-    localStorage.setItem('customCircuits', JSON.stringify(customCircuits));
-}
+
+
 
 console.log(`Base de données chargée: ${CIRCUITS_DATABASE.length} circuits`);
 console.log(`- Auto: ${CIRCUITS_DATABASE.filter(c => c.type === 'auto').length}`);
@@ -1417,9 +1352,7 @@ console.log(`- Moto: ${CIRCUITS_DATABASE.filter(c => c.type === 'moto').length}`
             displayAnalysis();
             displayProgression();
             segmentLapsFromGPSTrack();
-            loadCustomCircuits();
-
-          
+                     
 
         }
 
@@ -1504,7 +1437,8 @@ console.log(`- Moto: ${CIRCUITS_DATABASE.filter(c => c.type === 'moto').length}`
 }
 
 function selectCircuitManually(circuitName) {
-    const allCircuits = [...CIRCUITS_DATABASE, ...customCircuits];
+    // Chercher uniquement dans la base de données
+const allCircuits = CIRCUITS_DATABASE;
     detectedCircuit = allCircuits.find(c => c.name === circuitName);
     
     document.getElementById('circuits-modal').remove();
@@ -2502,12 +2436,7 @@ detectAndDisplaySpeedMarkers(points, lapLayer);
             comparisonLayers = [];
         }
         
-        function saveDetectedCircuit() {
-            const circuitName = document.getElementById('new-circuit-name').value.trim();
-            if (!circuitName) { alert('Veuillez entrer un nom de circuit'); return; }
-            alert(`Circuit "${circuitName}" enregistre !`);
-            document.getElementById('circuit-unknown').style.display = 'none';
-        }
+        
     </script>
 </body>
 </html>
