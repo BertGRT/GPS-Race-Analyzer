@@ -1849,7 +1849,100 @@ async function loadESP32File(ip, filename) {
 window.addEventListener('DOMContentLoaded', () => {
     updateStoredFilesCount();
 });
+        // ==========================================
+// CONNEXION ESP32 / GPS_LAPTIMER
+// ==========================================
+
+async function connectESP32() {
+    const ip = document.getElementById('esp32-ip').value;
+    const status = document.getElementById('esp32-status');
+    
+    status.style.display = 'block';
+    status.style.background = '#fff3cd';
+    status.style.color = '#856404';
+    status.innerHTML = '🔄 Connexion au GPS_LapTimer...';
+    
+    try {
+        // TEST DE CONNEXION
+        const pingResponse = await fetch(`http://${ip}/api/ping`);
+        if (!pingResponse.ok) throw new Error('Connexion impossible');
         
+        // RÉCUPÉRER LA LISTE DES SESSIONS
+        const sessionsResponse = await fetch(`http://${ip}/api/sessions`);
+        if (!sessionsResponse.ok) throw new Error('Erreur lecture sessions');
+        
+        const sessions = await sessionsResponse.json();
+        
+        status.style.background = '#d4edda';
+        status.style.color = '#155724';
+        status.innerHTML = `✅ Connecté au GPS_LapTimer (${ip})<br><small>${sessions.length} session(s) disponible(s)</small>`;
+        
+        displayESP32Files(sessions, ip);
+    } catch (error) {
+        status.style.background = '#f8d7da';
+        status.style.color = '#721c24';
+        status.innerHTML = `❌ Erreur: ${error.message}<br><small>Vérifiez:<br>
+            1. GPS_LapTimer allumé<br>
+            2. Connecté au WiFi "GPS_LapTimer"<br>
+            3. IP correcte (défaut: 192.168.4.2)</small>`;
+    }
+}
+
+function displayESP32Files(sessions, ip) {
+    const container = document.getElementById('esp32-files-container');
+    const listDiv = document.getElementById('esp32-files-list');
+    
+    listDiv.style.display = 'block';
+    
+    if (!sessions || sessions.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999;">Aucune session trouvée</p>';
+        return;
+    }
+    
+    container.innerHTML = sessions.map(session => {
+        // Convertir secondes en format minute:seconde.centième
+        const totalSeconds = session.best;
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = Math.floor(totalSeconds % 60);
+        const centimes = Math.floor((totalSeconds % 1) * 100);
+        const formattedTime = `${minutes}'${seconds.toString().padStart(2, '0')}.${centimes.toString().padStart(2, '0')}`;
+        
+        return `
+            <div class="file-item" style="cursor: pointer;" onclick="loadESP32File('${ip}', '${session.filename}')">
+                <div class="file-item-content">
+                    <div class="file-item-header">
+                        <div class="file-item-title">📄 Session ${session.id}</div>
+                    </div>
+                    <div class="file-item-stats">
+                        <span>🏁 ${session.laps} tours</span>
+                        <span>⏱️ Meilleur: ${formattedTime}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function loadESP32File(ip, filename) {
+    try {
+        const response = await fetch(`http://${ip}/api/session?file=${encodeURIComponent(filename)}`);
+        if (!response.ok) throw new Error('Téléchargement impossible');
+        
+        const data = await response.json();
+        sessionData = data;
+        currentSessionId = 'gps_laptimer_' + data.id;
+        
+        // Sauvegarder automatiquement
+        saveSessionToStorage(data);
+        
+        document.getElementById('esp32-page').style.display = 'none';
+        displaySession();
+        
+        console.log('Session chargée depuis GPS_LapTimer:', data.id);
+    } catch (error) {
+        alert('Erreur de téléchargement: ' + error.message);
+    }
+}
         const uploadArea = document.getElementById('upload-area');
         const fileInput = document.getElementById('file-input');
         
