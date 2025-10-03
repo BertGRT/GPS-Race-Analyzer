@@ -754,12 +754,12 @@ if ('serviceWorker' in navigator) {
                 <p>Importer un fichier JSON depuis votre appareil</p>
             </div>
             
-            <!-- Option 2: ESP32 WiFi -->
-            <div class="connection-card" onclick="showESP32Mode()">
-                <div class="connection-icon">📡</div>
-                <h3>ESP32 GPS Logger</h3>
-                <p>Se connecter à l'ESP32 via WiFi</p>
-            </div>
+            <!-- Option 2: GPS_LapTimer WiFi -->
+<div class="connection-card" onclick="showESP32Mode()">
+    <div class="connection-icon">⏱️</div>
+    <h3>GPS_LapTimer</h3>
+    <p>Se connecter au chronomètre GPS via WiFi</p>
+</div>
             
             <!-- Option 3: Fichiers Stockés -->
             <div class="connection-card" onclick="showStoredFiles()" id="stored-files-card">
@@ -778,17 +778,17 @@ if ('serviceWorker' in navigator) {
             <input type="file" id="file-input" accept=".json" style="display: none;">
         </div>
         
-        <!-- MODE ESP32 -->
-        <div id="esp32-page" style="display: none;">
-            <button class="back-button" onclick="returnToHome()">← Retour</button>
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h2 style="color: #1976d2;">📡 Connexion ESP32</h2>
-            </div>
-            
-            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; margin: 0 auto;">
-                <div class="form-group">
-                    <label>Adresse IP de l'ESP32</label>
-                    <input type="text" id="esp32-ip" placeholder="192.168.4.1" value="192.168.4.1" 
+        <!-- MODE GPS_LAPTIMER -->
+<div id="esp32-page" style="display: none;">
+    <button class="back-button" onclick="returnToHome()">← Retour</button>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="color: #1976d2;">⏱️ Connexion GPS_LapTimer</h2>
+    </div>
+    
+    <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; margin: 0 auto;">
+        <div class="form-group">
+            <label>Adresse IP du GPS_LapTimer</label>
+            <input type="text" id="esp32-ip" placeholder="192.168.4.2" value="192.168.4.2"
                            style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;">
                 </div>
                 
@@ -1763,39 +1763,39 @@ async function downloadMultipleSessionsAsZip(sessions, selectedIndices) {
 // CONNEXION ESP32
 // ==========================================
 
-async function connectESP32() {
-    const ip = document.getElementById('esp32-ip').value;
-    const status = document.getElementById('esp32-status');
+function displayESP32Files(sessions, ip) {
+    const container = document.getElementById('esp32-files-container');
+    const listDiv = document.getElementById('esp32-files-list');
     
-    status.style.display = 'block';
-    status.style.background = '#fff3cd';
-    status.style.color = '#856404';
-    status.innerHTML = '🔄 Connexion à l\'ESP32...';
+    listDiv.style.display = 'block';
     
-    try {
-        // TEST DE CONNEXION
-        const pingResponse = await fetch(`http://${ip}/api/ping`);
-        if (!pingResponse.ok) throw new Error('Connexion impossible');
-        
-        // RÉCUPÉRER LA LISTE DES SESSIONS
-        const sessionsResponse = await fetch(`http://${ip}/api/sessions`);
-        if (!sessionsResponse.ok) throw new Error('Erreur lecture sessions');
-        
-        const sessions = await sessionsResponse.json();
-        
-        status.style.background = '#d4edda';
-        status.style.color = '#155724';
-        status.innerHTML = `✅ Connecté à l'ESP32 (${ip})<br><small>${sessions.length} session(s) disponible(s)</small>`;
-        
-        displayESP32Files(sessions, ip);
-    } catch (error) {
-        status.style.background = '#f8d7da';
-        status.style.color = '#721c24';
-        status.innerHTML = `❌ Erreur: ${error.message}<br><small>Vérifiez:<br>
-            1. ESP32 allumé<br>
-            2. Connecté au WiFi "GPS_LapTimer"<br>
-            3. IP correcte (défaut: 192.168.4.2)</small>`;
+    if (!sessions || sessions.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999;">Aucune session trouvée</p>';
+        return;
     }
+    
+    container.innerHTML = sessions.map(session => {
+        // Convertir secondes en format minute:seconde.centième
+        const totalSeconds = session.best;
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = Math.floor(totalSeconds % 60);
+        const centimes = Math.floor((totalSeconds % 1) * 100);
+        const formattedTime = `${minutes}'${seconds.toString().padStart(2, '0')}.${centimes.toString().padStart(2, '0')}`;
+        
+        return `
+            <div class="file-item" style="cursor: pointer;" onclick="loadESP32File('${ip}', '${session.filename}')">
+                <div class="file-item-content">
+                    <div class="file-item-header">
+                        <div class="file-item-title">📄 Session ${session.id}</div>
+                    </div>
+                    <div class="file-item-stats">
+                        <span>🏁 ${session.laps} tours</span>
+                        <span>⏱️ Meilleur: ${formattedTime}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function displayESP32Files(sessions, ip) {
@@ -1831,7 +1831,7 @@ async function loadESP32File(ip, filename) {
         
         const data = await response.json();
         sessionData = data;
-        currentSessionId = 'esp32_' + data.id;
+        currentSessionId = 'gps_laptimer_' + data.id;
         
         // Sauvegarder automatiquement
         saveSessionToStorage(data);
@@ -1839,7 +1839,7 @@ async function loadESP32File(ip, filename) {
         document.getElementById('esp32-page').style.display = 'none';
         displaySession();
         
-        console.log('Session chargée depuis ESP32:', data.id);
+        console.log('Session chargée depuis GPS_LapTimer:', data.id);
     } catch (error) {
         alert('Erreur de téléchargement: ' + error.message);
     }
