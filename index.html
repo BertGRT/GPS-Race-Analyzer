@@ -1938,38 +1938,13 @@ async function downloadSelectedESP32Sessions(ip) {
         return;
     }
     
-    if (selectedFiles.length === 1) {
-        await downloadSingleESP32Session(ip, selectedFiles[0]);
-    } else {
-        await downloadMultipleESP32Sessions(ip, selectedFiles);
-    }
+    // Télécharger tous les fichiers séparément (pas de ZIP)
+    await downloadMultipleSeparateFiles(ip, selectedFiles);
 }
 
-async function downloadSingleESP32Session(ip, filename) {
+async function downloadMultipleSeparateFiles(ip, filenames) {
     try {
-        const response = await fetch(`http://${ip}/api/session?file=${encodeURIComponent(filename)}`);
-        if (!response.ok) throw new Error('Téléchargement impossible');
-        
-        const data = await response.json();
-        const json = JSON.stringify(data, null, 2);
-        downloadFile(json, `gps_session_${data.id}.json`, 'application/json');
-        
-        alert('Session téléchargée avec succès !');
-    } catch (error) {
-        alert('Erreur de téléchargement: ' + error.message);
-    }
-}
-
-async function downloadMultipleESP32Sessions(ip, filenames) {
-    if (typeof JSZip === 'undefined') {
-        alert('Bibliothèque ZIP non disponible.');
-        return;
-    }
-    
-    try {
-        const zip = new JSZip();
-        const folder = zip.folder('gps_sessions');
-        
+        // Afficher la barre de progression
         const progressDiv = document.createElement('div');
         progressDiv.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 50px rgba(0,0,0,0.3); z-index: 10000; text-align: center;';
         progressDiv.innerHTML = `
@@ -1981,26 +1956,55 @@ async function downloadMultipleESP32Sessions(ip, filenames) {
         `;
         document.body.appendChild(progressDiv);
         
+        // Télécharger chaque fichier individuellement
         for (let i = 0; i < filenames.length; i++) {
-            const response = await fetch(`http://${ip}/api/session?file=${encodeURIComponent(filenames[i])}`);
-            if (response.ok) {
-                const data = await response.json();
-                folder.file(`session_${data.id}.json`, JSON.stringify(data, null, 2));
+            const filename = filenames[i];
+            
+            try {
+                const response = await fetch(`http://${ip}/api/session?file=${encodeURIComponent(filename)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const json = JSON.stringify(data, null, 2);
+                    
+                    // Télécharger immédiatement ce fichier
+                    const blob = new Blob([json], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `session_${data.id}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    // Petit délai entre chaque téléchargement (évite les blocages navigateur)
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+            } catch (error) {
+                console.error(`Erreur téléchargement ${filename}:`, error);
             }
             
-            document.getElementById('progress-bar').style.width = ((i + 1) / filenames.length * 100) + '%';
+            // Mettre à jour la progression
+            const progress = ((i + 1) / filenames.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
             document.getElementById('progress-text').textContent = `${i + 1} / ${filenames.length}`;
         }
         
-        const content = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
-        downloadFile(content, `gps_sessions_${new Date().toISOString().split('T')[0]}.zip`, 'application/zip');
-        
+        // Fermer la barre de progression
         document.body.removeChild(progressDiv);
-        alert(`${filenames.length} sessions téléchargées !`);
+        alert(`${filenames.length} session(s) téléchargée(s) avec succès !`);
+        
     } catch (error) {
-        alert('Erreur: ' + error.message);
+        alert('Erreur lors du téléchargement: ' + error.message);
+        const progressDiv = document.querySelector('[id="progress-bar"]');
+        if (progressDiv && progressDiv.parentElement && progressDiv.parentElement.parentElement) {
+            document.body.removeChild(progressDiv.parentElement.parentElement);
+        }
     }
 }
+
+
+
 
 async function loadESP32File(ip, filename) {
     try {
@@ -2066,19 +2070,21 @@ async function loadESP32File(ip, filename) {
 }
         
         function displaySession() {
-
-     if (!document.querySelector('.back-button')) {
-    const backBtn = document.createElement('button');
-    backBtn.className = 'back-button';
-    backBtn.textContent = '← Changer de fichier';
-    backBtn.onclick = returnToFileSelection;
-    document.getElementById('session-content').insertBefore(
-        backBtn, 
-        document.getElementById('session-content').firstChild
-    );
-}     
-    document.getElementById('upload-area').style.display = 'none';
+document.getElementById('upload-area').style.display = 'none';
     document.getElementById('session-content').style.display = 'block';
+
+     if (!document.querySelector('#session-back-button')) {
+        const backBtn = document.createElement('button');
+        backBtn.id = 'session-back-button';
+        backBtn.className = 'back-button';
+        backBtn.textContent = '← Changer de fichier';
+        backBtn.onclick = returnToFileSelection;
+        document.getElementById('session-content').insertBefore(
+            backBtn, 
+            document.getElementById('session-content').firstChild
+        );
+    }
+    
     
     document.getElementById('session-title').textContent = 'Session Circuit - Analyse GPS';
     
