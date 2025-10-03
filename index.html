@@ -66,7 +66,166 @@ if ('serviceWorker' in navigator) {
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 30px;
+            position: relative;
         }
+
+       
+
+#home-page {
+    display: block;
+}
+
+.connection-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin: 20px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid #e0e0e0;
+    text-align: center;
+}
+
+.connection-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    border-color: #667eea;
+}
+
+.connection-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+}
+
+.connection-card h3 {
+    color: #1976d2;
+    margin-bottom: 10px;
+}
+
+.connection-card p {
+    color: #666;
+    margin: 0;
+}
+
+.back-button {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+}
+
+.back-button:hover {
+    background: #d32f2f;
+    transform: translateX(-3px);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* ===== STYLES POUR LA LISTE DES FICHIERS ===== */
+
+.file-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    border-left: 4px solid #1976d2;
+    transition: all 0.2s ease;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.file-item:hover {
+    background: #e3f2fd;
+}
+
+.file-item-checkbox {
+    margin-top: 5px;
+}
+
+.file-item-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.file-item-content {
+    flex: 1;
+}
+
+.file-item.selected {
+    background: #e8f5e9;
+    border-left-color: #4caf50;
+}
+
+.file-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.file-item-title {
+    font-weight: bold;
+    color: #1976d2;
+    font-size: 1.1rem;
+}
+
+.file-item-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.file-item-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.file-item-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.file-action-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-load {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-delete {
+    background: #f44336;
+    color: white;
+}
+
+.file-action-btn:hover {
+    transform: scale(1.05);
+}
         
         .upload-area:hover {
             border-color: #764ba2;
@@ -581,11 +740,97 @@ if ('serviceWorker' in navigator) {
     </div>
     
     <div class="container">
-        <div class="upload-area" id="upload-area">
+        <!-- PAGE D'ACCUEIL / CONNEXION -->
+        <div id="home-page">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h2 style="color: #1976d2; margin-bottom: 20px;">🏁 Bienvenue</h2>
+                <p style="color: #666; font-size: 1.1rem;">Choisissez une source de données</p>
+            </div>
+            
+            <!-- Option 1: Fichier Local -->
+            <div class="connection-card" onclick="showLocalFileMode()">
+                <div class="connection-icon">📁</div>
+                <h3>Fichier Local</h3>
+                <p>Importer un fichier JSON depuis votre appareil</p>
+            </div>
+            
+            <!-- Option 2: ESP32 WiFi -->
+            <div class="connection-card" onclick="showESP32Mode()">
+                <div class="connection-icon">📡</div>
+                <h3>ESP32 GPS Logger</h3>
+                <p>Se connecter à l'ESP32 via WiFi</p>
+            </div>
+            
+            <!-- Option 3: Fichiers Stockés -->
+            <div class="connection-card" onclick="showStoredFiles()" id="stored-files-card">
+                <div class="connection-icon">💾</div>
+                <h3>Sessions Sauvegardées</h3>
+                <p id="stored-count">Aucune session</p>
+            </div>
+        </div>
+        
+        <!-- MODE FICHIER LOCAL -->
+        <div class="upload-area" id="upload-area" style="display: none;">
+            <button class="back-button" onclick="returnToHome()">← Retour</button>
             <div class="upload-icon">📁</div>
             <h3>Glissez-deposez votre fichier JSON</h3>
             <p>ou cliquez pour selectionner</p>
             <input type="file" id="file-input" accept=".json" style="display: none;">
+        </div>
+        
+        <!-- MODE ESP32 -->
+        <div id="esp32-page" style="display: none;">
+            <button class="back-button" onclick="returnToHome()">← Retour</button>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #1976d2;">📡 Connexion ESP32</h2>
+            </div>
+            
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; margin: 0 auto;">
+                <div class="form-group">
+                    <label>Adresse IP de l'ESP32</label>
+                    <input type="text" id="esp32-ip" placeholder="192.168.4.1" value="192.168.4.1" 
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;">
+                </div>
+                
+                <div id="esp32-status" style="padding: 15px; border-radius: 8px; margin: 20px 0; display: none;"></div>
+                
+                <button onclick="connectESP32()" style="width: 100%; padding: 15px; background: linear-gradient(45deg, #1976d2, #42a5f5); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px;">
+                    🔗 Se Connecter
+                </button>
+                
+                <div id="esp32-files-list" style="margin-top: 30px; display: none;">
+                    <h3 style="color: #1976d2; margin-bottom: 15px;">📂 Fichiers Disponibles</h3>
+                    <div id="esp32-files-container"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- LISTE DES FICHIERS STOCKÉS -->
+        <div id="stored-files-page" style="display: none;">
+            <button class="back-button" onclick="returnToHome()">← Retour</button>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #1976d2;">💾 Sessions Sauvegardées</h2>
+            </div>
+            
+            <div style="max-width: 800px; margin: 0 auto 20px auto; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                <button onclick="selectAllSessions()" style="padding: 10px 20px; background: #2196f3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    ☑️ Tout sélectionner
+                </button>
+                <button onclick="deselectAllSessions()" style="padding: 10px 20px; background: #9e9e9e; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    ☐ Tout désélectionner
+                </button>
+                <button id="download-selected-btn" onclick="downloadSelectedSessions()" style="padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: none;">
+                    📥 Télécharger (<span id="selected-count">0</span>)
+                </button>
+            </div>
+            
+            <div id="stored-files-list" style="max-width: 800px; margin: 0 auto;"></div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button onclick="clearAllSessions()" style="padding: 12px 25px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    🗑️ Supprimer Toutes les Sessions
+                </button>
+            </div>
         </div>
         
         <div id="session-content">
@@ -798,6 +1043,7 @@ if ('serviceWorker' in navigator) {
         let comparisonChart = null;
         let isComparisonMode = false;
         let currentReplayData = null;
+        let currentSessionId = null;
 
         // BASE DE DONNÉES COMPLÈTE - 155 CIRCUITS OUTDOOR FRANCE
 const CIRCUITS_DATABASE = [
@@ -1260,6 +1506,349 @@ console.log(`Base de données chargée: ${CIRCUITS_DATABASE.length} circuits`);
 console.log(`- Auto: ${CIRCUITS_DATABASE.filter(c => c.type === 'auto').length}`);
 console.log(`- Karting: ${CIRCUITS_DATABASE.filter(c => c.type === 'karting').length}`);
 console.log(`- Moto: ${CIRCUITS_DATABASE.filter(c => c.type === 'moto').length}`);
+
+
+// ==========================================
+// GESTION DES PAGES
+// ==========================================
+
+function showLocalFileMode() {
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('upload-area').style.display = 'block';
+}
+
+function showESP32Mode() {
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('esp32-page').style.display = 'block';
+}
+
+function showStoredFiles() {
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('stored-files-page').style.display = 'block';
+    loadStoredFilesList();
+}
+
+function returnToHome() {
+    // Cacher toutes les pages
+    document.getElementById('upload-area').style.display = 'none';
+    document.getElementById('esp32-page').style.display = 'none';
+    document.getElementById('stored-files-page').style.display = 'none';
+    document.getElementById('session-content').style.display = 'none';
+    
+    // Réinitialiser
+    if (map) {
+        map.remove();
+        map = null;
+    }
+    sessionData = null;
+    currentSessionId = null;
+    
+    // Retour à l'accueil
+    document.getElementById('home-page').style.display = 'block';
+    updateStoredFilesCount();
+}
+
+function returnToFileSelection() {
+    document.getElementById('session-content').style.display = 'none';
+    if (map) {
+        map.remove();
+        map = null;
+    }
+    
+    // Retourner à la page d'origine
+    if (currentSessionId && currentSessionId.startsWith('stored_')) {
+        showStoredFiles();
+    } else {
+        showLocalFileMode();
+    }
+}
+
+// ==========================================
+// STOCKAGE LOCAL
+// ==========================================
+
+function saveSessionToStorage(data) {
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    const sessionId = 'stored_' + Date.now();
+    
+    sessions.push({
+        id: sessionId,
+        data: data,
+        savedAt: Date.now(),
+        name: `Session ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`
+    });
+    
+    localStorage.setItem('gpsSessions', JSON.stringify(sessions));
+    updateStoredFilesCount();
+    return sessionId;
+}
+
+function loadStoredFilesList() {
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    const container = document.getElementById('stored-files-list');
+    
+    if (sessions.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 50px;">Aucune session sauvegardée</p>';
+        return;
+    }
+    
+    container.innerHTML = sessions.map((session, index) => {
+        const date = new Date(session.savedAt);
+        const data = session.data;
+        
+        return `
+            <div class="file-item" id="file-item-${index}">
+                <div class="file-item-checkbox">
+                    <input type="checkbox" id="checkbox-${index}" onchange="updateSelectedCount()">
+                </div>
+                <div class="file-item-content">
+                    <div class="file-item-header">
+                        <div class="file-item-title">${session.name}</div>
+                        <div class="file-item-date">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</div>
+                    </div>
+                    <div class="file-item-stats">
+                        <span>🏁 ${data.laps} tours</span>
+                        <span>⏱️ Meilleur: ${formatTime(data.best)}</span>
+                        <span>🚀 ${data.maxSpd.toFixed(1)} km/h</span>
+                    </div>
+                    <div class="file-item-actions">
+                        <button class="file-action-btn btn-load" onclick="loadStoredSession(${index})">
+                            📊 Analyser
+                        </button>
+                        <button class="file-action-btn btn-delete" onclick="deleteStoredSession(${index})">
+                            🗑️ Supprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    updateSelectedCount();
+}
+
+function loadStoredSession(index) {
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    if (sessions[index]) {
+        currentSessionId = sessions[index].id;
+        sessionData = sessions[index].data;
+        document.getElementById('stored-files-page').style.display = 'none';
+        displaySession();
+    }
+}
+
+function deleteStoredSession(index) {
+    if (!confirm('Supprimer cette session ?')) return;
+    
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    sessions.splice(index, 1);
+    localStorage.setItem('gpsSessions', JSON.stringify(sessions));
+    loadStoredFilesList();
+    updateStoredFilesCount();
+}
+
+function clearAllSessions() {
+    if (!confirm('Supprimer TOUTES les sessions sauvegardées ? Cette action est irréversible.')) return;
+    
+    localStorage.removeItem('gpsSessions');
+    loadStoredFilesList();
+    updateStoredFilesCount();
+}
+
+function updateStoredFilesCount() {
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    const countElement = document.getElementById('stored-count');
+    if (countElement) {
+        countElement.textContent = sessions.length === 0 ? 'Aucune session' : `${sessions.length} session(s) disponible(s)`;
+    }
+}
+
+function selectAllSessions() {
+    const checkboxes = document.querySelectorAll('[id^="checkbox-"]');
+    checkboxes.forEach(cb => cb.checked = true);
+    updateSelectedCount();
+}
+
+function deselectAllSessions() {
+    const checkboxes = document.querySelectorAll('[id^="checkbox-"]');
+    checkboxes.forEach(cb => cb.checked = false);
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const checkboxes = document.querySelectorAll('[id^="checkbox-"]:checked');
+    const count = checkboxes.length;
+    const btn = document.getElementById('download-selected-btn');
+    const countSpan = document.getElementById('selected-count');
+    
+    if (btn && countSpan) {
+        if (count > 0) {
+            btn.style.display = 'inline-block';
+            countSpan.textContent = count;
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+    
+    // Mettre en surbrillance les items sélectionnés
+    document.querySelectorAll('.file-item').forEach((item, index) => {
+        const checkbox = document.getElementById(`checkbox-${index}`);
+        if (checkbox && checkbox.checked) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+async function downloadSelectedSessions() {
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    const checkboxes = document.querySelectorAll('[id^="checkbox-"]:checked');
+    const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.id.replace('checkbox-', '')));
+    
+    if (selectedIndices.length === 0) {
+        alert('Aucune session sélectionnée');
+        return;
+    }
+    
+    if (selectedIndices.length === 1) {
+        // Télécharger un seul fichier JSON
+        const session = sessions[selectedIndices[0]];
+        const json = JSON.stringify(session.data, null, 2);
+        const filename = `session_${session.data.id || 'export'}.json`;
+        downloadFile(json, filename, 'application/json');
+    } else {
+        // Télécharger plusieurs fichiers en ZIP
+        await downloadMultipleSessionsAsZip(sessions, selectedIndices);
+    }
+}
+
+async function downloadMultipleSessionsAsZip(sessions, selectedIndices) {
+    if (typeof JSZip === 'undefined') {
+        alert('Bibliothèque ZIP non chargée. Téléchargement des fichiers individuellement...');
+        selectedIndices.forEach(index => {
+            const session = sessions[index];
+            const json = JSON.stringify(session.data, null, 2);
+            const filename = `session_${session.data.id || index}.json`;
+            downloadFile(json, filename, 'application/json');
+        });
+        return;
+    }
+    
+    const zip = new JSZip();
+    const folder = zip.folder('gps_sessions');
+    
+    selectedIndices.forEach(index => {
+        const session = sessions[index];
+        const json = JSON.stringify(session.data, null, 2);
+        const filename = `session_${session.data.id || index}.json`;
+        folder.file(filename, json);
+    });
+    
+    try {
+        const content = await zip.generateAsync({
+            type: 'blob',
+            compression: 'DEFLATE',
+            compressionOptions: { level: 9 }
+        });
+        
+        const timestamp = new Date().toISOString().split('T')[0];
+        downloadFile(content, `gps_sessions_${timestamp}.zip`, 'application/zip');
+    } catch (error) {
+        alert('Erreur lors de la création du ZIP: ' + error.message);
+    }
+}
+
+// ==========================================
+// CONNEXION ESP32
+// ==========================================
+
+async function connectESP32() {
+    const ip = document.getElementById('esp32-ip').value;
+    const status = document.getElementById('esp32-status');
+    
+    status.style.display = 'block';
+    status.style.background = '#fff3cd';
+    status.style.color = '#856404';
+    status.innerHTML = '🔄 Connexion à l\'ESP32...';
+    
+    try {
+        // TEST DE CONNEXION
+        const pingResponse = await fetch(`http://${ip}/api/ping`);
+        if (!pingResponse.ok) throw new Error('Connexion impossible');
+        
+        // RÉCUPÉRER LA LISTE DES SESSIONS
+        const sessionsResponse = await fetch(`http://${ip}/api/sessions`);
+        if (!sessionsResponse.ok) throw new Error('Erreur lecture sessions');
+        
+        const sessions = await sessionsResponse.json();
+        
+        status.style.background = '#d4edda';
+        status.style.color = '#155724';
+        status.innerHTML = `✅ Connecté à l'ESP32 (${ip})<br><small>${sessions.length} session(s) disponible(s)</small>`;
+        
+        displayESP32Files(sessions, ip);
+    } catch (error) {
+        status.style.background = '#f8d7da';
+        status.style.color = '#721c24';
+        status.innerHTML = `❌ Erreur: ${error.message}<br><small>Vérifiez:<br>
+            1. ESP32 allumé<br>
+            2. Connecté au WiFi "GPS_LapTimer"<br>
+            3. IP correcte (défaut: 192.168.4.2)</small>`;
+    }
+}
+
+function displayESP32Files(sessions, ip) {
+    const container = document.getElementById('esp32-files-container');
+    const listDiv = document.getElementById('esp32-files-list');
+    
+    listDiv.style.display = 'block';
+    
+    if (!sessions || sessions.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999;">Aucune session trouvée</p>';
+        return;
+    }
+    
+    container.innerHTML = sessions.map(session => `
+        <div class="file-item" style="cursor: pointer;" onclick="loadESP32File('${ip}', '${session.filename}')">
+            <div class="file-item-content">
+                <div class="file-item-header">
+                    <div class="file-item-title">📄 Session ${session.id}</div>
+                </div>
+                <div class="file-item-stats">
+                    <span>🏁 ${session.laps} tours</span>
+                    <span>⏱️ Meilleur: ${session.best.toFixed(2)}s</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function loadESP32File(ip, filename) {
+    try {
+        const response = await fetch(`http://${ip}/api/session?file=${encodeURIComponent(filename)}`);
+        if (!response.ok) throw new Error('Téléchargement impossible');
+        
+        const data = await response.json();
+        sessionData = data;
+        currentSessionId = 'esp32_' + data.id;
+        
+        // Sauvegarder automatiquement
+        saveSessionToStorage(data);
+        
+        document.getElementById('esp32-page').style.display = 'none';
+        displaySession();
+        
+        console.log('Session chargée depuis ESP32:', data.id);
+    } catch (error) {
+        alert('Erreur de téléchargement: ' + error.message);
+    }
+}
+
+// Initialisation au chargement
+window.addEventListener('DOMContentLoaded', () => {
+    updateStoredFilesCount();
+});
         
         const uploadArea = document.getElementById('upload-area');
         const fileInput = document.getElementById('file-input');
@@ -1283,19 +1872,39 @@ console.log(`- Moto: ${CIRCUITS_DATABASE.filter(c => c.type === 'moto').length}`
         });
        
         function loadSession(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    sessionData = JSON.parse(e.target.result);
-                    displaySession();
-                } catch (error) {
-                    alert('Erreur de lecture du fichier JSON: ' + error.message);
-                }
-            };
-            reader.readAsText(file);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            sessionData = JSON.parse(e.target.result);
+            
+            // NOUVEAU : Proposer de sauvegarder
+            if (confirm('Voulez-vous sauvegarder cette session localement pour un accès rapide ultérieur ?')) {
+                currentSessionId = saveSessionToStorage(sessionData);
+            } else {
+                currentSessionId = 'temp_' + Date.now();
+            }
+            
+            document.getElementById('upload-area').style.display = 'none';
+            displaySession();
+        } catch (error) {
+            alert('Erreur de lecture du fichier JSON: ' + error.message);
         }
+    };
+    reader.readAsText(file);
+}
         
         function displaySession() {
+
+     if (!document.querySelector('.back-button')) {
+    const backBtn = document.createElement('button');
+    backBtn.className = 'back-button';
+    backBtn.textContent = '← Changer de fichier';
+    backBtn.onclick = returnToFileSelection;
+    document.getElementById('session-content').insertBefore(
+        backBtn, 
+        document.getElementById('session-content').firstChild
+    );
+}     
     document.getElementById('upload-area').style.display = 'none';
     document.getElementById('session-content').style.display = 'block';
     
@@ -1340,7 +1949,7 @@ console.log(`- Moto: ${CIRCUITS_DATABASE.filter(c => c.type === 'moto').length}`
             const totalTime = sessionData.times.reduce((a, b) => a + b, 0);
             document.getElementById('stat-total').textContent = formatTime(totalTime);
 
-            
+           
             
             displayLapsTable();
             displayAnalysis();
