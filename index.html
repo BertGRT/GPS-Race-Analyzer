@@ -1763,66 +1763,9 @@ async function downloadMultipleSessionsAsZip(sessions, selectedIndices) {
 // CONNEXION ESP32
 // ==========================================
 
-function displayESP32Files(sessions, ip) {
-    const container = document.getElementById('esp32-files-container');
-    const listDiv = document.getElementById('esp32-files-list');
-    
-    listDiv.style.display = 'block';
-    
-    if (!sessions || sessions.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #999;">Aucune session trouvée</p>';
-        return;
-    }
-    
-    container.innerHTML = sessions.map(session => {
-        // Convertir secondes en format minute:seconde.centième
-        const totalSeconds = session.best;
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = Math.floor(totalSeconds % 60);
-        const centimes = Math.floor((totalSeconds % 1) * 100);
-        const formattedTime = `${minutes}'${seconds.toString().padStart(2, '0')}.${centimes.toString().padStart(2, '0')}`;
-        
-        return `
-            <div class="file-item" style="cursor: pointer;" onclick="loadESP32File('${ip}', '${session.filename}')">
-                <div class="file-item-content">
-                    <div class="file-item-header">
-                        <div class="file-item-title">📄 Session ${session.id}</div>
-                    </div>
-                    <div class="file-item-stats">
-                        <span>🏁 ${session.laps} tours</span>
-                        <span>⏱️ Meilleur: ${formattedTime}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
 
-function displayESP32Files(sessions, ip) {
-    const container = document.getElementById('esp32-files-container');
-    const listDiv = document.getElementById('esp32-files-list');
-    
-    listDiv.style.display = 'block';
-    
-    if (!sessions || sessions.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #999;">Aucune session trouvée</p>';
-        return;
-    }
-    
-    container.innerHTML = sessions.map(session => `
-        <div class="file-item" style="cursor: pointer;" onclick="loadESP32File('${ip}', '${session.filename}')">
-            <div class="file-item-content">
-                <div class="file-item-header">
-                    <div class="file-item-title">📄 Session ${session.id}</div>
-                </div>
-                <div class="file-item-stats">
-                    <span>🏁 ${session.laps} tours</span>
-                    <span>⏱️ Meilleur: ${session.best.toFixed(2)}s</span>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
+
+
 
 async function loadESP32File(ip, filename) {
     try {
@@ -1899,8 +1842,23 @@ function displayESP32Files(sessions, ip) {
         return;
     }
     
-    container.innerHTML = sessions.map(session => {
-        // Convertir secondes en format minute:seconde.centième
+    // NOUVEAU : Boutons de contrôle
+    const controlsHTML = `
+        <div style="max-width: 800px; margin: 0 auto 20px auto; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+            <button onclick="selectAllESP32Sessions()" style="padding: 10px 20px; background: #2196f3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                ☑️ Tout sélectionner
+            </button>
+            <button onclick="deselectAllESP32Sessions()" style="padding: 10px 20px; background: #9e9e9e; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                ☐ Tout désélectionner
+            </button>
+            <button id="download-esp32-selected-btn" onclick="downloadSelectedESP32Sessions('${ip}')" style="padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: none;">
+                📥 Télécharger (<span id="esp32-selected-count">0</span>)
+            </button>
+        </div>
+    `;
+    
+    // NOUVEAU : Cases à cocher pour chaque session
+    const sessionsHTML = sessions.map((session, index) => {
         const totalSeconds = session.best;
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = Math.floor(totalSeconds % 60);
@@ -1908,7 +1866,10 @@ function displayESP32Files(sessions, ip) {
         const formattedTime = `${minutes}'${seconds.toString().padStart(2, '0')}.${centimes.toString().padStart(2, '0')}`;
         
         return `
-            <div class="file-item" style="cursor: pointer;" onclick="loadESP32File('${ip}', '${session.filename}')">
+            <div class="file-item" id="esp32-file-item-${index}">
+                <div class="file-item-checkbox">
+                    <input type="checkbox" id="esp32-checkbox-${index}" data-filename="${session.filename}" onchange="updateESP32SelectedCount()">
+                </div>
                 <div class="file-item-content">
                     <div class="file-item-header">
                         <div class="file-item-title">📄 Session ${session.id}</div>
@@ -1917,10 +1878,128 @@ function displayESP32Files(sessions, ip) {
                         <span>🏁 ${session.laps} tours</span>
                         <span>⏱️ Meilleur: ${formattedTime}</span>
                     </div>
+                    <div class="file-item-actions">
+                        <button class="file-action-btn btn-load" onclick="loadESP32File('${ip}', '${session.filename}')">
+                            📊 Analyser
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
     }).join('');
+    
+    container.innerHTML = controlsHTML + '<div style="max-width: 800px; margin: 0 auto;">' + sessionsHTML + '</div>';
+    updateESP32SelectedCount();
+}
+
+function selectAllESP32Sessions() {
+    const checkboxes = document.querySelectorAll('[id^="esp32-checkbox-"]');
+    checkboxes.forEach(cb => cb.checked = true);
+    updateESP32SelectedCount();
+}
+
+function deselectAllESP32Sessions() {
+    const checkboxes = document.querySelectorAll('[id^="esp32-checkbox-"]');
+    checkboxes.forEach(cb => cb.checked = false);
+    updateESP32SelectedCount();
+}
+
+function updateESP32SelectedCount() {
+    const checkboxes = document.querySelectorAll('[id^="esp32-checkbox-"]:checked');
+    const count = checkboxes.length;
+    const btn = document.getElementById('download-esp32-selected-btn');
+    const countSpan = document.getElementById('esp32-selected-count');
+    
+    if (btn && countSpan) {
+        if (count > 0) {
+            btn.style.display = 'inline-block';
+            countSpan.textContent = count;
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+    
+    document.querySelectorAll('[id^="esp32-file-item-"]').forEach((item, index) => {
+        const checkbox = document.getElementById(`esp32-checkbox-${index}`);
+        if (checkbox && checkbox.checked) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+async function downloadSelectedESP32Sessions(ip) {
+    const checkboxes = document.querySelectorAll('[id^="esp32-checkbox-"]:checked');
+    const selectedFiles = Array.from(checkboxes).map(cb => cb.dataset.filename);
+    
+    if (selectedFiles.length === 0) {
+        alert('Aucune session sélectionnée');
+        return;
+    }
+    
+    if (selectedFiles.length === 1) {
+        await downloadSingleESP32Session(ip, selectedFiles[0]);
+    } else {
+        await downloadMultipleESP32Sessions(ip, selectedFiles);
+    }
+}
+
+async function downloadSingleESP32Session(ip, filename) {
+    try {
+        const response = await fetch(`http://${ip}/api/session?file=${encodeURIComponent(filename)}`);
+        if (!response.ok) throw new Error('Téléchargement impossible');
+        
+        const data = await response.json();
+        const json = JSON.stringify(data, null, 2);
+        downloadFile(json, `gps_session_${data.id}.json`, 'application/json');
+        
+        alert('Session téléchargée avec succès !');
+    } catch (error) {
+        alert('Erreur de téléchargement: ' + error.message);
+    }
+}
+
+async function downloadMultipleESP32Sessions(ip, filenames) {
+    if (typeof JSZip === 'undefined') {
+        alert('Bibliothèque ZIP non disponible.');
+        return;
+    }
+    
+    try {
+        const zip = new JSZip();
+        const folder = zip.folder('gps_sessions');
+        
+        const progressDiv = document.createElement('div');
+        progressDiv.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 50px rgba(0,0,0,0.3); z-index: 10000; text-align: center;';
+        progressDiv.innerHTML = `
+            <h3 style="margin-bottom: 15px; color: #1976d2;">Téléchargement en cours...</h3>
+            <div style="width: 300px; height: 30px; background: #e0e0e0; border-radius: 15px; overflow: hidden;">
+                <div id="progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #4caf50, #8bc34a); transition: width 0.3s;"></div>
+            </div>
+            <p id="progress-text" style="margin-top: 10px; color: #666;">0 / ${filenames.length}</p>
+        `;
+        document.body.appendChild(progressDiv);
+        
+        for (let i = 0; i < filenames.length; i++) {
+            const response = await fetch(`http://${ip}/api/session?file=${encodeURIComponent(filenames[i])}`);
+            if (response.ok) {
+                const data = await response.json();
+                folder.file(`session_${data.id}.json`, JSON.stringify(data, null, 2));
+            }
+            
+            document.getElementById('progress-bar').style.width = ((i + 1) / filenames.length * 100) + '%';
+            document.getElementById('progress-text').textContent = `${i + 1} / ${filenames.length}`;
+        }
+        
+        const content = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+        downloadFile(content, `gps_sessions_${new Date().toISOString().split('T')[0]}.zip`, 'application/zip');
+        
+        document.body.removeChild(progressDiv);
+        alert(`${filenames.length} sessions téléchargées !`);
+    } catch (error) {
+        alert('Erreur: ' + error.message);
+    }
 }
 
 async function loadESP32File(ip, filename) {
