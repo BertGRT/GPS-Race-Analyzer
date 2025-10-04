@@ -1823,13 +1823,13 @@ function displayESP32Files(sessions, ip) {
     const controlsHTML = `
         <div style="max-width: 800px; margin: 0 auto 20px auto; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
             <button onclick="selectAllESP32Sessions()" style="padding: 10px 20px; background: #2196f3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
-                Tout sélectionner
+                ☑️ Tout sélectionner
             </button>
             <button onclick="deselectAllESP32Sessions()" style="padding: 10px 20px; background: #9e9e9e; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
-                Tout désélectionner
+                ☐ Tout désélectionner
             </button>
             <button id="download-esp32-selected-btn" onclick="downloadSelectedESP32Sessions('${ip}')" style="padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: none;">
-                Télécharger (<span id="esp32-selected-count">0</span>)
+                📥 Télécharger (<span id="esp32-selected-count">0</span>)
             </button>
         </div>
     `;
@@ -1841,10 +1841,13 @@ function displayESP32Files(sessions, ip) {
         const centimes = Math.floor((totalSeconds % 1) * 100);
         const formattedTime = `${minutes}'${seconds.toString().padStart(2, '0')}.${centimes.toString().padStart(2, '0')}`;
         
+        // LIGNE MODIFIÉE : ajout d'un fallback pour filename
+        const filename = session.filename || `session_${session.id}.json`;
+        
         return `
             <div class="file-item" id="esp32-file-item-${index}">
                 <div class="file-item-checkbox">
-                    <input type="checkbox" id="esp32-checkbox-${index}" data-filename="${session.filename}" onchange="updateESP32SelectedCount()">
+                    <input type="checkbox" id="esp32-checkbox-${index}" data-filename="${filename}" onchange="updateESP32SelectedCount()">
                 </div>
                 <div class="file-item-content">
                     <div class="file-item-header">
@@ -1855,8 +1858,8 @@ function displayESP32Files(sessions, ip) {
                         <span>⏱️ Meilleur: ${formattedTime}</span>
                     </div>
                     <div class="file-item-actions">
-                        <button class="file-action-btn btn-load" onclick="loadESP32File('${ip}', '${session.filename}')">
-                            Analyser
+                        <button class="file-action-btn btn-load" onclick="loadESP32File('${ip}', '${filename}')">
+                            📊 Analyser
                         </button>
                     </div>
                 </div>
