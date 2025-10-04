@@ -1766,28 +1766,6 @@ async function downloadMultipleSessionsAsZip(sessions, selectedIndices) {
 
 
 
-
-async function loadESP32File(ip, filename) {
-    try {
-        const response = await fetch(`http://${ip}/api/session?file=${encodeURIComponent(filename)}`);
-        if (!response.ok) throw new Error('Téléchargement impossible');
-        
-        const data = await response.json();
-        sessionData = data;
-        currentSessionId = 'gps_laptimer_' + data.id;
-        
-        // Sauvegarder automatiquement
-        saveSessionToStorage(data);
-        
-        document.getElementById('esp32-page').style.display = 'none';
-        displaySession();
-        
-        console.log('Session chargée depuis GPS_LapTimer:', data.id);
-    } catch (error) {
-        alert('Erreur de téléchargement: ' + error.message);
-    }
-}
-
 // Initialisation au chargement
 window.addEventListener('DOMContentLoaded', () => {
     updateStoredFilesCount();
@@ -1842,22 +1820,20 @@ function displayESP32Files(sessions, ip) {
         return;
     }
     
-    // NOUVEAU : Boutons de contrôle
     const controlsHTML = `
         <div style="max-width: 800px; margin: 0 auto 20px auto; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
             <button onclick="selectAllESP32Sessions()" style="padding: 10px 20px; background: #2196f3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
-                ☑️ Tout sélectionner
+                Tout sélectionner
             </button>
             <button onclick="deselectAllESP32Sessions()" style="padding: 10px 20px; background: #9e9e9e; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
-                ☐ Tout désélectionner
+                Tout désélectionner
             </button>
             <button id="download-esp32-selected-btn" onclick="downloadSelectedESP32Sessions('${ip}')" style="padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: none;">
-                📥 Télécharger (<span id="esp32-selected-count">0</span>)
+                Télécharger (<span id="esp32-selected-count">0</span>)
             </button>
         </div>
     `;
     
-    // NOUVEAU : Cases à cocher pour chaque session
     const sessionsHTML = sessions.map((session, index) => {
         const totalSeconds = session.best;
         const minutes = Math.floor(totalSeconds / 60);
@@ -1872,7 +1848,7 @@ function displayESP32Files(sessions, ip) {
                 </div>
                 <div class="file-item-content">
                     <div class="file-item-header">
-                        <div class="file-item-title">📄 Session ${session.id}</div>
+                        <div class="file-item-title">Session ${session.id}</div>
                     </div>
                     <div class="file-item-stats">
                         <span>🏁 ${session.laps} tours</span>
@@ -1880,7 +1856,7 @@ function displayESP32Files(sessions, ip) {
                     </div>
                     <div class="file-item-actions">
                         <button class="file-action-btn btn-load" onclick="loadESP32File('${ip}', '${session.filename}')">
-                            📊 Analyser
+                            Analyser
                         </button>
                     </div>
                 </div>
@@ -2193,24 +2169,7 @@ document.getElementById('upload-area').style.display = 'none';
         `;
     });
     
-    // Circuits personnalisés
-    if (customCircuits.length > 0) {
-        html += `<h3 style="color: #9c27b0; border-bottom: 2px solid #9c27b0; padding-bottom: 5px; margin: 25px 0 15px 0;">
-                 ⭐ Mes Circuits</h3>`;
-        
-        customCircuits.forEach(circuit => {
-            html += `
-                <div onclick="selectCircuitManually('${circuit.name}')" 
-                     style="background: #f3e5f5; border: 1px solid #9c27b0; border-radius: 8px; padding: 12px; 
-                            margin-bottom: 5px; cursor: pointer; transition: all 0.2s;"
-                     onmouseover="this.style.background='#e1bee7'"
-                     onmouseout="this.style.background='#f3e5f5'">
-                    <strong>${circuit.name}</strong><br>
-                    <small style="color: #666;">${circuit.location} - ${circuit.length} km</small>
-                </div>
-            `;
-        });
-    }
+    
     
     html += '</div>';
     modal.innerHTML = html;
