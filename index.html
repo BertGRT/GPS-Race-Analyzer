@@ -449,6 +449,14 @@
         }
         
         @media (max-width: 768px) {
+            .header {
+                display: none;
+            }
+            
+            body {
+                padding: 10px;
+            }
+            
             .stats-grid { 
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
@@ -689,6 +697,7 @@
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="./app.js"></script>
     
     <script>
         let sessionData = null;
