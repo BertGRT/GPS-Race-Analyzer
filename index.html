@@ -7,17 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
      <!-- PWA Support -->
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#1976d2">
+<meta name="theme-color" content="#667eea">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="GPS Analyzer">
+<meta name="apple-mobile-web-app-title" content="GPS LapTimer">
+<link rel="apple-touch-icon" href="./icon-192.png">
 
 <script>
 // Enregistrer le service worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(reg => console.log('Service Worker enregistré'))
-    .catch(err => console.log('Erreur SW:', err));
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ Service Worker enregistré', reg.scope))
+      .catch(err => console.error('❌ Erreur SW:', err));
+  });
 }
 </script>
     <title>GPS Race Analyzer Pro</title>
