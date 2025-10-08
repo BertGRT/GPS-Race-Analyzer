@@ -1,27 +1,25 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <!-- PWA Support -->
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
-    <meta name="theme-color" content="#1976d2">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="GPS Analyzer">
-    <link rel="apple-touch-icon" href="./icon-192.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
 
-    <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Service Worker enregistré'))
-        .catch(err => console.log('Erreur SW:', err));
-    }
-    </script>
+   
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+     <!-- PWA Support -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1976d2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GPS Analyzer">
+
+<script>
+// Enregistrer le service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(reg => console.log('Service Worker enregistré'))
+    .catch(err => console.log('Erreur SW:', err));
+}
+</script>
     <title>GPS Race Analyzer Pro</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
@@ -32,11 +30,14 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: white;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex; /* AJOUTÉ */
+    align-items: center; /* AJOUTÉ */
+    justify-content: center; /* AJOUTÉ */
+}
         
         .header {
             text-align: center;
@@ -56,7 +57,7 @@
             background: white;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
         
         .upload-area {
@@ -68,7 +69,168 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 30px;
+            position: relative;
         }
+
+       
+
+#home-page {
+    display: block;
+    max-width: 800px; /* AJOUTÉ : centrer le contenu */
+    margin: 0 auto; /* AJOUTÉ : centrer */
+}
+
+.connection-card {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 20px;
+    padding: 30px;
+    margin: 20px 0; /* CHANGÉ : marges verticales seulement */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    text-align: left; /* AJOUTÉ : alignement à gauche du texte */
+    display: flex; /* AJOUTÉ : pour aligner icône + texte */
+    align-items: center;
+    gap: 20px;
+}
+
+.connection-icon {
+    font-size: 3rem; /* RÉDUIT de 4rem à 3rem */
+    min-width: 60px; /* AJOUTÉ : largeur fixe pour l'icône */
+    text-align: center;
+}
+
+.connection-card h3 {
+    color: #1976d2;
+    margin-bottom: 5px; /* RÉDUIT */
+    font-size: 1.3rem;
+}
+
+.connection-card p {
+    color: #666;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.back-button {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+}
+
+.back-button:hover {
+    background: #d32f2f;
+    transform: translateX(-3px);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* ===== STYLES POUR LA LISTE DES FICHIERS ===== */
+
+.file-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    border-left: 4px solid #1976d2;
+    transition: all 0.2s ease;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.file-item:hover {
+    background: #e3f2fd;
+}
+
+.file-item-checkbox {
+    margin-top: 5px;
+}
+
+.file-item-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.file-item-content {
+    flex: 1;
+}
+
+.file-item.selected {
+    background: #e8f5e9;
+    border-left-color: #4caf50;
+}
+
+.file-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.file-item-title {
+    font-weight: bold;
+    color: #1976d2;
+    font-size: 1.1rem;
+}
+
+.file-item-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.file-item-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.file-item-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.file-action-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-load {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-delete {
+    background: #f44336;
+    color: white;
+}
+
+.file-action-btn:hover {
+    transform: scale(1.05);
+}
         
         .upload-area:hover {
             border-color: #764ba2;
@@ -115,28 +277,27 @@
         }
         
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-            transition: transform 0.3s ease;
-        }
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    transition: transform 0.3s ease;
+}
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
 
-        .stat-label {
-            font-size: 0.85rem;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
+.stat-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
         .tabs {
             display: flex;
             gap: 10px;
@@ -234,6 +395,8 @@
             min-height: 500px;
             border-radius: 10px;
         }
+        
+       
         
         .track-stats {
             display: grid;
@@ -454,64 +617,540 @@
         }
         
         @media (max-width: 768px) {
-            .header {
-                display: none;
-            }
-            
-            body {
-                padding: 10px;
-            }
-            
             .stats-grid { 
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-            
-            .stat-card { padding: 15px; }
-            .stat-value { font-size: 1.5rem; }
-            .stat-label { font-size: 0.7rem; }
-            .session-header { flex-direction: column; text-align: center; }
-            .session-info h2 { font-size: 1.2rem; }
-            .header h1 { font-size: 1.8rem; }
-            .container { padding: 15px; }
-            .map-container, #map { height: 400px; min-height: 400px; }
-            table { font-size: 0.75rem; }
-            table th, table td { padding: 6px 4px; }
-            .tab { padding: 10px 12px; font-size: 0.85rem; }
-            .analysis-card { padding: 15px; }
-            .analysis-card h4 { font-size: 1rem; }
-            .analysis-grid { grid-template-columns: 1fr; }
-            .track-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .turns-grid { grid-template-columns: 1fr; }
-        }
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px; /* Réduire l'espace */
+    }
+    
+    .stat-card {
+        padding: 15px; /* Réduire le padding */
+    }
+    
+    .stat-value {
+        font-size: 1.5rem; /* Réduire la taille */
+    }
+    
+    .stat-label {
+        font-size: 0.7rem; /* Réduire la taille */
+    }
+    
+    .session-header { 
+        flex-direction: column; 
+        text-align: center; 
+    }
+    
+    .session-info h2 {
+        font-size: 1.2rem; /* Réduire le titre */
+    }
+    
+    .header h1 { 
+        font-size: 1.8rem; 
+    }
+    
+    .container { 
+        padding: 15px; /* Réduire les marges */
+    }
+    
+    .map-container, #map { 
+        height: 400px; 
+        min-height: 400px; 
+    }
+    
+    /* Tableaux responsive */
+    table {
+        font-size: 0.75rem;
+    }
+    
+    table th, table td {
+        padding: 6px 4px;
+    }
+    
+    /* Onglets plus compacts */
+    .tab {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+    
+    /* Cartes d'analyse plus petites */
+    .analysis-card {
+        padding: 15px;
+    }
+    
+    .analysis-card h4 {
+        font-size: 1rem;
+    }
+    
+    /* Grilles en 1 colonne sur mobile */
+    .analysis-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .track-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .turns-grid {
+        grid-template-columns: 1fr;
+    }
+}
 
-        @media (max-width: 900px) and (orientation: landscape) {
-            .container { padding: 10px; }
-            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-            .stat-card { padding: 10px; }
-            .stat-value { font-size: 1.3rem; }
-            .stat-label { font-size: 0.65rem; }
-            .map-container, #map { height: 300px; min-height: 300px; }
-            .header { padding: 15px; }
-            .header h1 { font-size: 1.5rem; }
-            table { font-size: 0.7rem; }
-        }
+/* Mode paysage mobile */
+@media (max-width: 900px) and (orientation: landscape) {
+    .container {
+        padding: 10px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    
+    .stat-card {
+        padding: 10px;
+    }
+    
+    .stat-value {
+        font-size: 1.3rem;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem;
+    }
+    
+    .map-container, #map {
+        height: 300px;
+        min-height: 300px;
+    }
+    
+    .header {
+        padding: 15px;
+    }
+    
+    .header h1 {
+        font-size: 1.5rem;
+    }
+    
+    table {
+        font-size: 0.7rem;
+    }
+
+    /* ===== STYLES PAGE ACCUEIL MODERNE ===== */
+.home-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+     border-radius: 20px 20px 0 0; /* CHANGÉ : arrondi seulement en haut */
+    margin: -30px -30px 0 -30px; /* CHANGÉ : pour coller aux bords du container */
+}
+
+.home-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.app-logo {
+    width: 100px; /* RÉDUIT de 120px */
+    height: 100px; /* RÉDUIT de 120px */
+    background: white;
+    border-radius: 22px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+    padding: 12px;
+}
+
+.app-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.home-title {
+    color: white;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.home-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 15px;
+    font-weight: 400;
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-section {
+    text-align: center;
+    margin: 40px auto; /* CHANGÉ : centré avec auto */
+    max-width: 600px; /* AJOUTÉ : limite la largeur */
+}
+
+.welcome-section h2 {
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.welcome-section p {
+    color: #666;
+    font-size: 16px;
+}
+
+/* ===== OPTIMISATION MOBILE PORTRAIT ===== */
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+        background: white;
+    }
+    
+    .container {
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    
+    /* Header mobile */
+    .home-header {
+        padding: 30px 20px;
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .app-logo {
+        width: 80px;
+        height: 80px;
+        padding: 10px;
+        margin: 0 auto 15px;
+    }
+    
+    .home-title {
+        font-size: 22px;
+        margin-bottom: 5px;
+    }
+    
+    .home-subtitle {
+        font-size: 13px;
+    }
+    
+    /* Section bienvenue */
+    .welcome-section {
+        margin: 25px auto;
+        padding: 0 15px;
+    }
+    
+    .welcome-section h2 {
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
+    
+    .welcome-section p {
+        font-size: 14px;
+    }
+    
+    /* Page d'accueil */
+    #home-page {
+        padding: 0 15px 20px 15px;
+        max-width: 100%;
+    }
+    
+    /* Cartes de connexion */
+    .connection-card {
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 15px;
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .connection-icon {
+        font-size: 3.5rem;
+        margin: 0;
+        min-width: auto;
+    }
+    
+    .connection-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+    }
+    
+    .connection-card p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    /* Animation hover désactivée sur mobile */
+    .connection-card:hover {
+        transform: none;
+    }
+    
+    .connection-card:active {
+        transform: scale(0.98);
+        transition: transform 0.1s;
+    }
+}
+
+/* ===== TRÈS PETITS ÉCRANS (iPhone SE, etc.) ===== */
+@media (max-width: 375px) {
+    .home-header {
+        padding: 25px 15px;
+    }
+    
+    .app-logo {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .home-title {
+        font-size: 20px;
+    }
+    
+    .home-subtitle {
+        font-size: 12px;
+    }
+    
+    .welcome-section h2 {
+        font-size: 18px;
+    }
+    
+    .connection-card {
+        padding: 18px;
+        margin: 12px 0;
+    }
+    
+    .connection-icon {
+        font-size: 3rem;
+    }
+    
+    .connection-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .connection-card p {
+        font-size: 0.85rem;
+    }
+}
+
+/* ===== MODE PAYSAGE MOBILE ===== */
+@media (max-width: 900px) and (orientation: landscape) {
+    .home-header {
+        padding: 20px;
+    }
+    
+    .app-logo {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 10px;
+    }
+    
+    .home-title {
+        font-size: 18px;
+    }
+    
+    .home-subtitle {
+        font-size: 12px;
+    }
+    
+    .welcome-section {
+        margin: 15px auto;
+    }
+    
+    .welcome-section h2 {
+        font-size: 18px;
+    }
+    
+    #home-page {
+        padding: 0 20px 15px 20px;
+    }
+    
+    .connection-card {
+        padding: 15px;
+        margin: 10px 0;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .connection-icon {
+        font-size: 2.5rem;
+        min-width: 50px;
+    }
+    
+    .connection-card h3 {
+        font-size: 1rem;
+    }
+    
+    .connection-card p {
+        font-size: 0.8rem;
+    }
+}
+/* ===== AMÉLIORATION TACTILE MOBILE ===== */
+
+@media (max-width: 768px) {
+    /* Meilleure zone de touch */
+    .connection-card {
+        min-height: 100px;
+        -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
+    }
+    
+    /* Retour arrière */
+    .back-button {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    /* Header normal (pas home-header) */
+    .header {
+        padding: 20px 15px;
+        margin-bottom: 20px;
+    }
+    
+    .header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .header p {
+        font-size: 0.9rem;
+    }
+}
+
+}
+            
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>GPS Race Analyzer Pro</h1>
-        <p>Analyse avancee de sessions de chronometrage GPS</p>
+    <div class="home-header">
+    <div class="app-logo">
+        <img src="./icon-192.png" alt="GRT Logo">
     </div>
+    <h1 class="home-title">GPS LapTimer Pro</h1>
+    <p class="home-subtitle">Chronométrage GPS Professionnel</p>
+</div>
     
     <div class="container">
-        <div class="upload-area" id="upload-area">
+        <!-- PAGE D'ACCUEIL / CONNEXION -->
+        <div id="home-page">
+    <div class="welcome-section">
+        <h2>👋 Bienvenue</h2>
+        <p>Choisissez une source de données</p>
+    </div>
+            
+            <!-- Option 1: Fichier Local -->
+            <div class="connection-card" onclick="showLocalFileMode()">
+                <div class="connection-icon">📁</div>
+                <h3>Fichier Local</h3>
+                <p>Importer un fichier JSON depuis votre appareil</p>
+            </div>
+            
+            <!-- Option 2: GPS_LapTimer WiFi -->
+<div class="connection-card" onclick="showESP32Mode()">
+    <div class="connection-icon">⏱️</div>
+    <h3>GPS_LapTimer</h3>
+    <p>Se connecter au chronomètre GPS via WiFi</p>
+</div>
+            
+            <!-- Option 3: Fichiers Stockés -->
+            <div class="connection-card" onclick="showStoredFiles()" id="stored-files-card">
+                <div class="connection-icon">💾</div>
+                <h3>Sessions Sauvegardées</h3>
+                <p id="stored-count">Aucune session</p>
+            </div>
+        </div>
+        
+        <!-- MODE FICHIER LOCAL -->
+        <div class="upload-area" id="upload-area" style="display: none;">
+            <button class="back-button" onclick="returnToHome()">← Retour</button>
             <div class="upload-icon">📁</div>
             <h3>Glissez-deposez votre fichier JSON</h3>
             <p>ou cliquez pour selectionner</p>
             <input type="file" id="file-input" accept=".json" style="display: none;">
         </div>
-
+        
+        <!-- MODE GPS_LAPTIMER -->
+<!-- MODE GPS_LAPTIMER BLUETOOTH -->
+<div id="esp32-page" style="display: none;">
+    <button class="back-button" onclick="returnToHome()">← Retour</button>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="color: #1976d2;">🔵 Connexion GPS_LapTimer Bluetooth</h2>
+        <p style="color: #666; margin-top: 10px;">Utilisez Chrome ou Edge</p>
+    </div>
+    
+    <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; margin: 0 auto;">
+        <div id="esp32-status" style="padding: 15px; border-radius: 8px; margin: 20px 0; display: none;"></div>
+        
+        <button onclick="connectESP32()" style="width: 100%; padding: 15px; background: linear-gradient(45deg, #1976d2, #42a5f5); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s;">
+            🔗 Connexion Bluetooth
+        </button>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #1976d2;">
+            <p style="margin: 0; font-size: 0.9rem; color: #1976d2;"><strong>Instructions :</strong></p>
+            <ol style="margin: 10px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: #666;">
+                <li>Allumez le GPS_LapTimer</li>
+                <li>Activez le Bluetooth sur votre appareil</li>
+                <li>Cliquez sur "Connexion Bluetooth"</li>
+                <li>Sélectionnez "GPS_Chrono_GRT" dans la liste</li>
+            </ol>
+        </div>
+        
+        <div id="esp32-files-list" style="margin-top: 30px; display: none;">
+            <h3 style="color: #1976d2; margin-bottom: 15px;">📂 Sessions Disponibles</h3>
+            <div id="esp32-files-container"></div>
+        </div>
+    </div>
+</div>
+        
+        <!-- LISTE DES FICHIERS STOCKÉS -->
+        <div id="stored-files-page" style="display: none;">
+            <button class="back-button" onclick="returnToHome()">← Retour</button>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #1976d2;">💾 Sessions Sauvegardées</h2>
+            </div>
+            
+            <div style="max-width: 800px; margin: 0 auto 20px auto; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                <button onclick="selectAllSessions()" style="padding: 10px 20px; background: #2196f3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    ☑️ Tout sélectionner
+                </button>
+                <button onclick="deselectAllSessions()" style="padding: 10px 20px; background: #9e9e9e; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    ☐ Tout désélectionner
+                </button>
+                <button id="download-selected-btn" onclick="downloadSelectedSessions()" style="padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: none;">
+                    📥 Télécharger (<span id="selected-count">0</span>)
+                </button>
+            </div>
+            
+            <div id="stored-files-list" style="max-width: 800px; margin: 0 auto;"></div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button onclick="clearAllSessions()" style="padding: 12px 25px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                    🗑️ Supprimer Toutes les Sessions
+                </button>
+            </div>
+        </div>
+        
         <div id="session-content">
             <div class="session-header">
                 <div class="session-info">
@@ -604,11 +1243,11 @@
                 </div>
 
                 <div class="auto-detect-box" id="circuit-unknown" style="display: none;">
-                    <h4 style="margin-bottom: 10px;">Circuit Non Identifié</h4>
-                    <p style="margin-bottom: 15px;">Ce circuit n'est pas dans la base de données des 155 circuits français.</p>
-                    <button class="replay-btn" style="background: linear-gradient(45deg, #9c27b0, #ba68c8);" 
-                            onclick="showAllCircuits()">Sélectionner manuellement</button>
-                </div>
+    <h4 style="margin-bottom: 10px;">Circuit Non Identifié</h4>
+    <p style="margin-bottom: 15px;">Ce circuit n'est pas dans la base de données des 155 circuits français.</p>
+    <button class="replay-btn" style="background: linear-gradient(45deg, #9c27b0, #ba68c8);" 
+            onclick="showAllCircuits()">Sélectionner manuellement</button>
+</div>
                 
                 <div class="circuit-info" id="circuit-info" style="display: none;">
                     <div class="circuit-icon"></div>
@@ -617,6 +1256,8 @@
                         <p id="circuit-location"></p>
                     </div>
                 </div>
+                
+                
                 
                 <div class="map-controls">
                     <button style="background: #2196f3; color: white;" onclick="switchMapView('satellite')">Vue Satellite</button>
@@ -646,6 +1287,8 @@
                         <button class="replay-btn" onclick="changeReplaySpeed(5)">5x</button>
                     </div>
                 </div>
+                
+                
                 
                 <div class="chart-container" id="speed-chart-container">
                     <h4 style="margin-bottom: 15px; color: #1976d2;">Evolution de la Vitesse</h4>
@@ -702,7 +1345,6 @@
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    <script src="./app.js"></script>
     
     <script>
         let sessionData = null;
@@ -719,400 +1361,1080 @@
         let comparisonChart = null;
         let isComparisonMode = false;
         let currentReplayData = null;
+        let currentSessionId = null;
+        let bluetoothDevice = null;
+        let bluetoothCharacteristic = null;
+        let bleDataBuffer = "";
+        let isReceivingFile = false;
+        let expectedFileSize = 0;
+        let receivedFileData = "";
 
-        // BASE DE DONNÉES COMPLÈTE - 155 CIRCUITS FRANCE
-        const CIRCUITS_DATABASE = [
-            // CIRCUITS AUTOMOBILE (33)
-            { name: "Circuit Carole", location: "Aulnay-sous-Bois, Île-de-France", 
-              lat: 48.9534, lng: 2.4847, radius: 2000, length: 1.814, type: "auto" },
-            { name: "Autodrome de Linas-Montlhéry", location: "Linas, Île-de-France", 
-              lat: 48.6428, lng: 2.2669, radius: 3000, length: 2.548, type: "auto" },
-            { name: "La Ferté-Gaucher", location: "La Ferté-Gaucher, Île-de-France", 
-              lat: 48.7808, lng: 3.3072, radius: 2000, length: 2.800, type: "auto" },
-            { name: "Croix-en-Ternois", location: "Croix-en-Ternois, Hauts-de-France", 
-              lat: 50.3456, lng: 2.2347, radius: 2000, length: 2.500, type: "auto" },
-            { name: "Clastres", location: "Clastres, Hauts-de-France", 
-              lat: 49.7414, lng: 3.2086, radius: 2000, length: 2.780, type: "auto" },
-            { name: "Circuit des Écuyers", location: "Beuvardes, Hauts-de-France", 
-              lat: 49.1073, lng: 3.5069, radius: 2000, length: 2.750, type: "auto" },
-            { name: "Folembray", location: "Folembray, Hauts-de-France", 
-              lat: 49.6692, lng: 3.4647, radius: 1500, length: 2.080, type: "auto" },
-            { name: "Magny-Cours", location: "Nevers, Bourgogne-Franche-Comté", 
-              lat: 46.8642, lng: 3.1633, radius: 3000, length: 4.411, type: "auto" },
-            { name: "Dijon-Prenois", location: "Prenois, Bourgogne-Franche-Comté", 
-              lat: 47.3628, lng: 4.8997, radius: 2500, length: 3.801, type: "auto" },
-            { name: "Mornay", location: "Mornay, Bourgogne-Franche-Comté", 
-              lat: 46.3753, lng: 4.6253, radius: 1500, length: 2.100, type: "auto" },
-            { name: "Bresse", location: "Saint-Marcel, Bourgogne-Franche-Comté", 
-              lat: 46.5261, lng: 5.3603, radius: 2000, length: 3.100, type: "auto" },
-            { name: "Paul Ricard", location: "Le Castellet, PACA", 
-              lat: 43.2506, lng: 5.7919, radius: 3000, length: 5.842, type: "auto" },
-            { name: "Circuit du Var", location: "Le Luc, PACA", 
-              lat: 43.3847, lng: 6.3881, radius: 2000, length: 3.800, type: "auto" },
-            { name: "Circuit de Lédenon", location: "Lédenon, Occitanie", 
-              lat: 43.9211, lng: 4.5025, radius: 2000, length: 3.156, type: "auto" },
-            { name: "Alès Cévennes", location: "Alès, Occitanie", 
-              lat: 44.0678, lng: 4.0839, radius: 2000, length: 2.485, type: "auto" },
-            { name: "Nogaro", location: "Nogaro, Occitanie", 
-              lat: 43.7611, lng: -0.0314, radius: 2500, length: 3.636, type: "auto" },
-            { name: "Albi", location: "Albi, Occitanie", 
-              lat: 43.9147, lng: 2.1153, radius: 2000, length: 3.565, type: "auto" },
-            { name: "Toulouse Francazal", location: "Toulouse, Occitanie", 
-              lat: 43.5456, lng: 1.3678, radius: 1500, length: 2.680, type: "auto" },
-            { name: "Pau-Arnos", location: "Arnos, Nouvelle-Aquitaine", 
-              lat: 43.4556, lng: -0.4489, radius: 2500, length: 3.030, type: "auto" },
-            { name: "Bordeaux-Mérignac", location: "Mérignac, Nouvelle-Aquitaine", 
-              lat: 44.8311, lng: -0.6889, radius: 2000, length: 2.529, type: "auto" },
-            { name: "Val de Vienne", location: "Le Vigeant, Nouvelle-Aquitaine", 
-              lat: 46.5733, lng: 0.6578, radius: 2500, length: 3.775, type: "auto" },
-            { name: "Faleyras", location: "Faleyras, Nouvelle-Aquitaine", 
-              lat: 44.7461, lng: -0.2578, radius: 1500, length: 1.900, type: "auto" },
-            { name: "Lurcy-Lévis", location: "Lurcy-Lévis, Auvergne-Rhône-Alpes", 
-              lat: 46.7386, lng: 2.9286, radius: 2500, length: 3.750, type: "auto" },
-            { name: "Issoire", location: "Issoire, Auvergne-Rhône-Alpes", 
-              lat: 45.5439, lng: 3.2769, radius: 2000, length: 3.100, type: "auto" },
-            { name: "Anneau du Rhin", location: "Biltzheim, Grand Est", 
-              lat: 47.9536, lng: 7.3597, radius: 2500, length: 3.705, type: "auto" },
-            { name: "Chambley", location: "Chambley, Grand Est", 
-              lat: 49.0225, lng: 5.8803, radius: 2500, length: 3.750, type: "auto" },
-            { name: "Bugatti Le Mans", location: "Le Mans, Pays de la Loire", 
-              lat: 47.9561, lng: 0.2269, radius: 3000, length: 4.185, type: "auto" },
-            { name: "Châteauroux", location: "Châteauroux, Centre-Val de Loire", 
-              lat: 46.8597, lng: 1.7253, radius: 2500, length: 3.650, type: "auto" },
-            { name: "Dreux", location: "Dreux, Centre-Val de Loire", 
-              lat: 48.7531, lng: 1.3547, radius: 1500, length: 2.200, type: "auto" },
-            { name: "Abbeville", location: "Abbeville, Hauts-de-France", 
-              lat: 50.0981, lng: 1.8392, radius: 1500, length: 1.720, type: "auto" },
-            { name: "Mettet", location: "Mettet, Belgique (proche France)", 
-              lat: 50.3206, lng: 4.6617, radius: 2500, length: 2.650, type: "auto" },
-            { name: "Spa-Francorchamps", location: "Stavelot, Belgique (proche France)", 
-              lat: 50.4372, lng: 5.9714, radius: 4000, length: 7.004, type: "auto" },
-            
-            // CIRCUITS KARTING (94)
-            { name: "SODI Paris", location: "Rungis, Île-de-France", 
-              lat: 48.7508, lng: 2.3528, radius: 1000, length: 1.150, type: "karting" },
-            { name: "PK1 Brétigny", location: "Brétigny-sur-Orge, Île-de-France", 
-              lat: 48.6042, lng: 2.3061, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting de Sénart", location: "Lieusaint, Île-de-France", 
-              lat: 48.6267, lng: 2.5492, radius: 1000, length: 1.200, type: "karting" },
-            { name: "Kart Ouest", location: "Trappes, Île-de-France", 
-              lat: 48.7686, lng: 1.9958, radius: 800, length: 1.050, type: "karting" },
-            { name: "Karting Cormeilles", location: "Cormeilles-en-Parisis, Île-de-France", 
-              lat: 48.9753, lng: 2.1997, radius: 800, length: 1.080, type: "karting" },
-            { name: "Racing Kart Dupré", location: "Évry, Île-de-France", 
-              lat: 48.6272, lng: 2.4492, radius: 800, length: 0.960, type: "karting" },
-            { name: "Karting des Fagnes", location: "Mariembourg, Île-de-France proche", 
-              lat: 50.0894, lng: 4.5208, radius: 1000, length: 1.250, type: "karting" },
-            { name: "Racing Kart de Mantes", location: "Mantes-la-Jolie, Île-de-France", 
-              lat: 48.9867, lng: 1.7122, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting de Lyon", location: "Corbas, Auvergne-Rhône-Alpes", 
-              lat: 45.6686, lng: 4.9022, radius: 1000, length: 1.200, type: "karting" },
-            { name: "Outdoor Lyon Ouest", location: "L'Arbresle, Auvergne-Rhône-Alpes", 
-              lat: 45.8353, lng: 4.6197, radius: 800, length: 1.050, type: "karting" },
-            { name: "Racing Kart Corsa", location: "Chaponnay, Auvergne-Rhône-Alpes", 
-              lat: 45.6231, lng: 4.9347, radius: 1000, length: 1.350, type: "karting" },
-            { name: "Karting de Grenoble", location: "Saint-Quentin-sur-Isère, Auvergne-Rhône-Alpes", 
-              lat: 45.2564, lng: 5.5539, radius: 1000, length: 1.280, type: "karting" },
-            { name: "Karting Annecy", location: "Argonay, Auvergne-Rhône-Alpes", 
-              lat: 45.9344, lng: 6.1478, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Saint-Étienne", location: "Andrézieux-Bouthéon, Auvergne-Rhône-Alpes", 
-              lat: 45.5283, lng: 4.2636, radius: 800, length: 1.050, type: "karting" },
-            { name: "Kart 01", location: "Bourg-en-Bresse, Auvergne-Rhône-Alpes", 
-              lat: 46.2058, lng: 5.2272, radius: 800, length: 1.000, type: "karting" },
-            { name: "Karting Chambéry", location: "La Ravoire, Auvergne-Rhône-Alpes", 
-              lat: 45.5631, lng: 5.9656, radius: 800, length: 1.120, type: "karting" },
-            { name: "Piste Kart 07", location: "Privas, Auvergne-Rhône-Alpes", 
-              lat: 44.7356, lng: 4.5986, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Valence", location: "Alixan, Auvergne-Rhône-Alpes", 
-              lat: 44.9769, lng: 5.0308, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Vichy", location: "Hauterive, Auvergne-Rhône-Alpes", 
-              lat: 46.1092, lng: 3.4297, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Roanne", location: "Le Coteau, Auvergne-Rhône-Alpes", 
-              lat: 46.0300, lng: 4.0886, radius: 700, length: 1.020, type: "karting" },
-            { name: "Karting de Lons", location: "Lons, Nouvelle-Aquitaine", 
-              lat: 43.3167, lng: -0.4000, radius: 800, length: 1.100, type: "karting" },
-            { name: "Speed Park Bordeaux", location: "Mérignac, Nouvelle-Aquitaine", 
-              lat: 44.8497, lng: -0.6944, radius: 1000, length: 1.300, type: "karting" },
-            { name: "Karting Saint-Junien", location: "Saint-Junien, Nouvelle-Aquitaine", 
-              lat: 45.8881, lng: 0.8997, radius: 800, length: 1.050, type: "karting" },
-            { name: "Karting Poitiers", location: "Chasseneuil-du-Poitou, Nouvelle-Aquitaine", 
-              lat: 46.6536, lng: 0.3731, radius: 800, length: 1.080, type: "karting" },
-            { name: "Karting La Rochelle", location: "Puilboreau, Nouvelle-Aquitaine", 
-              lat: 46.1811, lng: -1.1136, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Bergerac", location: "Bergerac, Nouvelle-Aquitaine", 
-              lat: 44.8528, lng: 0.4833, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Angoulême", location: "L'Isle-d'Espagnac, Nouvelle-Aquitaine", 
-              lat: 45.6553, lng: 0.1522, radius: 800, length: 1.050, type: "karting" },
-            { name: "Karting Pau", location: "Lescar, Nouvelle-Aquitaine", 
-              lat: 43.3381, lng: -0.4253, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Bayonne", location: "Ondres, Nouvelle-Aquitaine", 
-              lat: 43.5597, lng: -1.4564, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Limoges", location: "Bonnac-la-Côte, Nouvelle-Aquitaine", 
-              lat: 45.8881, lng: 1.2333, radius: 700, length: 1.000, type: "karting" },
-            { name: "Karting Brive", location: "Brive-la-Gaillarde, Nouvelle-Aquitaine", 
-              lat: 45.1508, lng: 1.5331, radius: 700, length: 0.920, type: "karting" },
-            { name: "Circuit de Karting du Val d'Argenton", location: "Argentonnay, Nouvelle-Aquitaine", 
-              lat: 46.9886, lng: -0.4292, radius: 800, length: 1.050, type: "karting" },
-            { name: "Karting Toulouse", location: "Aussonne, Occitanie", 
-              lat: 43.6814, lng: 1.3192, radius: 1000, length: 1.250, type: "karting" },
-            { name: "Karting Montpellier", location: "Vendargues, Occitanie", 
-              lat: 43.6553, lng: 3.9672, radius: 800, length: 1.150, type: "karting" },
-            { name: "Karting Perpignan", location: "Alénya, Occitanie", 
-              lat: 42.6453, lng: 2.9889, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Narbonne", location: "Narbonne, Occitanie", 
-              lat: 43.1839, lng: 3.0036, radius: 700, length: 1.020, type: "karting" },
-            { name: "Karting Nîmes", location: "Marguerittes, Occitanie", 
-              lat: 43.8628, lng: 4.4439, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Carcassonne", location: "Carcassonne, Occitanie", 
-              lat: 43.2131, lng: 2.3486, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Tarbes", location: "Séméac, Occitanie", 
-              lat: 43.2281, lng: 0.1114, radius: 700, length: 1.000, type: "karting" },
-            { name: "Karting Rodez", location: "Onet-le-Château, Occitanie", 
-              lat: 44.3694, lng: 2.5764, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Béziers", location: "Villeneuve-lès-Béziers, Occitanie", 
-              lat: 43.3275, lng: 3.2653, radius: 700, length: 1.050, type: "karting" },
-            { name: "Karting Cahors", location: "Cahors, Occitanie", 
-              lat: 44.4478, lng: 1.4403, radius: 700, length: 0.920, type: "karting" },
-            { name: "RKC Le Mans", location: "Le Mans, Pays de la Loire", 
-              lat: 47.9561, lng: 0.2269, radius: 1000, length: 1.382, type: "karting" },
-            { name: "Karting Nantes", location: "Bouguenais, Pays de la Loire", 
-              lat: 47.1778, lng: -1.6181, radius: 1000, length: 1.200, type: "karting" },
-            { name: "Karting Angers", location: "Écouflant, Pays de la Loire", 
-              lat: 47.5308, lng: -0.5297, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting La Roche-sur-Yon", location: "Mouilleron-le-Captif, Pays de la Loire", 
-              lat: 46.7211, lng: -1.4444, radius: 800, length: 1.050, type: "karting" },
-            { name: "Karting Laval", location: "Changé, Pays de la Loire", 
-              lat: 48.0939, lng: -0.7925, radius: 700, length: 1.000, type: "karting" },
-            { name: "Karting Saint-Nazaire", location: "Trignac, Pays de la Loire", 
-              lat: 47.3231, lng: -2.1953, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Cholet", location: "Cholet, Pays de la Loire", 
-              lat: 47.0586, lng: -0.8753, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Sablé", location: "Sablé-sur-Sarthe, Pays de la Loire", 
-              lat: 47.8436, lng: -0.3311, radius: 700, length: 1.020, type: "karting" },
-            { name: "Karting Marseille", location: "Plan-de-Campagne, PACA", 
-              lat: 43.4897, lng: 5.4331, radius: 1000, length: 1.250, type: "karting" },
-            { name: "Karting Nice", location: "Carros, PACA", 
-              lat: 43.7839, lng: 7.1864, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Toulon", location: "La Valette-du-Var, PACA", 
-              lat: 43.1372, lng: 5.9842, radius: 800, length: 1.080, type: "karting" },
-            { name: "Karting Avignon", location: "Sorgues, PACA", 
-              lat: 44.0094, lng: 4.8728, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Gap", location: "Gap, PACA", 
-              lat: 44.5592, lng: 6.0794, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Aix-en-Provence", location: "Venelles, PACA", 
-              lat: 43.5950, lng: 5.4814, radius: 800, length: 1.050, type: "karting" },
-            { name: "Karting Antibes", location: "Biot, PACA", 
-              lat: 43.6286, lng: 7.0972, radius: 700, length: 1.000, type: "karting" },
-            { name: "Karting Cannes", location: "Le Cannet, PACA", 
-              lat: 43.5778, lng: 7.0186, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Fréjus", location: "Fréjus, PACA", 
-              lat: 43.4331, lng: 6.7372, radius: 700, length: 1.020, type: "karting" },
-            { name: "Karting Strasbourg", location: "Ostwald, Grand Est", 
-              lat: 48.5431, lng: 7.7139, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Mulhouse", location: "Sausheim, Grand Est", 
-              lat: 47.7881, lng: 7.3764, radius: 800, length: 1.080, type: "karting" },
-            { name: "Karting Reims", location: "Cormontreuil, Grand Est", 
-              lat: 49.2181, lng: 4.0494, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Metz", location: "Augny, Grand Est", 
-              lat: 49.0672, lng: 6.1208, radius: 700, length: 1.000, type: "karting" },
-            { name: "Karting Nancy", location: "Tomblaine, Grand Est", 
-              lat: 48.6831, lng: 6.2200, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Colmar", location: "Wintzenheim, Grand Est", 
-              lat: 48.0722, lng: 7.2825, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Épinal", location: "Épinal, Grand Est", 
-              lat: 48.1744, lng: 6.4500, radius: 700, length: 0.920, type: "karting" },
-            { name: "Karting Lille", location: "Lezennes, Hauts-de-France", 
-              lat: 50.6150, lng: 3.1150, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Amiens", location: "Rivery, Hauts-de-France", 
-              lat: 49.9092, lng: 2.3231, radius: 800, length: 1.050, type: "karting" },
-            { name: "Karting Valenciennes", location: "Rouvignies, Hauts-de-France", 
-              lat: 50.3261, lng: 3.5403, radius: 700, length: 1.000, type: "karting" },
-            { name: "Karting Dunkerque", location: "Grande-Synthe, Hauts-de-France", 
-              lat: 51.0136, lng: 2.3019, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Calais", location: "Marck, Hauts-de-France", 
-              lat: 50.9453, lng: 1.9556, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Arras", location: "Saint-Laurent-Blangy, Hauts-de-France", 
-              lat: 50.3067, lng: 2.8089, radius: 700, length: 1.020, type: "karting" },
-            { name: "Karting Beauvais", location: "Tillé, Hauts-de-France", 
-              lat: 49.4614, lng: 2.1128, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Douai", location: "Lambres-lez-Douai, Hauts-de-France", 
-              lat: 50.3542, lng: 3.0592, radius: 700, length: 0.920, type: "karting" },
-            { name: "Karting Rennes", location: "Chartres-de-Bretagne, Bretagne", 
-              lat: 48.0439, lng: -1.7078, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Brest", location: "Gouesnou, Bretagne", 
-              lat: 48.4506, lng: -4.4689, radius: 700, length: 1.000, type: "karting" },
-            { name: "Karting Lorient", location: "Caudan, Bretagne", 
-              lat: 47.8103, lng: -3.3364, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Vannes", location: "Ploeren, Bretagne", 
-              lat: 47.6564, lng: -2.8636, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Saint-Brieuc", location: "Plérin, Bretagne", 
-              lat: 48.5422, lng: -2.7278, radius: 700, length: 1.020, type: "karting" },
-            { name: "Karting Quimper", location: "Pluguffan, Bretagne", 
-              lat: 47.9767, lng: -4.1678, radius: 700, length: 0.920, type: "karting" },
-            { name: "Circuit Nelly Delamarche", location: "Fougères, Bretagne", 
-              lat: 48.3528, lng: -1.2006, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Rouen", location: "Eslettes, Normandie", 
-              lat: 49.5683, lng: 1.3597, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Caen", location: "Carpiquet, Normandie", 
-              lat: 49.1883, lng: -0.4531, radius: 800, length: 1.050, type: "karting" },
-            { name: "Karting Le Havre", location: "Gonfreville-l'Orcher, Normandie", 
-              lat: 49.5069, lng: 0.2278, radius: 700, length: 1.000, type: "karting" },
-            { name: "Karting Alençon", location: "Valframbert, Normandie", 
-              lat: 48.4578, lng: 0.1036, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Cherbourg", location: "La Glacerie, Normandie", 
-              lat: 49.6158, lng: -1.6092, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Évreux", location: "Guichainville, Normandie", 
-              lat: 49.0314, lng: 1.1850, radius: 700, length: 0.920, type: "karting" },
-            { name: "Circuit Lucien Lebret", location: "Courseulles-sur-Mer, Normandie", 
-              lat: 49.3275, lng: -0.4578, radius: 800, length: 1.080, type: "karting" },
-            { name: "Circuit de Cabourg", location: "Cabourg, Normandie", 
-              lat: 49.2867, lng: -0.1178, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Orléans", location: "Saint-Jean-de-Braye, Centre-Val de Loire", 
-              lat: 47.9117, lng: 1.9731, radius: 800, length: 1.100, type: "karting" },
-            { name: "Karting Tours", location: "Chambray-lès-Tours, Centre-Val de Loire", 
-              lat: 47.3364, lng: 0.7178, radius: 700, length: 1.000, type: "karting" },
-            { name: "Karting Bourges", location: "Saint-Doulchard, Centre-Val de Loire", 
-              lat: 47.1006, lng: 2.3742, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Blois", location: "Vineuil, Centre-Val de Loire", 
-              lat: 47.5831, lng: 1.3778, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Chartres", location: "Lucé, Centre-Val de Loire", 
-              lat: 48.4344, lng: 1.4656, radius: 700, length: 0.920, type: "karting" },
-            { name: "Karting Dijon", location: "Chenôve, Bourgogne-Franche-Comté", 
-              lat: 47.2919, lng: 5.0047, radius: 800, length: 1.050, type: "karting" },
-            { name: "Karting Besançon", location: "Pirey, Bourgogne-Franche-Comté", 
-              lat: 47.2622, lng: 5.9725, radius: 700, length: 1.000, type: "karting" },
-            { name: "Karting Auxerre", location: "Monéteau, Bourgogne-Franche-Comté", 
-              lat: 47.8289, lng: 3.5703, radius: 700, length: 0.950, type: "karting" },
-            { name: "Karting Belfort", location: "Andelnans, Bourgogne-Franche-Comté", 
-              lat: 47.6092, lng: 6.8764, radius: 700, length: 0.980, type: "karting" },
-            { name: "Karting Ajaccio", location: "Afa, Corse", 
-              lat: 41.9561, lng: 8.8025, radius: 700, length: 0.900, type: "karting" },
-            { name: "Karting Bastia", location: "Borgo, Corse", 
-              lat: 42.5614, lng: 9.4264, radius: 700, length: 0.950, type: "karting" },
-            
-            // CIRCUITS MOTO (28)
-            { name: "Carole Moto", location: "Aulnay-sous-Bois, Île-de-France", 
-              lat: 48.9534, lng: 2.4847, radius: 2000, length: 1.814, type: "moto" },
-            { name: "Magny-Cours Moto", location: "Nevers, Bourgogne-Franche-Comté", 
-              lat: 46.8642, lng: 3.1633, radius: 3000, length: 4.411, type: "moto" },
-            { name: "Paul Ricard Moto", location: "Le Castellet, PACA", 
-              lat: 43.2506, lng: 5.7919, radius: 3000, length: 5.842, type: "moto" },
-            { name: "Dijon-Prenois Moto", location: "Prenois, Bourgogne-Franche-Comté", 
-              lat: 47.3628, lng: 4.8997, radius: 2500, length: 3.801, type: "moto" },
-            { name: "Lédenon Moto", location: "Lédenon, Occitanie", 
-              lat: 43.9211, lng: 4.5025, radius: 2000, length: 3.156, type: "moto" },
-            { name: "Alès Cévennes Moto", location: "Alès, Occitanie", 
-              lat: 44.0678, lng: 4.0839, radius: 2000, length: 2.485, type: "moto" },
-            { name: "Pau-Arnos Moto", location: "Arnos, Nouvelle-Aquitaine", 
-              lat: 43.4556, lng: -0.4489, radius: 2500, length: 3.030, type: "moto" },
-            { name: "Nogaro Moto", location: "Nogaro, Occitanie", 
-              lat: 43.7611, lng: -0.0314, radius: 2500, length: 3.636, type: "moto" },
-            { name: "Le Mans Moto", location: "Le Mans, Pays de la Loire", 
-              lat: 47.9561, lng: 0.2269, radius: 3000, length: 4.185, type: "moto" },
-            { name: "Lurcy-Lévis Moto", location: "Lurcy-Lévis, Auvergne-Rhône-Alpes", 
-              lat: 46.7386, lng: 2.9286, radius: 2500, length: 3.750, type: "moto" },
-            { name: "Issoire Moto", location: "Issoire, Auvergne-Rhône-Alpes", 
-              lat: 45.5439, lng: 3.2769, radius: 2000, length: 3.100, type: "moto" },
-            { name: "Anneau du Rhin Moto", location: "Biltzheim, Grand Est", 
-              lat: 47.9536, lng: 7.3597, radius: 2500, length: 3.705, type: "moto" },
-            { name: "Croix-en-Ternois Moto", location: "Croix-en-Ternois, Hauts-de-France", 
-              lat: 50.3456, lng: 2.2347, radius: 2000, length: 2.500, type: "moto" },
-            { name: "Clastres Moto", location: "Clastres, Hauts-de-France", 
-              lat: 49.7414, lng: 3.2086, radius: 2000, length: 2.780, type: "moto" },
-            { name: "Folembray Moto", location: "Folembray, Hauts-de-France", 
-              lat: 49.6692, lng: 3.4647, radius: 1500, length: 2.080, type: "moto" },
-            { name: "Val de Vienne Moto", location: "Le Vigeant, Nouvelle-Aquitaine", 
-              lat: 46.5733, lng: 0.6578, radius: 2500, length: 3.775, type: "moto" },
-            { name: "Bordeaux-Mérignac Moto", location: "Mérignac, Nouvelle-Aquitaine", 
-              lat: 44.8311, lng: -0.6889, radius: 2000, length: 2.529, type: "moto" },
-            { name: "Albi Moto", location: "Albi, Occitanie", 
-              lat: 43.9147, lng: 2.1153, radius: 2000, length: 3.565, type: "moto" },
-            { name: "La Ferté-Gaucher Moto", location: "La Ferté-Gaucher, Île-de-France", 
-              lat: 48.7808, lng: 3.3072, radius: 2000, length: 2.800, type: "moto" },
-            { name: "Bresse Moto", location: "Saint-Marcel, Bourgogne-Franche-Comté", 
-              lat: 46.5261, lng: 5.3603, radius: 2000, length: 3.100, type: "moto" },
-            { name: "Circuit du Var Moto", location: "Le Luc, PACA", 
-              lat: 43.3847, lng: 6.3881, radius: 2000, length: 3.800, type: "moto" },
-            { name: "Chambley Moto", location: "Chambley, Grand Est", 
-              lat: 49.0225, lng: 5.8803, radius: 2500, length: 3.750, type: "moto" },
-            { name: "Abbeville Moto", location: "Abbeville, Hauts-de-France", 
-              lat: 50.0981, lng: 1.8392, radius: 1500, length: 1.720, type: "moto" },
-            { name: "Dreux Moto", location: "Dreux, Centre-Val de Loire", 
-              lat: 48.7531, lng: 1.3547, radius: 1500, length: 2.200, type: "moto" },
-            { name: "Montlhéry Moto", location: "Linas, Île-de-France", 
-              lat: 48.6428, lng: 2.2669, radius: 3000, length: 2.548, type: "moto" },
-            { name: "Châteauroux Moto", location: "Châteauroux, Centre-Val de Loire", 
-              lat: 46.8597, lng: 1.7253, radius: 2500, length: 3.650, type: "moto" },
-            { name: "Faleyras Moto", location: "Faleyras, Nouvelle-Aquitaine", 
-              lat: 44.7461, lng: -0.2578, radius: 1500, length: 1.900, type: "moto" },
-            { name: "Mettet Moto", location: "Mettet, Belgique (proche France)", 
-              lat: 50.3206, lng: 4.6617, radius: 2500, length: 2.650, type: "moto" }
-        ];
+        const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
+        const CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
 
-        let detectedCircuit = null;
+        // BASE DE DONNÉES COMPLÈTE - 155 CIRCUITS OUTDOOR FRANCE
+const CIRCUITS_DATABASE = [
+    
+    // ==========================================
+    // CIRCUITS AUTOMOBILE (33)
+    // ==========================================
+    
+    // Île-de-France (3)
+    { name: "Circuit Carole", location: "Aulnay-sous-Bois, Île-de-France", 
+      lat: 48.9534, lng: 2.4847, radius: 2000, length: 1.814, type: "auto" },
+    { name: "Autodrome de Linas-Montlhéry", location: "Linas, Île-de-France", 
+      lat: 48.6428, lng: 2.2669, radius: 3000, length: 2.548, type: "auto" },
+    { name: "La Ferté-Gaucher", location: "La Ferté-Gaucher, Île-de-France", 
+      lat: 48.7808, lng: 3.3072, radius: 2000, length: 2.800, type: "auto" },
+    
+    // Hauts-de-France (4)
+    { name: "Croix-en-Ternois", location: "Croix-en-Ternois, Hauts-de-France", 
+      lat: 50.3456, lng: 2.2347, radius: 2000, length: 2.500, type: "auto" },
+    { name: "Clastres", location: "Clastres, Hauts-de-France", 
+      lat: 49.7414, lng: 3.2086, radius: 2000, length: 2.780, type: "auto" },
+    { name: "Circuit des Écuyers", location: "Beuvardes, Hauts-de-France", 
+      lat: 49.1073, lng: 3.5069, radius: 2000, length: 2.750, type: "auto" },
+    { name: "Folembray", location: "Folembray, Hauts-de-France", 
+      lat: 49.6692, lng: 3.4647, radius: 1500, length: 2.080, type: "auto" },
+    
+    // Bourgogne-Franche-Comté (4)
+    { name: "Magny-Cours", location: "Nevers, Bourgogne-Franche-Comté", 
+      lat: 46.8642, lng: 3.1633, radius: 3000, length: 4.411, type: "auto" },
+    { name: "Dijon-Prenois", location: "Prenois, Bourgogne-Franche-Comté", 
+      lat: 47.3628, lng: 4.8997, radius: 2500, length: 3.801, type: "auto" },
+    { name: "Mornay", location: "Mornay, Bourgogne-Franche-Comté", 
+      lat: 46.3753, lng: 4.6253, radius: 1500, length: 2.100, type: "auto" },
+    { name: "Bresse", location: "Saint-Marcel, Bourgogne-Franche-Comté", 
+      lat: 46.5261, lng: 5.3603, radius: 2000, length: 3.100, type: "auto" },
+    
+    // Provence-Alpes-Côte d'Azur (2)
+    { name: "Paul Ricard", location: "Le Castellet, PACA", 
+      lat: 43.2506, lng: 5.7919, radius: 3000, length: 5.842, type: "auto" },
+    { name: "Circuit du Var", location: "Le Luc, PACA", 
+      lat: 43.3847, lng: 6.3881, radius: 2000, length: 3.800, type: "auto" },
+    
+    // Occitanie (5)
+    { name: "Circuit de Lédenon", location: "Lédenon, Occitanie", 
+      lat: 43.9211, lng: 4.5025, radius: 2000, length: 3.156, type: "auto" },
+    { name: "Alès Cévennes", location: "Alès, Occitanie", 
+      lat: 44.0678, lng: 4.0839, radius: 2000, length: 2.485, type: "auto" },
+    { name: "Nogaro", location: "Nogaro, Occitanie", 
+      lat: 43.7611, lng: -0.0314, radius: 2500, length: 3.636, type: "auto" },
+    { name: "Albi", location: "Albi, Occitanie", 
+      lat: 43.9147, lng: 2.1153, radius: 2000, length: 3.565, type: "auto" },
+    { name: "Toulouse Francazal", location: "Toulouse, Occitanie", 
+      lat: 43.5456, lng: 1.3678, radius: 1500, length: 2.680, type: "auto" },
+    
+    // Nouvelle-Aquitaine (6)
+    { name: "Pau-Arnos", location: "Arnos, Nouvelle-Aquitaine", 
+      lat: 43.4556, lng: -0.4489, radius: 2500, length: 3.030, type: "auto" },
+    { name: "Bordeaux-Mérignac", location: "Mérignac, Nouvelle-Aquitaine", 
+      lat: 44.8311, lng: -0.6889, radius: 2000, length: 2.529, type: "auto" },
+    { name: "Val de Vienne", location: "Le Vigeant, Nouvelle-Aquitaine", 
+      lat: 46.5733, lng: 0.6578, radius: 2500, length: 3.775, type: "auto" },
+    { name: "Faleyras", location: "Faleyras, Nouvelle-Aquitaine", 
+      lat: 44.7461, lng: -0.2578, radius: 1500, length: 1.900, type: "auto" },
+    { name: "Lurcy-Lévis", location: "Lurcy-Lévis, Auvergne-Rhône-Alpes", 
+      lat: 46.7386, lng: 2.9286, radius: 2500, length: 3.750, type: "auto" },
+    { name: "Issoire", location: "Issoire, Auvergne-Rhône-Alpes", 
+      lat: 45.5439, lng: 3.2769, radius: 2000, length: 3.100, type: "auto" },
+    
+    // Grand Est (3)
+    { name: "Anneau du Rhin", location: "Biltzheim, Grand Est", 
+      lat: 47.9536, lng: 7.3597, radius: 2500, length: 3.705, type: "auto" },
+    { name: "Chambley", location: "Chambley, Grand Est", 
+      lat: 49.0225, lng: 5.8803, radius: 2500, length: 3.750, type: "auto" },
+    
+    // Pays de la Loire (1)
+    { name: "Bugatti Le Mans", location: "Le Mans, Pays de la Loire", 
+      lat: 47.9561, lng: 0.2269, radius: 3000, length: 4.185, type: "auto" },
+    
+    // Centre-Val de Loire (3)
+    { name: "Châteauroux", location: "Châteauroux, Centre-Val de Loire", 
+      lat: 46.8597, lng: 1.7253, radius: 2500, length: 3.650, type: "auto" },
+    { name: "Dreux", location: "Dreux, Centre-Val de Loire", 
+      lat: 48.7531, lng: 1.3547, radius: 1500, length: 2.200, type: "auto" },
+    { name: "Abbeville", location: "Abbeville, Hauts-de-France", 
+      lat: 50.0981, lng: 1.8392, radius: 1500, length: 1.720, type: "auto" },
+    
+    // Belgique proche France (2)
+    { name: "Mettet", location: "Mettet, Belgique (proche France)", 
+      lat: 50.3206, lng: 4.6617, radius: 2500, length: 2.650, type: "auto" },
+    { name: "Spa-Francorchamps", location: "Stavelot, Belgique (proche France)", 
+      lat: 50.4372, lng: 5.9714, radius: 4000, length: 7.004, type: "auto" },
+    
+    // ==========================================
+    // CIRCUITS KARTING (94)
+    // ==========================================
+    
+    // Île-de-France (8)
+    { name: "SODI Paris", location: "Rungis, Île-de-France", 
+      lat: 48.7508, lng: 2.3528, radius: 1000, length: 1.150, type: "karting" },
+    { name: "PK1 Brétigny", location: "Brétigny-sur-Orge, Île-de-France", 
+      lat: 48.6042, lng: 2.3061, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting de Sénart", location: "Lieusaint, Île-de-France", 
+      lat: 48.6267, lng: 2.5492, radius: 1000, length: 1.200, type: "karting" },
+    { name: "Kart Ouest", location: "Trappes, Île-de-France", 
+      lat: 48.7686, lng: 1.9958, radius: 800, length: 1.050, type: "karting" },
+    { name: "Karting Cormeilles", location: "Cormeilles-en-Parisis, Île-de-France", 
+      lat: 48.9753, lng: 2.1997, radius: 800, length: 1.080, type: "karting" },
+    { name: "Racing Kart Dupré", location: "Évry, Île-de-France", 
+      lat: 48.6272, lng: 2.4492, radius: 800, length: 0.960, type: "karting" },
+    { name: "Karting des Fagnes", location: "Mariembourg, Île-de-France proche", 
+      lat: 50.0894, lng: 4.5208, radius: 1000, length: 1.250, type: "karting" },
+    { name: "Racing Kart de Mantes", location: "Mantes-la-Jolie, Île-de-France", 
+      lat: 48.9867, lng: 1.7122, radius: 800, length: 1.100, type: "karting" },
+    
+    // Auvergne-Rhône-Alpes (12)
+    { name: "Karting de Lyon", location: "Corbas, Auvergne-Rhône-Alpes", 
+      lat: 45.6686, lng: 4.9022, radius: 1000, length: 1.200, type: "karting" },
+    { name: "Outdoor Lyon Ouest", location: "L'Arbresle, Auvergne-Rhône-Alpes", 
+      lat: 45.8353, lng: 4.6197, radius: 800, length: 1.050, type: "karting" },
+    { name: "Racing Kart Corsa", location: "Chaponnay, Auvergne-Rhône-Alpes", 
+      lat: 45.6231, lng: 4.9347, radius: 1000, length: 1.350, type: "karting" },
+    { name: "Karting de Grenoble", location: "Saint-Quentin-sur-Isère, Auvergne-Rhône-Alpes", 
+      lat: 45.2564, lng: 5.5539, radius: 1000, length: 1.280, type: "karting" },
+    { name: "Karting Annecy", location: "Argonay, Auvergne-Rhône-Alpes", 
+      lat: 45.9344, lng: 6.1478, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Saint-Étienne", location: "Andrézieux-Bouthéon, Auvergne-Rhône-Alpes", 
+      lat: 45.5283, lng: 4.2636, radius: 800, length: 1.050, type: "karting" },
+    { name: "Kart 01", location: "Bourg-en-Bresse, Auvergne-Rhône-Alpes", 
+      lat: 46.2058, lng: 5.2272, radius: 800, length: 1.000, type: "karting" },
+    { name: "Karting Chambéry", location: "La Ravoire, Auvergne-Rhône-Alpes", 
+      lat: 45.5631, lng: 5.9656, radius: 800, length: 1.120, type: "karting" },
+    { name: "Piste Kart 07", location: "Privas, Auvergne-Rhône-Alpes", 
+      lat: 44.7356, lng: 4.5986, radius: 700, length: 0.950, type: "karting" },
+    { name: "Karting Valence", location: "Alixan, Auvergne-Rhône-Alpes", 
+      lat: 44.9769, lng: 5.0308, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Vichy", location: "Hauterive, Auvergne-Rhône-Alpes", 
+      lat: 46.1092, lng: 3.4297, radius: 700, length: 0.980, type: "karting" },
+    { name: "Karting Roanne", location: "Le Coteau, Auvergne-Rhône-Alpes", 
+      lat: 46.0300, lng: 4.0886, radius: 700, length: 1.020, type: "karting" },
+    
+    // Nouvelle-Aquitaine (12)
+    { name: "Karting de Lons", location: "Lons, Nouvelle-Aquitaine", 
+      lat: 43.3167, lng: -0.4000, radius: 800, length: 1.100, type: "karting" },
+    { name: "Speed Park Bordeaux", location: "Mérignac, Nouvelle-Aquitaine", 
+      lat: 44.8497, lng: -0.6944, radius: 1000, length: 1.300, type: "karting" },
+    { name: "Karting Saint-Junien", location: "Saint-Junien, Nouvelle-Aquitaine", 
+      lat: 45.8881, lng: 0.8997, radius: 800, length: 1.050, type: "karting" },
+    { name: "Karting Poitiers", location: "Chasseneuil-du-Poitou, Nouvelle-Aquitaine", 
+      lat: 46.6536, lng: 0.3731, radius: 800, length: 1.080, type: "karting" },
+    { name: "Karting La Rochelle", location: "Puilboreau, Nouvelle-Aquitaine", 
+      lat: 46.1811, lng: -1.1136, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Bergerac", location: "Bergerac, Nouvelle-Aquitaine", 
+      lat: 44.8528, lng: 0.4833, radius: 700, length: 0.950, type: "karting" },
+    { name: "Karting Angoulême", location: "L'Isle-d'Espagnac, Nouvelle-Aquitaine", 
+      lat: 45.6553, lng: 0.1522, radius: 800, length: 1.050, type: "karting" },
+    { name: "Karting Pau", location: "Lescar, Nouvelle-Aquitaine", 
+      lat: 43.3381, lng: -0.4253, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Bayonne", location: "Ondres, Nouvelle-Aquitaine", 
+      lat: 43.5597, lng: -1.4564, radius: 700, length: 0.980, type: "karting" },
+    { name: "Karting Limoges", location: "Bonnac-la-Côte, Nouvelle-Aquitaine", 
+      lat: 45.8881, lng: 1.2333, radius: 700, length: 1.000, type: "karting" },
+    { name: "Karting Brive", location: "Brive-la-Gaillarde, Nouvelle-Aquitaine", 
+      lat: 45.1508, lng: 1.5331, radius: 700, length: 0.920, type: "karting" },
+    { name: "Circuit de Karting du Val d'Argenton", location: "Argentonnay, Nouvelle-Aquitaine", 
+      lat: 46.9886, lng: -0.4292, radius: 800, length: 1.050, type: "karting" },
+    
+    // Occitanie (10)
+    { name: "Karting Toulouse", location: "Aussonne, Occitanie", 
+      lat: 43.6814, lng: 1.3192, radius: 1000, length: 1.250, type: "karting" },
+    { name: "Karting Montpellier", location: "Vendargues, Occitanie", 
+      lat: 43.6553, lng: 3.9672, radius: 800, length: 1.150, type: "karting" },
+    { name: "Karting Perpignan", location: "Alénya, Occitanie", 
+      lat: 42.6453, lng: 2.9889, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Narbonne", location: "Narbonne, Occitanie", 
+      lat: 43.1839, lng: 3.0036, radius: 700, length: 1.020, type: "karting" },
+    { name: "Karting Nîmes", location: "Marguerittes, Occitanie", 
+      lat: 43.8628, lng: 4.4439, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Carcassonne", location: "Carcassonne, Occitanie", 
+      lat: 43.2131, lng: 2.3486, radius: 700, length: 0.950, type: "karting" },
+    { name: "Karting Tarbes", location: "Séméac, Occitanie", 
+      lat: 43.2281, lng: 0.1114, radius: 700, length: 1.000, type: "karting" },
+    { name: "Karting Rodez", location: "Onet-le-Château, Occitanie", 
+      lat: 44.3694, lng: 2.5764, radius: 700, length: 0.980, type: "karting" },
+    { name: "Karting Béziers", location: "Villeneuve-lès-Béziers, Occitanie", 
+      lat: 43.3275, lng: 3.2653, radius: 700, length: 1.050, type: "karting" },
+    { name: "Karting Cahors", location: "Cahors, Occitanie", 
+      lat: 44.4478, lng: 1.4403, radius: 700, length: 0.920, type: "karting" },
+    
+    // Pays de la Loire (8)
+    { name: "RKC Le Mans", location: "Le Mans, Pays de la Loire", 
+      lat: 47.9561, lng: 0.2269, radius: 1000, length: 1.382, type: "karting" },
+    { name: "Karting Nantes", location: "Bouguenais, Pays de la Loire", 
+      lat: 47.1778, lng: -1.6181, radius: 1000, length: 1.200, type: "karting" },
+    { name: "Karting Angers", location: "Écouflant, Pays de la Loire", 
+      lat: 47.5308, lng: -0.5297, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting La Roche-sur-Yon", location: "Mouilleron-le-Captif, Pays de la Loire", 
+      lat: 46.7211, lng: -1.4444, radius: 800, length: 1.050, type: "karting" },
+    { name: "Karting Laval", location: "Changé, Pays de la Loire", 
+      lat: 48.0939, lng: -0.7925, radius: 700, length: 1.000, type: "karting" },
+    { name: "Karting Saint-Nazaire", location: "Trignac, Pays de la Loire", 
+      lat: 47.3231, lng: -2.1953, radius: 700, length: 0.950, type: "karting" },
+    { name: "Karting Cholet", location: "Cholet, Pays de la Loire", 
+      lat: 47.0586, lng: -0.8753, radius: 700, length: 0.980, type: "karting" },
+    { name: "Karting Sablé", location: "Sablé-sur-Sarthe, Pays de la Loire", 
+      lat: 47.8436, lng: -0.3311, radius: 700, length: 1.020, type: "karting" },
+    
+    // Provence-Alpes-Côte d'Azur (9)
+    { name: "Karting Marseille", location: "Plan-de-Campagne, PACA", 
+      lat: 43.4897, lng: 5.4331, radius: 1000, length: 1.250, type: "karting" },
+    { name: "Karting Nice", location: "Carros, PACA", 
+      lat: 43.7839, lng: 7.1864, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Toulon", location: "La Valette-du-Var, PACA", 
+      lat: 43.1372, lng: 5.9842, radius: 800, length: 1.080, type: "karting" },
+    { name: "Karting Avignon", location: "Sorgues, PACA", 
+      lat: 44.0094, lng: 4.8728, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Gap", location: "Gap, PACA", 
+      lat: 44.5592, lng: 6.0794, radius: 700, length: 0.950, type: "karting" },
+    { name: "Karting Aix-en-Provence", location: "Venelles, PACA", 
+      lat: 43.5950, lng: 5.4814, radius: 800, length: 1.050, type: "karting" },
+    { name: "Karting Antibes", location: "Biot, PACA", 
+      lat: 43.6286, lng: 7.0972, radius: 700, length: 1.000, type: "karting" },
+    { name: "Karting Cannes", location: "Le Cannet, PACA", 
+      lat: 43.5778, lng: 7.0186, radius: 700, length: 0.980, type: "karting" },
+    { name: "Karting Fréjus", location: "Fréjus, PACA", 
+      lat: 43.4331, lng: 6.7372, radius: 700, length: 1.020, type: "karting" },
+    
+    // Grand Est (7)
+    { name: "Karting Strasbourg", location: "Ostwald, Grand Est", 
+      lat: 48.5431, lng: 7.7139, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Mulhouse", location: "Sausheim, Grand Est", 
+      lat: 47.7881, lng: 7.3764, radius: 800, length: 1.080, type: "karting" },
+    { name: "Karting Reims", location: "Cormontreuil, Grand Est", 
+      lat: 49.2181, lng: 4.0494, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Metz", location: "Augny, Grand Est", 
+      lat: 49.0672, lng: 6.1208, radius: 700, length: 1.000, type: "karting" },
+    { name: "Karting Nancy", location: "Tomblaine, Grand Est", 
+      lat: 48.6831, lng: 6.2200, radius: 700, length: 0.980, type: "karting" },
+    { name: "Karting Colmar", location: "Wintzenheim, Grand Est", 
+      lat: 48.0722, lng: 7.2825, radius: 700, length: 0.950, type: "karting" },
+    { name: "Karting Épinal", location: "Épinal, Grand Est", 
+      lat: 48.1744, lng: 6.4500, radius: 700, length: 0.920, type: "karting" },
+    
+    // Hauts-de-France (8)
+    { name: "Karting Lille", location: "Lezennes, Hauts-de-France", 
+      lat: 50.6150, lng: 3.1150, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Amiens", location: "Rivery, Hauts-de-France", 
+      lat: 49.9092, lng: 2.3231, radius: 800, length: 1.050, type: "karting" },
+    { name: "Karting Valenciennes", location: "Rouvignies, Hauts-de-France", 
+      lat: 50.3261, lng: 3.5403, radius: 700, length: 1.000, type: "karting" },
+    { name: "Karting Dunkerque", location: "Grande-Synthe, Hauts-de-France", 
+      lat: 51.0136, lng: 2.3019, radius: 700, length: 0.980, type: "karting" },
+    { name: "Karting Calais", location: "Marck, Hauts-de-France", 
+      lat: 50.9453, lng: 1.9556, radius: 700, length: 0.950, type: "karting" },
+    { name: "Karting Arras", location: "Saint-Laurent-Blangy, Hauts-de-France", 
+      lat: 50.3067, lng: 2.8089, radius: 700, length: 1.020, type: "karting" },
+    { name: "Karting Beauvais", location: "Tillé, Hauts-de-France", 
+      lat: 49.4614, lng: 2.1128, radius: 700, length: 0.980, type: "karting" },
+    { name: "Karting Douai", location: "Lambres-lez-Douai, Hauts-de-France", 
+      lat: 50.3542, lng: 3.0592, radius: 700, length: 0.920, type: "karting" },
+    
+    // Bretagne (7)
+    { name: "Karting Rennes", location: "Chartres-de-Bretagne, Bretagne", 
+      lat: 48.0439, lng: -1.7078, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Brest", location: "Gouesnou, Bretagne", 
+      lat: 48.4506, lng: -4.4689, radius: 700, length: 1.000, type: "karting" },
+    { name: "Karting Lorient", location: "Caudan, Bretagne", 
+      lat: 47.8103, lng: -3.3364, radius: 700, length: 0.980, type: "karting" },
+    { name: "Karting Vannes", location: "Ploeren, Bretagne", 
+      lat: 47.6564, lng: -2.8636, radius: 700, length: 0.950, type: "karting" },
+    { name: "Karting Saint-Brieuc", location: "Plérin, Bretagne", 
+      lat: 48.5422, lng: -2.7278, radius: 700, length: 1.020, type: "karting" },
+    { name: "Karting Quimper", location: "Pluguffan, Bretagne", 
+      lat: 47.9767, lng: -4.1678, radius: 700, length: 0.920, type: "karting" },
+    { name: "Circuit Nelly Delamarche", location: "Fougères, Bretagne", 
+      lat: 48.3528, lng: -1.2006, radius: 700, length: 0.980, type: "karting" },
+    
+    // Normandie (13)
+    { name: "Karting Rouen", location: "Eslettes, Normandie", 
+      lat: 49.5683, lng: 1.3597, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Caen", location: "Carpiquet, Normandie", 
+      lat: 49.1883, lng: -0.4531, radius: 800, length: 1.050, type: "karting" },
+    { name: "Karting Le Havre", location: "Gonfreville-l'Orcher, Normandie", 
+      lat: 49.5069, lng: 0.2278, radius: 700, length: 1.000, type: "karting" },
+    { name: "Karting Alençon", location: "Valframbert, Normandie", 
+      lat: 48.4578, lng: 0.1036, radius: 700, length: 0.950, type: "karting" },
+    { name: "Karting Cherbourg", location: "La Glacerie, Normandie", 
+      lat: 49.6158, lng: -1.6092, radius: 700, length: 0.980, type: "karting" },
+    { name: "Karting Évreux", location: "Guichainville, Normandie", 
+      lat: 49.0314, lng: 1.1850, radius: 700, length: 0.920, type: "karting" },
+    { name: "Circuit Lucien Lebret", location: "Courseulles-sur-Mer, Normandie", 
+      lat: 49.3275, lng: -0.4578, radius: 800, length: 1.080, type: "karting" },
+    { name: "Circuit de Cabourg", location: "Cabourg, Normandie", 
+      lat: 49.2867, lng: -0.1178, radius: 700, length: 0.950, type: "karting" },
+    { name: "Circuit international d'Aunay les Bois", location: "Aunay-sur-Odon, Normandie", 
+      lat: 49.0194, lng: -0.6272, radius: 1000, length: 1.200, type: "karting" },
+    { name: "Circuit du Mortainais", location: "Mortain-Bocage, Normandie", 
+      lat: 48.6472, lng: -0.9419, radius: 800, length: 1.050, type: "karting" },
+    { name: "Circuit de la Hague", location: "Beaumont-Hague, Normandie", 
+      lat: 49.6644, lng: -1.8364, radius: 700, length: 0.980, type: "karting" },
+    { name: "Circuit de la Manche", location: "Saint-Lô, Normandie", 
+      lat: 49.1153, lng: -1.0908, radius: 800, length: 1.100, type: "karting" },
+    { name: "Circuit du Parc", location: "Granville, Normandie", 
+      lat: 48.8378, lng: -1.5989, radius: 700, length: 0.920, type: "karting" },
+    
+    // Centre-Val de Loire (5)
+    { name: "Karting Orléans", location: "Saint-Jean-de-Braye, Centre-Val de Loire", 
+      lat: 47.9117, lng: 1.9731, radius: 800, length: 1.100, type: "karting" },
+    { name: "Karting Tours", location: "Chambray-lès-Tours, Centre-Val de Loire", 
+      lat: 47.3364, lng: 0.7178, radius: 700, length: 1.000, type: "karting" },
+    { name: "Karting Bourges", location: "Saint-Doulchard, Centre-Val de Loire", 
+      lat: 47.1006, lng: 2.3742, radius: 700, length: 0.950, type: "karting" },
+    { name: "Karting Blois", location: "Vineuil, Centre-Val de Loire", 
+      lat: 47.5831, lng: 1.3778, radius: 700, length: 0.980, type: "karting" },
+    { name: "Karting Chartres", location: "Lucé, Centre-Val de Loire", 
+      lat: 48.4344, lng: 1.4656, radius: 700, length: 0.920, type: "karting" },
+    
+    // Bourgogne-Franche-Comté (4)
+    { name: "Karting Dijon", location: "Chenôve, Bourgogne-Franche-Comté", 
+      lat: 47.2919, lng: 5.0047, radius: 800, length: 1.050, type: "karting" },
+    { name: "Karting Besançon", location: "Pirey, Bourgogne-Franche-Comté", 
+      lat: 47.2622, lng: 5.9725, radius: 700, length: 1.000, type: "karting" },
+    { name: "Karting Auxerre", location: "Monéteau, Bourgogne-Franche-Comté", 
+      lat: 47.8289, lng: 3.5703, radius: 700, length: 0.950, type: "karting" },
+    { name: "Karting Belfort", location: "Andelnans, Bourgogne-Franche-Comté", 
+      lat: 47.6092, lng: 6.8764, radius: 700, length: 0.980, type: "karting" },
+    
+    // Corse (2)
+    { name: "Karting Ajaccio", location: "Afa, Corse", 
+      lat: 41.9561, lng: 8.8025, radius: 700, length: 0.900, type: "karting" },
+    { name: "Karting Bastia", location: "Borgo, Corse", 
+      lat: 42.5614, lng: 9.4264, radius: 700, length: 0.950, type: "karting" },
+    
+    // ==========================================
+    // CIRCUITS MOTO (28)
+    // ==========================================
+    
+    { name: "Carole Moto", location: "Aulnay-sous-Bois, Île-de-France", 
+      lat: 48.9534, lng: 2.4847, radius: 2000, length: 1.814, type: "moto" },
+    { name: "Magny-Cours Moto", location: "Nevers, Bourgogne-Franche-Comté", 
+      lat: 46.8642, lng: 3.1633, radius: 3000, length: 4.411, type: "moto" },
+    { name: "Paul Ricard Moto", location: "Le Castellet, PACA", 
+      lat: 43.2506, lng: 5.7919, radius: 3000, length: 5.842, type: "moto" },
+    { name: "Dijon-Prenois Moto", location: "Prenois, Bourgogne-Franche-Comté", 
+      lat: 47.3628, lng: 4.8997, radius: 2500, length: 3.801, type: "moto" },
+    { name: "Lédenon Moto", location: "Lédenon, Occitanie", 
+      lat: 43.9211, lng: 4.5025, radius: 2000, length: 3.156, type: "moto" },
+    { name: "Alès Cévennes Moto", location: "Alès, Occitanie", 
+      lat: 44.0678, lng: 4.0839, radius: 2000, length: 2.485, type: "moto" },
+    { name: "Pau-Arnos Moto", location: "Arnos, Nouvelle-Aquitaine", 
+      lat: 43.4556, lng: -0.4489, radius: 2500, length: 3.030, type: "moto" },
+    { name: "Nogaro Moto", location: "Nogaro, Occitanie", 
+      lat: 43.7611, lng: -0.0314, radius: 2500, length: 3.636, type: "moto" },
+    { name: "Le Mans Moto", location: "Le Mans, Pays de la Loire", 
+      lat: 47.9561, lng: 0.2269, radius: 3000, length: 4.185, type: "moto" },
+    { name: "Lurcy-Lévis Moto", location: "Lurcy-Lévis, Auvergne-Rhône-Alpes", 
+      lat: 46.7386, lng: 2.9286, radius: 2500, length: 3.750, type: "moto" },
+    { name: "Issoire Moto", location: "Issoire, Auvergne-Rhône-Alpes", 
+      lat: 45.5439, lng: 3.2769, radius: 2000, length: 3.100, type: "moto" },
+    { name: "Anneau du Rhin Moto", location: "Biltzheim, Grand Est", 
+      lat: 47.9536, lng: 7.3597, radius: 2500, length: 3.705, type: "moto" },
+    { name: "Croix-en-Ternois Moto", location: "Croix-en-Ternois, Hauts-de-France", 
+      lat: 50.3456, lng: 2.2347, radius: 2000, length: 2.500, type: "moto" },
+    { name: "Clastres Moto", location: "Clastres, Hauts-de-France", 
+      lat: 49.7414, lng: 3.2086, radius: 2000, length: 2.780, type: "moto" },
+    { name: "Folembray Moto", location: "Folembray, Hauts-de-France", 
+      lat: 49.6692, lng: 3.4647, radius: 1500, length: 2.080, type: "moto" },
+    { name: "Val de Vienne Moto", location: "Le Vigeant, Nouvelle-Aquitaine", 
+      lat: 46.5733, lng: 0.6578, radius: 2500, length: 3.775, type: "moto" },
+    { name: "Bordeaux-Mérignac Moto", location: "Mérignac, Nouvelle-Aquitaine", 
+      lat: 44.8311, lng: -0.6889, radius: 2000, length: 2.529, type: "moto" },
+    { name: "Albi Moto", location: "Albi, Occitanie", 
+      lat: 43.9147, lng: 2.1153, radius: 2000, length: 3.565, type: "moto" },
+    { name: "La Ferté-Gaucher Moto", location: "La Ferté-Gaucher, Île-de-France", 
+      lat: 48.7808, lng: 3.3072, radius: 2000, length: 2.800, type: "moto" },
+    { name: "Bresse Moto", location: "Saint-Marcel, Bourgogne-Franche-Comté", 
+      lat: 46.5261, lng: 5.3603, radius: 2000, length: 3.100, type: "moto" },
+    { name: "Circuit du Var Moto", location: "Le Luc, PACA", 
+      lat: 43.3847, lng: 6.3881, radius: 2000, length: 3.800, type: "moto" },
+    { name: "Chambley Moto", location: "Chambley, Grand Est", 
+      lat: 49.0225, lng: 5.8803, radius: 2500, length: 3.750, type: "moto" },
+    { name: "Abbeville Moto", location: "Abbeville, Hauts-de-France", 
+      lat: 50.0981, lng: 1.8392, radius: 1500, length: 1.720, type: "moto" },
+    { name: "Dreux Moto", location: "Dreux, Centre-Val de Loire", 
+      lat: 48.7531, lng: 1.3547, radius: 1500, length: 2.200, type: "moto" },
+    { name: "Montlhéry Moto", location: "Linas, Île-de-France", 
+      lat: 48.6428, lng: 2.2669, radius: 3000, length: 2.548, type: "moto" },
+    { name: "Châteauroux Moto", location: "Châteauroux, Centre-Val de Loire", 
+      lat: 46.8597, lng: 1.7253, radius: 2500, length: 3.650, type: "moto" },
+    { name: "Faleyras Moto", location: "Faleyras, Nouvelle-Aquitaine", 
+      lat: 44.7461, lng: -0.2578, radius: 1500, length: 1.900, type: "moto" },
+    { name: "Mettet Moto", location: "Mettet, Belgique (proche France)", 
+      lat: 50.3206, lng: 4.6617, radius: 2500, length: 2.650, type: "moto" },
+];
 
-        // INITIALISATION
-        const uploadArea = document.getElementById('upload-area');
-        const fileInput = document.getElementById('file-input');
+let detectedCircuit = null;
+
+
+
+
+function detectCircuitFromGPS() {
+    if (!sessionData || !sessionData.gpsTrack || sessionData.gpsTrack.length === 0) {
+        return null;
+    }
+    
+    // Calculer le centre du tracé GPS
+    const track = sessionData.gpsTrack;
+    const centerLat = track.reduce((sum, p) => sum + p.lat, 0) / track.length;
+    const centerLng = track.reduce((sum, p) => sum + p.lng, 0) / track.length;
+    
+    console.log(`Centre GPS: ${centerLat.toFixed(6)}, ${centerLng.toFixed(6)}`);
+    
+    // Chercher dans tous les circuits (base + custom)
+    // Chercher uniquement dans la base de données
+const allCircuits = CIRCUITS_DATABASE;
+    
+    for (const circuit of allCircuits) {
+        const distance = calculateDistance(
+            { lat: centerLat, lng: centerLng },
+            { lat: circuit.lat, lng: circuit.lng }
+        );
         
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('drag-over');
-        });
-        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('drag-over');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type === 'application/json') loadSession(file);
-        });
+        console.log(`Distance ${circuit.name}: ${distance.toFixed(0)}m (rayon: ${circuit.radius}m)`);
         
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) loadSession(file);
-        });
-       
-        function loadSession(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    sessionData = JSON.parse(e.target.result);
-                    displaySession();
-                } catch (error) {
-                    alert('Erreur de lecture du fichier JSON: ' + error.message);
-                }
-            };
-            reader.readAsText(file);
+        if (distance < circuit.radius) {
+            console.log(`✓ Circuit détecté: ${circuit.name}`);
+            return circuit;
         }
+    }
+    
+    console.log('Aucun circuit reconnu');
+    return null;
+}
+
+function showCircuitDetection() {
+    detectedCircuit = detectCircuitFromGPS();
+    
+    const circuitInfo = document.getElementById('circuit-info');
+    const circuitUnknown = document.getElementById('circuit-unknown');
+    
+    if (detectedCircuit) {
+        circuitInfo.style.display = 'flex';
+        circuitUnknown.style.display = 'none';
         
-        function displaySession() {
-            document.getElementById('upload-area').style.display = 'none';
-            document.getElementById('session-content').style.display = 'block';
+        document.querySelector('#circuit-info .circuit-icon').textContent = 
+            detectedCircuit.type === 'auto' ? '🏎️' : '🏁';
+        document.getElementById('circuit-name').textContent = detectedCircuit.name;
+        document.getElementById('circuit-location').textContent = 
+            `${detectedCircuit.location} - ${detectedCircuit.length} km`;
+    } else {
+        circuitInfo.style.display = 'none';
+         circuitUnknown.style.display = 'block'; 
+    }
+}
+
+
+
+
+
+console.log(`Base de données chargée: ${CIRCUITS_DATABASE.length} circuits`);
+console.log(`- Auto: ${CIRCUITS_DATABASE.filter(c => c.type === 'auto').length}`);
+console.log(`- Karting: ${CIRCUITS_DATABASE.filter(c => c.type === 'karting').length}`);
+console.log(`- Moto: ${CIRCUITS_DATABASE.filter(c => c.type === 'moto').length}`);
+
+
+// ==========================================
+// GESTION DES PAGES
+// ==========================================
+
+function showLocalFileMode() {
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('upload-area').style.display = 'block';
+}
+
+function showESP32Mode() {
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('esp32-page').style.display = 'block';
+}
+
+function showStoredFiles() {
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('stored-files-page').style.display = 'block';
+    loadStoredFilesList();
+}
+
+function returnToHome() {
+    // Cacher toutes les pages
+    document.getElementById('upload-area').style.display = 'none';
+    document.getElementById('esp32-page').style.display = 'none';
+    document.getElementById('stored-files-page').style.display = 'none';
+    document.getElementById('session-content').style.display = 'none';
+    
+    // Réinitialiser
+    if (map) {
+        map.remove();
+        map = null;
+    }
+    sessionData = null;
+    currentSessionId = null;
+    
+    // Retour à l'accueil
+    document.getElementById('home-page').style.display = 'block';
+    updateStoredFilesCount();
+}
+
+function returnToFileSelection() {
+    document.getElementById('session-content').style.display = 'none';
+    if (map) {
+        map.remove();
+        map = null;
+    }
+    
+    // Retourner à la page d'origine
+    if (currentSessionId && currentSessionId.startsWith('stored_')) {
+        showStoredFiles();
+    } else {
+        showLocalFileMode();
+    }
+}
+
+// ==========================================
+// STOCKAGE LOCAL
+// ==========================================
+
+function saveSessionToStorage(data) {
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    const sessionId = 'stored_' + Date.now();
+    
+    sessions.push({
+        id: sessionId,
+        data: data,
+        savedAt: Date.now(),
+        name: `Session ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`
+    });
+    
+    localStorage.setItem('gpsSessions', JSON.stringify(sessions));
+    updateStoredFilesCount();
+    return sessionId;
+}
+
+function loadStoredFilesList() {
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    const container = document.getElementById('stored-files-list');
+    
+    if (sessions.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 50px;">Aucune session sauvegardée</p>';
+        return;
+    }
+    
+    container.innerHTML = sessions.map((session, index) => {
+        const date = new Date(session.savedAt);
+        const data = session.data;
+        
+        return `
+            <div class="file-item" id="file-item-${index}">
+                <div class="file-item-checkbox">
+                    <input type="checkbox" id="checkbox-${index}" onchange="updateSelectedCount()">
+                </div>
+                <div class="file-item-content">
+                    <div class="file-item-header">
+                        <div class="file-item-title">${session.name}</div>
+                        <div class="file-item-date">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</div>
+                    </div>
+                    <div class="file-item-stats">
+                        <span>🏁 ${data.laps} tours</span>
+                        <span>⏱️ Meilleur: ${formatTime(data.best)}</span>
+                        <span>🚀 ${data.maxSpd.toFixed(1)} km/h</span>
+                    </div>
+                    <div class="file-item-actions">
+                        <button class="file-action-btn btn-load" onclick="loadStoredSession(${index})">
+                            📊 Analyser
+                        </button>
+                        <button class="file-action-btn btn-delete" onclick="deleteStoredSession(${index})">
+                            🗑️ Supprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    updateSelectedCount();
+}
+
+function loadStoredSession(index) {
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    if (sessions[index]) {
+        currentSessionId = sessions[index].id;
+        sessionData = sessions[index].data;
+        document.getElementById('stored-files-page').style.display = 'none';
+        displaySession();
+    }
+}
+
+function deleteStoredSession(index) {
+    if (!confirm('Supprimer cette session ?')) return;
+    
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    sessions.splice(index, 1);
+    localStorage.setItem('gpsSessions', JSON.stringify(sessions));
+    loadStoredFilesList();
+    updateStoredFilesCount();
+}
+
+function clearAllSessions() {
+    if (!confirm('Supprimer TOUTES les sessions sauvegardées ? Cette action est irréversible.')) return;
+    
+    localStorage.removeItem('gpsSessions');
+    loadStoredFilesList();
+    updateStoredFilesCount();
+}
+
+function updateStoredFilesCount() {
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    const countElement = document.getElementById('stored-count');
+    if (countElement) {
+        countElement.textContent = sessions.length === 0 ? 'Aucune session' : `${sessions.length} session(s) disponible(s)`;
+    }
+}
+
+function selectAllSessions() {
+    const checkboxes = document.querySelectorAll('[id^="checkbox-"]');
+    checkboxes.forEach(cb => cb.checked = true);
+    updateSelectedCount();
+}
+
+function deselectAllSessions() {
+    const checkboxes = document.querySelectorAll('[id^="checkbox-"]');
+    checkboxes.forEach(cb => cb.checked = false);
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const checkboxes = document.querySelectorAll('[id^="checkbox-"]:checked');
+    const count = checkboxes.length;
+    const btn = document.getElementById('download-selected-btn');
+    const countSpan = document.getElementById('selected-count');
+    
+    if (btn && countSpan) {
+        if (count > 0) {
+            btn.style.display = 'inline-block';
+            countSpan.textContent = count;
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+    
+    // Mettre en surbrillance les items sélectionnés
+    document.querySelectorAll('.file-item').forEach((item, index) => {
+        const checkbox = document.getElementById(`checkbox-${index}`);
+        if (checkbox && checkbox.checked) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+async function downloadSelectedSessions() {
+    const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    const checkboxes = document.querySelectorAll('[id^="checkbox-"]:checked');
+    const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.id.replace('checkbox-', '')));
+    
+    if (selectedIndices.length === 0) {
+        alert('Aucune session sélectionnée');
+        return;
+    }
+    
+    if (selectedIndices.length === 1) {
+        // Télécharger un seul fichier JSON
+        const session = sessions[selectedIndices[0]];
+        const json = JSON.stringify(session.data, null, 2);
+        const filename = `session_${session.data.id || 'export'}.json`;
+        downloadFile(json, filename, 'application/json');
+    } else {
+        // Télécharger plusieurs fichiers en ZIP
+        await downloadMultipleSessionsAsZip(sessions, selectedIndices);
+    }
+}
+
+async function downloadMultipleSessionsAsZip(sessions, selectedIndices) {
+    if (typeof JSZip === 'undefined') {
+        alert('Bibliothèque ZIP non chargée. Téléchargement des fichiers individuellement...');
+        selectedIndices.forEach(index => {
+            const session = sessions[index];
+            const json = JSON.stringify(session.data, null, 2);
+            const filename = `session_${session.data.id || index}.json`;
+            downloadFile(json, filename, 'application/json');
+        });
+        return;
+    }
+    
+    const zip = new JSZip();
+    const folder = zip.folder('gps_sessions');
+    
+    selectedIndices.forEach(index => {
+        const session = sessions[index];
+        const json = JSON.stringify(session.data, null, 2);
+        const filename = `session_${session.data.id || index}.json`;
+        folder.file(filename, json);
+    });
+    
+    try {
+        const content = await zip.generateAsync({
+            type: 'blob',
+            compression: 'DEFLATE',
+            compressionOptions: { level: 9 }
+        });
+        
+        const timestamp = new Date().toISOString().split('T')[0];
+        downloadFile(content, `gps_sessions_${timestamp}.zip`, 'application/zip');
+    } catch (error) {
+        alert('Erreur lors de la création du ZIP: ' + error.message);
+    }
+}
+
+// ==========================================
+// CONNEXION ESP32
+// ==========================================
+
+
+
+
+// Initialisation au chargement
+window.addEventListener('DOMContentLoaded', () => {
+    updateStoredFilesCount();
+});
+        // ==========================================
+// CONNEXION ESP32 / GPS_LAPTIMER
+// ==========================================
+
+// ==========================================
+// CONNEXION ESP32 / GPS_LAPTIMER - BLUETOOTH BLE
+// ==========================================
+
+async function connectESP32() {
+    const status = document.getElementById('esp32-status');
+    
+    status.style.display = 'block';
+    status.style.background = '#fff3cd';
+    status.style.color = '#856404';
+    status.innerHTML = '🔄 Connexion Bluetooth...';
+    
+    try {
+        // Demander connexion Bluetooth
+        bluetoothDevice = await navigator.bluetooth.requestDevice({
+            filters: [{ namePrefix: 'GPS_Chrono' }],
+            optionalServices: [SERVICE_UUID]
+        });
+        
+        status.innerHTML = '🔄 Connexion au service BLE...';
+        
+        const server = await bluetoothDevice.gatt.connect();
+        const service = await server.getPrimaryService(SERVICE_UUID);
+        bluetoothCharacteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+        
+        // Activer les notifications
+        await bluetoothCharacteristic.startNotifications();
+        bluetoothCharacteristic.addEventListener('characteristicvaluechanged', handleBLENotification);
+        
+        // Gérer la déconnexion
+        bluetoothDevice.addEventListener('gattserverdisconnected', onBLEDisconnected);
+        
+        status.style.background = '#d4edda';
+        status.style.color = '#155724';
+        status.innerHTML = `✅ Connecté à ${bluetoothDevice.name}`;
+        
+        // Récupérer la liste des fichiers
+        await sendBLECommand('LIST');
+        
+    } catch (error) {
+        status.style.background = '#f8d7da';
+        status.style.color = '#721c24';
+        status.innerHTML = `❌ Erreur: ${error.message}<br><small>Vérifiez:<br>
+            1. Bluetooth activé<br>
+            2. GPS_LapTimer allumé<br>
+            3. Navigateur compatible (Chrome/Edge)</small>`;
+    }
+}
+
+function onBLEDisconnected() {
+    console.log('Bluetooth déconnecté');
+    bluetoothDevice = null;
+    bluetoothCharacteristic = null;
+    alert('Connexion Bluetooth perdue');
+}
+
+// ==========================================
+// GESTION RÉCEPTION DONNÉES BLUETOOTH
+// ==========================================
+
+function handleBLENotification(event) {
+    const value = event.target.value;
+    const decoder = new TextDecoder('utf-8');
+    const text = decoder.decode(value);
+    
+    // Debug uniquement pour les petits messages
+    if (text.length < 100) {
+        console.log('BLE reçu:', text);
+    }
+    
+    // Si on reçoit un fichier complet
+    if (isReceivingFile) {
+        // Détecter EOF (peut être avec ou sans \n, seul ou avec des données)
+        if (text.trim() === "EOF" || text === "EOF\n") {
+            // Fin de fichier
+            console.log(`✅ Fichier complet reçu: ${receivedFileData.length} octets`);
+            isReceivingFile = false;
             
-            document.getElementById('session-title').textContent = 'Session Circuit - Analyse GPS';
+            // Attendre un peu pour s'assurer que tout est bien reçu
+            setTimeout(() => {
+                processBLEFileData(receivedFileData);
+                receivedFileData = "";
+                expectedFileSize = 0;
+            }, 100);
             
-            let dateText = "Date inconnue";
+        } else if (text.startsWith("SIZE:")) {
+            // Taille du fichier annoncée
+            expectedFileSize = parseInt(text.substring(5).trim());
+            console.log(`📦 Fichier attendu: ${expectedFileSize} octets`);
+            receivedFileData = ""; // Réinitialiser
             
-            if (sessionData.id) {
-                const parts = sessionData.id.split('-');
-                if (parts.length === 2) {
-                    const dateStr = parts[0];
-                    const timeStr = parts[1];
-                    
-                    const day = dateStr.substring(0, 2);
-                    const month = dateStr.substring(2, 4);
-                    const year = dateStr.substring(4, 8);
-                    const hour = timeStr.substring(0, 2);
-                    const minute = timeStr.substring(2, 4);
-                    
-                    dateText = `${day}/${month}/${year} à ${hour}:${minute}`;
-                } else {
-                    dateText = sessionData.id;
+        } else {
+            // Données du fichier (ne pas inclure EOF s'il est dans le même chunk)
+            let cleanText = text.replace(/EOF\n?$/, ''); // Supprimer EOF en fin seulement
+            receivedFileData += cleanText;
+            
+            // Afficher progression tous les 5000 octets
+            if (receivedFileData.length % 5000 < 200) {
+                const progress = expectedFileSize > 0 
+                    ? ((receivedFileData.length / expectedFileSize) * 100).toFixed(0)
+                    : '?';
+                console.log(`📥 Réception: ${receivedFileData.length} octets (${progress}%)`);
+                
+                const status = document.getElementById('esp32-status');
+                if (status) {
+                    status.innerHTML = `📥 Téléchargement: ${receivedFileData.length} / ${expectedFileSize} octets (${progress}%)`;
                 }
             }
+        }
+    } else {
+        // Réponse normale (JSON court)
+        bleDataBuffer += text;
+        
+        // Traiter quand on a une ligne complète
+        if (text.includes('\n') || text.includes('EOF')) {
+            processBLEResponse(bleDataBuffer);
+            bleDataBuffer = "";
+        }
+    }
+}
+
+// ==========================================
+// ENVOI COMMANDES ET TRAITEMENT RÉPONSES
+// ==========================================
+
+async function sendBLECommand(command) {
+    if (!bluetoothCharacteristic) {
+        alert('Bluetooth non connecté');
+        return;
+    }
+    
+    console.log('Envoi commande BLE:', command);
+    const encoder = new TextEncoder();
+    const data = encoder.encode(command + '\n');
+    await bluetoothCharacteristic.writeValue(data);
+}
+
+function processBLEResponse(data) {
+    try {
+        // Nettoyer les données (EOF peut être dans les chunks)
+        data = data.replace(/EOF\n?/g, '').trim();
+        
+        console.log('Traitement réponse BLE:', data.substring(0, 100));
+        
+        // Parser le JSON principal
+        const json = JSON.parse(data);
+        
+        console.log('JSON parsé:', json);
+        
+        if (json.status === "OK") {
+            // Cas 1 : data est déjà un objet
+            if (json.data && typeof json.data === 'object') {
+                if (json.data.files) {
+                    console.log(`${json.data.files.length} fichiers trouvés`);
+                    displayESP32Files(json.data.files, 'BLE');
+                }
+            }
+            // Cas 2 : data est une string JSON
+            else if (json.data && typeof json.data === 'string') {
+                const parsedData = JSON.parse(json.data);
+                if (parsedData.files) {
+                    console.log(`${parsedData.files.length} fichiers trouvés`);
+                    displayESP32Files(parsedData.files, 'BLE');
+                }
+            }
+        } 
+        // Cas 3 : Réponse directe sans wrapper
+        else if (json.files) {
+            console.log(`${json.files.length} fichiers trouvés (format direct)`);
+            displayESP32Files(json.files, 'BLE');
+        }
+        else if (json.status === "ERROR") {
+            alert('Erreur ESP32: ' + json.message);
+        }
+    } catch (error) {
+        console.error('Erreur parsing JSON:', error);
+        console.log('Données brutes complètes:', data);
+    }
+}
+
+function processBLEFileData(data) {
+    try {
+        // Nettoyer agressivement
+        data = data.replace(/EOF\n?/g, '').trim();
+        
+        console.log('📄 Parsing JSON...');
+        console.log('Premiers caractères:', data.substring(0, 100));
+        console.log('Derniers caractères:', data.substring(data.length - 100));
+        
+        // Vérifier que ça commence et finit bien par { }
+        if (!data.startsWith('{') || !data.endsWith('}')) {
+            console.error('❌ JSON malformé - début ou fin incorrect');
+            throw new Error('Format JSON invalide');
+        }
+        
+        const json = JSON.parse(data);
+        
+        console.log('✅ JSON parsé avec succès');
+        console.log('Session:', json.id, '/', json.laps, 'tours /', json.points, 'points GPS');
+        
+        sessionData = json;
+        currentSessionId = 'ble_' + json.id;
+        
+        // Sauvegarder automatiquement
+        saveSessionToStorage(json);
+        
+        document.getElementById('esp32-page').style.display = 'none';
+        document.getElementById('esp32-status').style.display = 'none';
+        displaySession();
+        
+    } catch (error) {
+        console.error('❌ Erreur lecture fichier:', error);
+        console.log('Taille données reçues:', data.length);
+        console.log('Position erreur:', error.message);
+        
+        // Essayer de sauvegarder les données brutes pour debug
+        console.log('Données complètes:', data);
+        
+        alert('Erreur lecture fichier JSON\nVoir console (F12) pour détails');
+        
+        const status = document.getElementById('esp32-status');
+        status.style.background = '#f8d7da';
+        status.style.color = '#721c24';
+        status.innerHTML = '❌ Fichier JSON invalide<br><small>Ouvrir Console (F12) pour détails</small>';
+        
+        isReceivingFile = false;
+    }
+}
+
+function displayESP32Files(sessions, source) {
+    const container = document.getElementById('esp32-files-container');
+    const listDiv = document.getElementById('esp32-files-list');
+    
+    listDiv.style.display = 'block';
+    
+    if (!sessions || sessions.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999;">Aucune session trouvée</p>';
+        return;
+    }
+    
+    const sessionsHTML = sessions.map((session, index) => {
+        const filename = session.name;
+        const fileSize = session.size ? `${(session.size / 1024).toFixed(1)} Ko` : 'N/A';
+        
+        return `
+            <div class="file-item" id="esp32-file-item-${index}">
+                <div class="file-item-content">
+                    <div class="file-item-header">
+                        <div class="file-item-title">${filename}</div>
+                        <div class="file-item-date">${fileSize}</div>
+                    </div>
+                    <div class="file-item-actions">
+                        <button class="file-action-btn btn-load" onclick="loadESP32File('${filename}')">
+                            📊 Analyser
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = '<div style="max-width: 800px; margin: 0 auto;">' + sessionsHTML + '</div>';
+}
+
+
+
+async function loadESP32File(filename) {
+    try {
+        isReceivingFile = true;
+        receivedFileData = "";
+        
+        const status = document.getElementById('esp32-status');
+        status.style.display = 'block';
+        status.style.background = '#fff3cd';
+        status.style.color = '#856404';
+        status.innerHTML = '📥 Téléchargement en cours...';
+        
+        console.log('Demande fichier:', filename);
+        await sendBLECommand('GET:' + filename);
+        
+    } catch (error) {
+        console.error('Erreur téléchargement:', error);
+        alert('Erreur de téléchargement: ' + error.message);
+        isReceivingFile = false;
+        
+        const status = document.getElementById('esp32-status');
+        status.style.background = '#f8d7da';
+        status.innerHTML = '❌ Échec du téléchargement';
+    }
+}
+        
+        function displaySession() {
+document.getElementById('upload-area').style.display = 'none';
+    document.getElementById('session-content').style.display = 'block';
+
+     if (!document.querySelector('#session-back-button')) {
+        const backBtn = document.createElement('button');
+        backBtn.id = 'session-back-button';
+        backBtn.className = 'back-button';
+        backBtn.textContent = '← Changer de fichier';
+        backBtn.onclick = returnToFileSelection;
+        document.getElementById('session-content').insertBefore(
+            backBtn, 
+            document.getElementById('session-content').firstChild
+        );
+    }
+    
+    
+    document.getElementById('session-title').textContent = 'Session Circuit - Analyse GPS';
+    
+    // === CORRECTION DATE : Extraire depuis l'ID ===
+    let dateText = "Date inconnue";
+    
+    if (sessionData.id) {
+        // Format ID: "01102025-1430" ou "ddmmyyyy-hhmm"
+        const parts = sessionData.id.split('-');
+        if (parts.length === 2) {
+            const dateStr = parts[0]; // "01102025"
+            const timeStr = parts[1]; // "1430"
             
-            document.getElementById('session-date').textContent = dateText;
+            const day = dateStr.substring(0, 2);
+            const month = dateStr.substring(2, 4);
+            const year = dateStr.substring(4, 8);
+            const hour = timeStr.substring(0, 2);
+            const minute = timeStr.substring(2, 4);
+            
+            // Créer un texte lisible
+            dateText = `${day}/${month}/${year} à ${hour}:${minute}`;
+        } else {
+            dateText = sessionData.id; // Afficher l'ID brut si format inconnu
+        }
+    }
+    
+    document.getElementById('session-date').textContent = dateText;
             
             const trackLength = sessionData.trackLength || 1.814;
             document.getElementById('session-badge').textContent = `${trackLength} km - ${sessionData.laps} tours`;
@@ -1127,125 +2449,1081 @@
             
             const totalTime = sessionData.times.reduce((a, b) => a + b, 0);
             document.getElementById('stat-total').textContent = formatTime(totalTime);
+
+           
             
             displayLapsTable();
             displayAnalysis();
             displayProgression();
             segmentLapsFromGPSTrack();
+                     
+
         }
 
-        function detectCircuitFromGPS() {
+        function showAllCircuits() {
+    const modal = document.createElement('div');
+    modal.id = 'circuits-modal';
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); z-index: 10000;
+        display: flex; align-items: center; justify-content: center;
+        padding: 20px; overflow-y: auto;
+    `;
+    
+    let html = `
+        <div style="background: white; border-radius: 15px; padding: 30px; max-width: 600px; 
+                    width: 100%; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #1976d2;">🏁 Sélection du Circuit</h3>
+                <button onclick="document.getElementById('circuits-modal').remove()" 
+                        style="background: #f44336; color: white; border: none; padding: 8px 15px; 
+                               border-radius: 5px; cursor: pointer;">✕</button>
+            </div>
+            <p style="color: #666; margin-bottom: 20px;">Circuit non détecté automatiquement. Veuillez sélectionner :</p>
+    `;
+    
+    // Circuits automobile
+    html += `<h3 style="color: #1976d2; border-bottom: 2px solid #1976d2; padding-bottom: 5px; margin: 20px 0 15px 0;">
+             🏎️ Circuits Automobile</h3>`;
+    
+    CIRCUITS_DATABASE.filter(c => c.type === 'auto').forEach(circuit => {
+        html += `
+            <div onclick="selectCircuitManually('${circuit.name}')" 
+                 style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 12px; 
+                        margin-bottom: 5px; cursor: pointer; transition: all 0.2s;"
+                 onmouseover="this.style.background='#e3f2fd'; this.style.borderColor='#1976d2'"
+                 onmouseout="this.style.background='white'; this.style.borderColor='#ddd'">
+                <strong>${circuit.name}</strong><br>
+                <small style="color: #666;">${circuit.location} - ${circuit.length} km</small>
+            </div>
+        `;
+    });
+    
+    // Circuits karting
+    html += `<h3 style="color: #ff9800; border-bottom: 2px solid #ff9800; padding-bottom: 5px; margin: 25px 0 15px 0;">
+             🏁 Circuits Karting</h3>`;
+    
+    CIRCUITS_DATABASE.filter(c => c.type === 'karting').forEach(circuit => {
+        html += `
+            <div onclick="selectCircuitManually('${circuit.name}')" 
+                 style="background: #fff8e1; border: 1px solid #ff9800; border-radius: 8px; padding: 12px; 
+                        margin-bottom: 5px; cursor: pointer; transition: all 0.2s;"
+                 onmouseover="this.style.background='#ffe0b2'"
+                 onmouseout="this.style.background='#fff8e1'">
+                <strong>${circuit.name}</strong><br>
+                <small style="color: #666;">${circuit.location} - ${circuit.length} km</small>
+            </div>
+        `;
+    });
+    
+    
+    
+    html += '</div>';
+    modal.innerHTML = html;
+    document.body.appendChild(modal);
+}
+
+function selectCircuitManually(circuitName) {
+    // Chercher uniquement dans la base de données
+const allCircuits = CIRCUITS_DATABASE;
+    detectedCircuit = allCircuits.find(c => c.name === circuitName);
+    
+    document.getElementById('circuits-modal').remove();
+    showCircuitDetection();
+    
+    console.log('Circuit sélectionné manuellement:', detectedCircuit.name);
+}
+        
+        function displayLapsTable() {
+            const tbody = document.querySelector('#laps-table tbody');
+            tbody.innerHTML = '';
+            
+            const bestTime = sessionData.best;
+            let bestLapIndex = sessionData.times.findIndex(t => t === bestTime);
+            
+            sessionData.times.forEach((time, index) => {
+                const row = document.createElement('tr');
+                if (index === bestLapIndex) row.classList.add('best-lap');
+                
+                const delta = time - bestTime;
+                const deltaClass = delta === 0 ? 'delta-zero' : 'delta-positive';
+                const deltaSign = delta === 0 ? '' : '+';
+                
+                const maxSpeed = 150 + Math.random() * 40;
+                const avgSpeed = 90 + Math.random() * 10;
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${formatTime(time)}</td>
+                    <td class="${deltaClass}">${deltaSign}${(delta/1000).toFixed(3)}</td>
+                    <td>${maxSpeed.toFixed(1)}</td>
+                    <td>${avgSpeed.toFixed(1)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function displayAnalysis() {
+            const grid = document.getElementById('analysis-grid');
+            const times = sessionData.times;
+            
+            const avg = times.reduce((a, b) => a + b, 0) / times.length;
+            const variance = times.reduce((sum, time) => sum + Math.pow(time - avg, 2), 0) / times.length;
+            const stdDev = Math.sqrt(variance);
+            const consistency = Math.max(0, 100 - (stdDev / avg) * 100);
+            
+            grid.innerHTML = `
+                <div class="analysis-card">
+                    <h4>Consistance des Tours</h4>
+                    <p><strong>Ecart-type:</strong> ${(stdDev/1000).toFixed(3)}s</p>
+                    <p><strong>Consistance:</strong> ${consistency.toFixed(1)}%</p>
+                    <div style="background: #e0e0e0; height: 20px; border-radius: 10px; margin: 10px 0; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #4caf50, #8bc34a); height: 100%; width: ${consistency}%; border-radius: 10px;"></div>
+                    </div>
+                </div>
+                <div class="analysis-card">
+                    <h4>Performance</h4>
+                    <p><strong>Meilleur tour:</strong> ${formatTime(sessionData.best)}</p>
+                    <p><strong>Vitesse max:</strong> ${sessionData.maxSpd.toFixed(1)} km/h</p>
+                    <p><strong>Tours sub-1'08:</strong> ${times.filter(t => t < 68000).length}/${times.length}</p>
+                </div>
+                <div class="analysis-card">
+                    <h4>Progression</h4>
+                    <p><strong>Premier tour:</strong> ${formatTime(times[0])}</p>
+                    <p><strong>Dernier tour:</strong> ${formatTime(times[times.length-1])}</p>
+                    <p><strong>Amelioration:</strong> ${((times[0]-sessionData.best)/1000).toFixed(3)}s</p>
+                </div>
+                <div class="analysis-card">
+                    <h4>Statistiques Globales</h4>
+                    <p><strong>Temps moyen:</strong> ${formatTime(avg)}</p>
+                    <p><strong>Tours total:</strong> ${times.length}</p>
+                    <p><strong>Points GPS:</strong> ${sessionData.points || '-'}</p>
+                </div>
+            `;
+        }
+        
+        function displayProgression() {
+            const container = document.getElementById('progress-bars');
+            const times = sessionData.times;
+            const bestTime = sessionData.best;
+            const worstTime = Math.max(...times);
+            
+            container.innerHTML = times.map((time, index) => {
+                const delta = time - bestTime;
+                const percentage = ((worstTime - time) / (worstTime - bestTime)) * 100;
+                
+                let color = '';
+                if (time === bestTime) color = 'linear-gradient(90deg, #4caf50, #8bc34a)';
+                else if (delta < 1000) color = 'linear-gradient(90deg, #2196f3, #64b5f6)';
+                else if (delta < 2000) color = 'linear-gradient(90deg, #ff9800, #ffb74d)';
+                else color = 'linear-gradient(90deg, #f44336, #ef5350)';
+                
+                return `
+                    <div class="progress-item">
+                        <div class="progress-label">T${index + 1}</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: ${Math.max(percentage, 20)}%; background: ${color};">
+                                ${formatTime(time)} ${delta === 0 ? '(RECORD)' : `(+${(delta/1000).toFixed(3)})`}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(`${tabName}-content`).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'track' && sessionData && sessionData.gpsTrack) {
+    setTimeout(() => {
+        if (!map) {
+            initMap(); // Initialise la carte ET affiche le tracé
+        } else {
+            map.invalidateSize();
+        }
+        showCircuitDetection(); // Détection circuit séparée (info bonus)
+    }, 100);
+}
+            
+            if (tabName === 'turns' && sessionData && sessionData.gpsTrack) analyzeTurns();
+        }
+        
+        function initMap() {
             if (!sessionData || !sessionData.gpsTrack || sessionData.gpsTrack.length === 0) {
-                return null;
+                document.getElementById('map').innerHTML = '<div style="padding: 50px; text-align: center; color: #999;">Aucune donnee GPS disponible</div>';
+                return;
             }
             
             const track = sessionData.gpsTrack;
             const centerLat = track.reduce((sum, p) => sum + p.lat, 0) / track.length;
             const centerLng = track.reduce((sum, p) => sum + p.lng, 0) / track.length;
             
-            for (const circuit of CIRCUITS_DATABASE) {
-                const distance = calculateDistance(
-                    { lat: centerLat, lng: centerLng },
-                    { lat: circuit.lat, lng: circuit.lng }
-                );
+            map = L.map('map').setView([centerLat, centerLng], 15);
+            addMapTiles();
+            displayBestLap();
+            
+            setTimeout(() => map.invalidateSize(), 100);
+        }
+        
+        function addMapTiles() {
+            if (currentMapView === 'satellite') {
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: 'Tiles Esri',
+                    maxZoom: 19
+                }).addTo(map);
+            } else {
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: 'OpenStreetMap contributors',
+                    maxZoom: 19
+                }).addTo(map);
+            }
+        }
+        
+        function getAccelerationColor(prevSpeed, currentSpeed, nextSpeed) {
+            const accel1 = currentSpeed - prevSpeed;
+            const accel2 = nextSpeed - currentSpeed;
+            const avgAccel = (accel1 + accel2) / 2;
+            
+            // Seuils ajustés pour GPS à haute fréquence
+            if (avgAccel < -3) return '#ff0000';      // Rouge: forte décélération
+            else if (avgAccel < -1) return '#ff8800';  // Orange: décélération moyenne
+            else if (avgAccel < 1) return '#ffff00';   // Jaune: vitesse stable
+            else if (avgAccel < 3) return '#88ff00';   // Vert clair: accélération moyenne
+            else return '#00ff00';                      // Vert: forte accélération
+        }
+        
+        function detectAndDisplaySpeedMarkers(points, layer) {
+            console.log('=== FONCTION UNIFIEE APPELEE ===');
+            console.log('Nombre de points:', points.length);
+            
+            let speedMarkers = [];
+            const windowSize = 8;
+            
+            // Détecter tous les extrema de la courbe
+            for (let j = windowSize; j < points.length - windowSize; j++) {
+                const speeds = [];
+                for (let k = j - windowSize; k <= j + windowSize; k++) {
+                    speeds.push(points[k].spd);
+                }
                 
-                if (distance < circuit.radius) {
-                    return circuit;
+                const currentSpeed = points[j].spd;
+                const minSpeed = Math.min(...speeds);
+                const maxSpeed = Math.max(...speeds);
+                
+                // Creux
+                if (currentSpeed === minSpeed) {
+                    const prevSpeed = points[Math.max(0, j - 3)].spd;
+                    const nextSpeed = points[Math.min(points.length - 1, j + 3)].spd;
+                    
+                    if (prevSpeed > currentSpeed && nextSpeed > currentSpeed) {
+                        speedMarkers.push({
+                            pos: [points[j].lat, points[j].lng],
+                            speed: currentSpeed,
+                            type: 'min'
+                        });
+                        j += windowSize;
+                    }
+                }
+                
+                // Sommet
+                if (currentSpeed === maxSpeed) {
+                    const prevSpeed = points[Math.max(0, j - 3)].spd;
+                    const nextSpeed = points[Math.min(points.length - 1, j + 3)].spd;
+                    
+                    if (prevSpeed < currentSpeed && nextSpeed < currentSpeed) {
+                        speedMarkers.push({
+                            pos: [points[j].lat, points[j].lng],
+                            speed: currentSpeed,
+                            type: 'max'
+                        });
+                        j += windowSize;
+                    }
                 }
             }
             
-            return null;
-        }
-
-        function showCircuitDetection() {
-            detectedCircuit = detectCircuitFromGPS();
+            console.log(`Etiquettes detectees: ${speedMarkers.length} (${speedMarkers.filter(m => m.type === 'min').length} creux, ${speedMarkers.filter(m => m.type === 'max').length} sommets)`);
             
-            const circuitInfo = document.getElementById('circuit-info');
-            const circuitUnknown = document.getElementById('circuit-unknown');
-            
-            if (detectedCircuit) {
-                circuitInfo.style.display = 'flex';
-                circuitUnknown.style.display = 'none';
+            // Afficher les étiquettes
+            speedMarkers.forEach((marker, index) => {
+                const bgColor = marker.type === 'min' ? '#ff0000' : '#00ff00';
                 
-                document.querySelector('#circuit-info .circuit-icon').textContent = 
-                    detectedCircuit.type === 'auto' ? '🏎️' : '🏁';
-                document.getElementById('circuit-name').textContent = detectedCircuit.name;
-                document.getElementById('circuit-location').textContent = 
-                    `${detectedCircuit.location} - ${detectedCircuit.length} km`;
-            } else {
-                circuitInfo.style.display = 'none';
-                circuitUnknown.style.display = 'block'; 
-            }
-        }
-
-        function showAllCircuits() {
-            const modal = document.createElement('div');
-            modal.id = 'circuits-modal';
-            modal.style.cssText = `
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(0,0,0,0.8); z-index: 10000;
-                display: flex; align-items: center; justify-content: center;
-                padding: 20px; overflow-y: auto;
-            `;
-            
-            let html = `
-                <div style="background: white; border-radius: 15px; padding: 30px; max-width: 600px; 
-                            width: 100%; max-height: 80vh; overflow-y: auto;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3 style="margin: 0; color: #1976d2;">🏁 Sélection du Circuit (${CIRCUITS_DATABASE.length} circuits)</h3>
-                        <button onclick="document.getElementById('circuits-modal').remove()" 
-                                style="background: #f44336; color: white; border: none; padding: 8px 15px; 
-                                       border-radius: 5px; cursor: pointer;">✕</button>
-                    </div>
-                    <p style="color: #666; margin-bottom: 20px;">Circuit non détecté automatiquement. Veuillez sélectionner :</p>
-            `;
-            
-            html += `<h3 style="color: #1976d2; border-bottom: 2px solid #1976d2; padding-bottom: 5px; margin: 20px 0 15px 0;">
-                     🏎️ Circuits Automobile (${CIRCUITS_DATABASE.filter(c => c.type === 'auto').length})</h3>`;
-            
-            CIRCUITS_DATABASE.filter(c => c.type === 'auto').forEach(circuit => {
-                html += `
-                    <div onclick="selectCircuitManually('${circuit.name}')" 
-                         style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 12px; 
-                                margin-bottom: 5px; cursor: pointer; transition: all 0.2s;"
-                         onmouseover="this.style.background='#e3f2fd'; this.style.borderColor='#1976d2'"
-                         onmouseout="this.style.background='white'; this.style.borderColor='#ddd'">
-                        <strong>${circuit.name}</strong><br>
-                        <small style="color: #666;">${circuit.location} - ${circuit.length} km</small>
-                    </div>
-                `;
+                console.log(`Etiquette ${index + 1}: ${marker.type}, vitesse ${marker.speed}, couleur ${bgColor}`);
+                
+                const icon = L.divIcon({
+                    className: 'speed-marker',
+                    html: `<div style="background: ${bgColor}; color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 13px; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.5); white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${Math.round(marker.speed)}</div>`,
+                    iconSize: [50, 25],
+                    iconAnchor: [25, 12]
+                });
+                
+                const markerObj = L.marker(marker.pos, { icon: icon, zIndexOffset: 1000 });
+                markerObj.addTo(layer);
+                console.log('Marker ajoute au layer');
             });
-            
-            html += `<h3 style="color: #ff9800; border-bottom: 2px solid #ff9800; padding-bottom: 5px; margin: 25px 0 15px 0;">
-                     🏁 Circuits Karting (${CIRCUITS_DATABASE.filter(c => c.type === 'karting').length})</h3>`;
-            
-            CIRCUITS_DATABASE.filter(c => c.type === 'karting').slice(0, 20).forEach(circuit => {
-                html += `
-                    <div onclick="selectCircuitManually('${circuit.name}')" 
-                         style="background: #fff8e1; border: 1px solid #ff9800; border-radius: 8px; padding: 12px; 
-                                margin-bottom: 5px; cursor: pointer; transition: all 0.2s;"
-                         onmouseover="this.style.background='#ffe0b2'"
-                         onmouseout="this.style.background='#fff8e1'">
-                        <strong>${circuit.name}</strong><br>
-                        <small style="color: #666;">${circuit.location} - ${circuit.length} km</small>
-                    </div>
-                `;
-            });
-            
-            html += '<p style="text-align: center; color: #999; margin-top: 15px; font-size: 0.9rem;">+ ' + (CIRCUITS_DATABASE.filter(c => c.type === 'karting').length - 20) + ' autres circuits karting disponibles</p>';
-            
-            html += '</div>';
-            modal.innerHTML = html;
-            document.body.appendChild(modal);
-        }
-
-        function selectCircuitManually(circuitName) {
-            detectedCircuit = CIRCUITS_DATABASE.find(c => c.name === circuitName);
-            document.getElementById('circuits-modal').remove();
-            showCircuitDetection();
         }
         
-        // SUITE DU CODE JAVASCRIPT DANS LE PROCHAIN MESSAGE (limites de taille)
+        function displayBestLap() {
+            if (!map || !lapSegments || lapSegments.length === 0) return;
+            
+            const bestLap = lapSegments.find(lap => lap.isBestLap);
+            if (!bestLap) return;
+            
+            if (gpsLayer) map.removeLayer(gpsLayer);
+            gpsLayer = L.layerGroup().addTo(map);
+            
+            const track = bestLap.points;
+            currentReplayData = { lap: bestLap, track: track };
+            
+            // Dessiner d'abord la trajectoire avec les couleurs d'accélération
+            for (let i = 0; i < track.length - 1; i++) {
+                const prevPoint = i > 0 ? track[i - 1] : track[i];
+                const p1 = track[i];
+                const p2 = track[i + 1];
+                const nextPoint = i < track.length - 2 ? track[i + 2] : p2;
+                
+                const color = getAccelerationColor(prevPoint.spd, p1.spd, nextPoint.spd);
+                
+                const segment = L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], {
+                    color: color,
+                    weight: 5,
+                    opacity: 0.9
+                });
+                
+                const accel = p2.spd - p1.spd;
+                const accelText = accel > 0 ? `+${accel.toFixed(1)}` : accel.toFixed(1);
+                
+                segment.bindPopup(`
+                    <strong>MEILLEUR TOUR ${bestLap.lapNumber}</strong><br>
+                    Temps: ${formatTime(bestLap.time)}<br>
+                    Vitesse: ${p1.spd.toFixed(1)} km/h<br>
+                    Acceleration: ${accelText} km/h<br>
+                    Position: ${(p1.t / 1000).toFixed(1)}s
+                `);
+                
+                segment.addTo(gpsLayer);
+            }
+            
+            // Utiliser la fonction réutilisable pour les étiquettes
+            detectAndDisplaySpeedMarkers(track, gpsLayer);
+            
+            if (!replayMarker) {
+                const markerIcon = L.divIcon({
+                    className: 'replay-marker',
+                    html: `<div style="position: relative;">
+                        <div style="width: 16px; height: 16px; background: #ff0000; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.5);"></div>
+                        <div id="replay-speed-tag" style="position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: #ff0000; color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 13px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.5); display: none;">0 km/h</div>
+                    </div>`,
+                    iconSize: [22, 22],
+                    iconAnchor: [11, 11]
+                });
+                
+                replayMarker = L.marker([track[0].lat, track[0].lng], { 
+                    icon: markerIcon, 
+                    opacity: 0,
+                    zIndexOffset: 2000 
+                }).addTo(gpsLayer);
+            }
+            
+            const bounds = L.latLngBounds(track.map(p => [p.lat, p.lng]));
+            map.fitBounds(bounds, { padding: [50, 50] });
+            
+            displayBestLapStats(bestLap);
+            initReplayControlsForBestLap(bestLap);
+            createBestLapSpeedChart(bestLap);
+        }
+        
+        function displayBestLapStats(bestLap) {
+            const track = bestLap.points;
+            document.getElementById('track-points').textContent = track.length;
+            
+            let totalDistance = 0;
+            for (let i = 0; i < track.length - 1; i++) {
+                totalDistance += calculateDistance(track[i], track[i + 1]);
+            }
+            document.getElementById('track-distance').textContent = (totalDistance / 1000).toFixed(2) + ' km';
+            
+            const speeds = track.map(p => p.spd);
+            document.getElementById('track-minspeed').textContent = Math.min(...speeds).toFixed(1) + ' km/h';
+            document.getElementById('track-maxspeed').textContent = Math.max(...speeds).toFixed(1) + ' km/h';
+        }
+        
+        function initReplayControlsForBestLap(bestLap) {
+            const track = bestLap.points;
+            document.getElementById('replay-controls-circuit').style.display = 'block';
+            
+            const slider = document.getElementById('replay-slider-circuit');
+            slider.max = track.length - 1;
+            slider.value = 0;
+            
+            const newSlider = slider.cloneNode(true);
+            slider.parentNode.replaceChild(newSlider, slider);
+            
+            newSlider.addEventListener('input', (e) => {
+                replayIndex = parseInt(e.target.value);
+                updateReplayPosition();
+            });
+            
+            replayIndex = 0;
+        }
+        
+        function updateReplayPosition() {
+            if (!currentReplayData) return;
+            
+            const track = currentReplayData.track;
+            const point = track[Math.floor(replayIndex)];
+            if (!point) return;
+            
+            if (replayMarker) {
+                replayMarker.setOpacity(1);
+                replayMarker.setLatLng([point.lat, point.lng]);
+                map.panTo([point.lat, point.lng], {animate: false});
+                
+                const speedTag = document.getElementById('replay-speed-tag');
+                if (speedTag) {
+                    speedTag.style.display = 'block';
+                    speedTag.textContent = `${Math.round(point.spd)} km/h`;
+                    speedTag.style.background = '#ff0000';  // Toujours rouge
+                }
+            }
+            
+            document.getElementById('replay-time-circuit').textContent = (point.t / 1000).toFixed(1) + 's';
+            document.getElementById('replay-speed-circuit').textContent = point.spd.toFixed(1) + ' km/h';
+            document.getElementById('replay-position-circuit').textContent = `${Math.floor(replayIndex) + 1}/${track.length}`;
+            document.getElementById('replay-slider-circuit').value = replayIndex;
+            
+            if (speedChart) {
+                const datasetIndex = isComparisonMode ? speedChart.data.datasets.length - 1 : 1;
+                if (speedChart.data.datasets[datasetIndex]) {
+                    speedChart.data.datasets[datasetIndex].data = [{ x: point.t / 1000, y: point.spd }];
+                    speedChart.update('none');
+                }
+            }
+            
+            if (comparisonChart) {
+                const cursorDatasetIndex = comparisonChart.data.datasets.length - 1;
+                if (comparisonChart.data.datasets[cursorDatasetIndex]) {
+                    const startTime = currentReplayData.lap.points[0].t;
+                    comparisonChart.data.datasets[cursorDatasetIndex].data = [{ 
+                        x: (point.t - startTime) / 1000, 
+                        y: point.spd 
+                    }];
+                    comparisonChart.update('none');
+                }
+            }
+        }
+        
+        function createBestLapSpeedChart(bestLap) {
+            const ctx = document.getElementById('speed-chart');
+            if (!ctx) return;
+            
+            const track = bestLap.points;
+            document.getElementById('speed-chart-container').style.display = 'block';
+            
+            if (speedChart) speedChart.destroy();
+            
+            speedChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: `Meilleur Tour ${bestLap.lapNumber} - ${formatTime(bestLap.time)}`,
+                            data: track.map(p => ({ x: p.t / 1000, y: p.spd })),
+                            borderColor: '#1976d2',
+                            backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 0,
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'Position',
+                            data: [{ x: track[0].t / 1000, y: track[0].spd }],
+                            borderColor: '#ff0000',
+                            backgroundColor: '#ff0000',
+                            pointRadius: 8,
+                            pointHoverRadius: 10,
+                            pointBorderWidth: 3,
+                            pointBorderColor: '#ffffff',
+                            showLine: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { display: true, text: 'Temps (s)', font: { size: 14 } },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Vitesse (km/h)', font: { size: 14 } },
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { filter: function(item) { return item.text !== 'Position'; } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.datasetIndex === 0) return `Vitesse: ${context.parsed.y.toFixed(1)} km/h`;
+                                    return null;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Evolution de la Vitesse - Meilleur Tour',
+                            font: { size: 16, weight: 'bold' },
+                            color: '#1976d2'
+                        }
+                    },
+                    onClick: (event, elements, chart) => {
+                        const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
+                        const dataX = chart.scales.x.getValueForPixel(canvasPosition.x);
+                        
+                        let closestIndex = 0;
+                        let minDiff = Math.abs(track[0].t / 1000 - dataX);
+                        
+                        for (let i = 1; i < track.length; i++) {
+                            const diff = Math.abs(track[i].t / 1000 - dataX);
+                            if (diff < minDiff) {
+                                minDiff = diff;
+                                closestIndex = i;
+                            }
+                        }
+                        
+                        replayIndex = closestIndex;
+                        updateReplayPosition();
+                    }
+                }
+            });
+        }
+        
+        function calculateDistance(p1, p2) {
+            const R = 6371e3;
+            const φ1 = p1.lat * Math.PI / 180;
+            const φ2 = p2.lat * Math.PI / 180;
+            const Δφ = (p2.lat - p1.lat) * Math.PI / 180;
+            const Δλ = (p2.lng - p1.lng) * Math.PI / 180;
+            
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        
+        function switchMapView(view) {
+            if (!map) return;
+            currentMapView = view;
+            map.eachLayer((layer) => { if (layer instanceof L.TileLayer) map.removeLayer(layer); });
+            addMapTiles();
+        }
+        
+        function calculateAverageSpeed() {
+            if (!sessionData.times || sessionData.times.length === 0) return 0;
+            const trackLength = sessionData.trackLength || 1.814;
+            const avgTimeSeconds = sessionData.times.reduce((a, b) => a + b, 0) / sessionData.times.length / 1000;
+            return (trackLength / avgTimeSeconds) * 3600;
+        }
+        
+        function formatTime(ms) {
+            const totalSeconds = ms / 1000;
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = Math.floor(totalSeconds % 60);
+            const millis = Math.floor((totalSeconds % 1) * 1000);
+            return `${minutes}'${seconds.toString().padStart(2, '0')}.${millis.toString().padStart(3, '0')}`;
+        }
+        
+        function exportData(format) {
+            if (!sessionData) return;
+            switch(format) {
+                case 'csv': exportCSV(); break;
+                case 'gpx': exportGPX(); break;
+                case 'racechrono': exportRaceChrono(); break;
+                case 'telemetry': exportTelemetry(); break;
+            }
+        }
+        
+        function exportCSV() {
+            let csv = 'Tour,Temps (ms),Temps Formate,Ecart,Vitesse Max,Vitesse Moyenne\n';
+            const bestTime = sessionData.best;
+            sessionData.times.forEach((time, index) => {
+                const delta = time - bestTime;
+                const maxSpeed = (150 + Math.random() * 40).toFixed(1);
+                const avgSpeed = calculateAverageSpeed().toFixed(1);
+                csv += `${index + 1},${time},${formatTime(time)},${(delta/1000).toFixed(3)},${maxSpeed},${avgSpeed}\n`;
+            });
+            downloadFile(csv, `session_${sessionData.id}_data.csv`, 'text/csv');
+        }
+        
+        function exportGPX() {
+            if (!sessionData.gpsTrack) { alert('Aucune donnee GPS disponible'); return; }
+            let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="GPS Race Analyzer Pro">\n';
+            gpx += '  <metadata>\n    <name>Session ' + new Date(sessionData.start).toLocaleString() + '</name>\n  </metadata>\n';
+            gpx += '  <trk>\n    <name>Trajectoire GPS</name>\n    <trkseg>\n';
+            sessionData.gpsTrack.forEach(point => {
+                const timestamp = new Date(sessionData.start + point.t).toISOString();
+                gpx += `      <trkpt lat="${point.lat}" lon="${point.lng}">\n        <time>${timestamp}</time>\n`;
+                gpx += `        <extensions>\n          <speed>${(point.spd / 3.6).toFixed(2)}</speed>\n        </extensions>\n      </trkpt>\n`;
+            });
+            gpx += '    </trkseg>\n  </trk>\n</gpx>';
+            downloadFile(gpx, `session_${sessionData.id}_track.gpx`, 'application/gpx+xml');
+        }
+        
+        async function exportRaceChrono() {
+    const zip = new JSZip();
+    
+    // Structure RaceChrono avec métadonnées
+    const sessionInfo = {
+        "session": {
+            "id": sessionData.id,
+            "name": "GPS Session " + new Date(sessionData.start).toLocaleDateString(),
+            "date": new Date(sessionData.start).toISOString(),
+            "track": "Circuit détecté",
+            "vehicle": "Non spécifié",
+            "driver": "Pilote"
+        }
+    };
+    
+    // Données de tours
+    const lapsData = {
+        "laps": sessionData.times.map((time, index) => ({
+            "number": index + 1,
+            "time": time / 1000,
+            "sectors": [],
+            "valid": true
+        })),
+        "bestLapTime": sessionData.best / 1000,
+        "bestLapNumber": sessionData.times.indexOf(sessionData.best) + 1
+    };
+    
+    // Données GPS (telemetry)
+    const telemetryData = {
+        "telemetry": sessionData.gpsTrack ? sessionData.gpsTrack.map(p => ({
+            "timestamp": p.t,
+            "latitude": p.lat,
+            "longitude": p.lng,
+            "speed": p.spd / 3.6, // Conversion en m/s
+            "altitude": 0
+        })) : []
+    };
+    
+    // Ajouter les fichiers au ZIP
+    zip.file("session.json", JSON.stringify(sessionInfo, null, 2));
+    zip.file("laps.json", JSON.stringify(lapsData, null, 2));
+    zip.file("telemetry.json", JSON.stringify(telemetryData, null, 2));
+    
+    // Générer le fichier .rcz (ZIP)
+    const content = await zip.generateAsync({
+        type: "blob",
+        compression: "DEFLATE",
+        compressionOptions: { level: 9 }
+    });
+    
+    // Télécharger
+    downloadFile(content, `session_${sessionData.id}_racechrono.rcz`, 'application/zip');
+}
+        
+        function exportTelemetry() {
+            if (!sessionData.gpsTrack) { alert('Aucune donnee de telemetrie disponible'); return; }
+            let csv = 'Temps (ms),Latitude,Longitude,Vitesse (km/h),Timestamp\n';
+            sessionData.gpsTrack.forEach(point => {
+                csv += `${point.t},${point.lat},${point.lng},${point.spd},${sessionData.start + point.t}\n`;
+            });
+            downloadFile(csv, `session_${sessionData.id}_telemetry.csv`, 'text/csv');
+        }
+        
+        function downloadFile(content, filename, type) {
+    let blob;
+    
+    // Si content est déjà un Blob, l'utiliser directement
+    if (content instanceof Blob) {
+        blob = content;
+    } else {
+        // Sinon créer un Blob depuis le contenu texte
+        blob = new Blob([content], { type: type });
+    }
+    
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+        
+        function replayControl(action) {
+            if (!currentReplayData) return;
+            const track = currentReplayData.track;
+            
+            switch(action) {
+                case 'play':
+                    if (replayInterval) clearInterval(replayInterval);
+                    replayInterval = setInterval(() => {
+                        replayIndex += replaySpeed;
+                        if (replayIndex >= track.length - 1) {
+                            replayIndex = track.length - 1;
+                            clearInterval(replayInterval);
+                            replayInterval = null;
+                        }
+                        updateReplayPosition();
+                    }, 50);
+                    break;
+                case 'pause':
+                    if (replayInterval) { clearInterval(replayInterval); replayInterval = null; }
+                    break;
+                case 'reset':
+                    if (replayInterval) { clearInterval(replayInterval); replayInterval = null; }
+                    replayIndex = 0;
+                    updateReplayPosition();
+                    break;
+            }
+        }
+        
+        function changeReplaySpeed(speed) { replaySpeed = speed; }
+        
+        function analyzeTurns() {
+            if (!sessionData || !sessionData.gpsTrack) {
+                document.getElementById('turns-grid').innerHTML = '<p style="text-align: center; padding: 50px; color: #999;">Aucune donnee GPS disponible</p>';
+                return;
+            }
+            
+            const track = sessionData.gpsTrack;
+            const turns = detectTurns(track);
+            const turnsGrid = document.getElementById('turns-grid');
+            turnsGrid.innerHTML = '';
+            
+            turns.forEach((turn, index) => {
+                const card = document.createElement('div');
+                card.className = 'turn-card';
+                card.innerHTML = `
+                    <h4>Virage ${index + 1}</h4>
+                    <div class="turn-stat"><span>Vitesse d'entree</span><strong>${turn.entrySpeed.toFixed(1)} km/h</strong></div>
+                    <div class="turn-stat"><span>Vitesse a l'apex</span><strong>${turn.apexSpeed.toFixed(1)} km/h</strong></div>
+                    <div class="turn-stat"><span>Vitesse de sortie</span><strong>${turn.exitSpeed.toFixed(1)} km/h</strong></div>
+                    <div class="turn-stat"><span>Perte de vitesse</span><strong>${(turn.entrySpeed - turn.apexSpeed).toFixed(1)} km/h</strong></div>
+                `;
+                turnsGrid.appendChild(card);
+            });
+        }
+        
+        function detectTurns(track) {
+            const turns = [];
+            const minSpeedDrop = 40;
+            
+            for (let i = 10; i < track.length - 10; i++) {
+                const prevSpeed = track[i - 5].spd;
+                const currentSpeed = track[i].spd;
+                const nextSpeed = track[i + 5].spd;
+                
+                if (prevSpeed - currentSpeed > minSpeedDrop && nextSpeed > currentSpeed) {
+                    turns.push({
+                        index: i,
+                        entrySpeed: prevSpeed,
+                        apexSpeed: currentSpeed,
+                        exitSpeed: nextSpeed,
+                        position: { lat: track[i].lat, lng: track[i].lng }
+                    });
+                    i += 15;
+                }
+            }
+            return turns.slice(0, 8);
+        }
+        
+        function segmentLapsFromGPSTrack() {
+            if (!sessionData || !sessionData.gpsTrack || !sessionData.times) return;
+            
+            const track = sessionData.gpsTrack;
+            const lapTimes = sessionData.times;
+            lapSegments = [];
+            
+            const pointsPerLap = Math.floor(track.length / lapTimes.length);
+            
+            for (let lapIndex = 0; lapIndex < lapTimes.length; lapIndex++) {
+                const startIndex = lapIndex * pointsPerLap;
+                const endIndex = (lapIndex === lapTimes.length - 1) ? track.length : (lapIndex + 1) * pointsPerLap;
+                const lapPoints = track.slice(startIndex, endIndex);
+                
+                if (lapPoints.length > 0) {
+                    lapSegments.push({
+                        lapNumber: lapIndex + 1,
+                        time: lapTimes[lapIndex],
+                        points: lapPoints,
+                        isBestLap: lapTimes[lapIndex] === sessionData.best
+                    });
+                }
+            }
+            populateLapSelectors();
+        }
+        
+        function populateLapSelectors() {
+            const selector1 = document.getElementById('compare-lap1');
+            const selector2 = document.getElementById('compare-lap2');
+            if (!selector1 || !selector2) return;
+            
+            const bestLap = lapSegments.find(lap => lap.isBestLap);
+            if (bestLap) {
+                selector1.innerHTML = `<option value="${lapSegments.indexOf(bestLap)}">Tour ${bestLap.lapNumber} - ${formatTime(bestLap.time)} (Meilleur)</option>`;
+            }
+            
+            selector2.innerHTML = '<option value="">-- Selectionner --</option>';
+            lapSegments.forEach((lap, i) => {
+                if (!lap.isBestLap) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = `Tour ${lap.lapNumber} - ${formatTime(lap.time)}`;
+                    selector2.appendChild(option);
+                }
+            });
+        }
+        
+        function compareSelectedLaps() {
+            const lap1Index = document.getElementById('compare-lap1').value;
+            const lap2Index = document.getElementById('compare-lap2').value;
+            
+            if (lap1Index === '' || lap2Index === '') {
+                alert('Veuillez selectionner un tour a comparer');
+                return;
+            }
+            
+            const selectedLaps = [lap1Index, lap2Index];
+            
+            if (!map) {
+                initMap();
+                setTimeout(() => displayComparisonOnMap(selectedLaps), 500);
+            } else {
+                displayComparisonOnMap(selectedLaps);
+            }
+            
+            createComparisonSpeedChart(selectedLaps);
+            isComparisonMode = true;
+        }
+        
+        function displayComparisonOnMap(selectedLapIndexes) {
+            if (!map) return;
+            clearComparisonLayers();
+            
+            const colors = ['#4caf50', '#1976d2'];
+            const legendItems = [];
+            
+            selectedLapIndexes.forEach((lapIndex, i) => {
+                const lap = lapSegments[parseInt(lapIndex)];
+                if (!lap) return;
+                
+                const color = colors[i];
+                const points = lap.points;
+                const lapLayer = L.layerGroup().addTo(map);
+                comparisonLayers.push(lapLayer);
+                
+                if (i === 0) {
+                    // Trajectoire du meilleur tour avec couleurs d'accélération
+                    for (let j = 0; j < points.length - 1; j++) {
+                        const prevPoint = j > 0 ? points[j - 1] : points[j];
+                        const p1 = points[j];
+                        const p2 = points[j + 1];
+                        const nextPoint = j < points.length - 2 ? points[j + 2] : p2;
+                        
+                        const segmentColor = getAccelerationColor(prevPoint.spd, p1.spd, nextPoint.spd);
+                        const polyline = L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], { 
+                            color: segmentColor, 
+                            weight: 5, 
+                            opacity: 0.9 
+                        });
+                        polyline.bindPopup(`<strong>Tour ${lap.lapNumber}</strong><br>Temps: ${formatTime(lap.time)}<br>Vitesse: ${p1.spd.toFixed(1)} km/h`);
+                        polyline.addTo(lapLayer);
+                    }
+                    
+                 // Utiliser la fonction réutilisable pour afficher les étiquettes
+detectAndDisplaySpeedMarkers(points, lapLayer);   
+                } else {
+                    // Tour de comparaison en trait pointillé bleu
+                    const polyline = L.polyline(points.map(p => [p.lat, p.lng]), { 
+                        color: color, 
+                        weight: 4, 
+                        opacity: 0.8, 
+                        dashArray: '10, 5' 
+                    });
+                    polyline.bindPopup(`<strong>Tour ${lap.lapNumber}</strong><br>Temps: ${formatTime(lap.time)}<br>Points GPS: ${points.length}`);
+                    polyline.addTo(lapLayer);
+                }
+                
+                const startIcon = L.divIcon({
+                    className: 'speed-marker',
+                    html: `<div style="background: ${color}; color: white; padding: 3px 8px; border-radius: 10px; font-weight: bold; font-size: 11px; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">${lap.isBestLap ? '★' : 'T' + lap.lapNumber}</div>`,
+                    iconSize: [30, 20],
+                    iconAnchor: [15, 10]
+                });
+                L.marker([points[0].lat, points[0].lng], { icon: startIcon }).addTo(lapLayer);
+                
+                legendItems.push({ 
+                    color: color, 
+                    label: `${lap.isBestLap ? '★ ' : ''}Tour ${lap.lapNumber} - ${formatTime(lap.time)}`, 
+                    dashArray: i === 0 ? null : '10, 5' 
+                });
+            });
+            
+            displayComparisonLegend(legendItems);
+            
+            const allPoints = selectedLapIndexes.map(idx => lapSegments[parseInt(idx)]).filter(lap => lap).flatMap(lap => lap.points).map(p => [p.lat, p.lng]);
+            if (allPoints.length > 0) {
+                const bounds = L.latLngBounds(allPoints);
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+            
+            const bestLap = lapSegments[parseInt(selectedLapIndexes[0])];
+            if (bestLap) {
+                currentReplayData = { lap: bestLap, track: bestLap.points };
+                document.getElementById('replay-controls-circuit').style.display = 'block';
+                initReplayControlsForBestLap(bestLap);
+            }
+        }
+        
+        function displayComparisonLegend(items) {
+            const legend = document.getElementById('comparison-legend');
+            const itemsContainer = document.getElementById('legend-items');
+            
+            itemsContainer.innerHTML = items.map(item => `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 40px; height: 3px; background: ${item.color}; ${item.dashArray ? 'background: repeating-linear-gradient(90deg, ' + item.color + ' 0px, ' + item.color + ' 10px, transparent 10px, transparent 15px);' : ''}"></div>
+                    <span style="font-size: 0.9rem;">${item.label}</span>
+                </div>
+            `).join('');
+            legend.style.display = 'block';
+        }
+        
+        function createComparisonSpeedChart(selectedLapIndexes) {
+            const container = document.getElementById('speed-chart-container');
+            const canvas = document.getElementById('speed-chart');
+            if (!container || !canvas) return;
+            
+            container.style.display = 'block';
+            if (speedChart) { speedChart.destroy(); speedChart = null; }
+            if (comparisonChart) comparisonChart.destroy();
+            
+            const colors = [{ border: '#4caf50', bg: 'rgba(76, 175, 80, 0.1)' }, { border: '#1976d2', bg: 'rgba(25, 118, 210, 0.1)' }];
+            
+            const datasets = selectedLapIndexes.map((lapIndex, i) => {
+                const lap = lapSegments[parseInt(lapIndex)];
+                if (!lap) return null;
+                
+                const startTime = lap.points[0].t;
+                const normalizedData = lap.points.map(p => ({ x: (p.t - startTime) / 1000, y: p.spd }));
+                
+                return {
+                    label: `${lap.isBestLap ? '★ ' : ''}Tour ${lap.lapNumber} - ${formatTime(lap.time)}`,
+                    data: normalizedData,
+                    borderColor: colors[i].border,
+                    backgroundColor: colors[i].bg,
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: false,
+                    pointRadius: 0
+                };
+            }).filter(d => d !== null);
+            
+            const firstLap = lapSegments[parseInt(selectedLapIndexes[0])];
+            if (firstLap && firstLap.points.length > 0) {
+                datasets.push({
+                    label: 'Position Actuelle',
+                    data: [{ x: 0, y: firstLap.points[0].spd }],
+                    borderColor: '#ff0000',
+                    backgroundColor: '#ff0000',
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    pointBorderWidth: 3,
+                    pointBorderColor: '#ffffff',
+                    showLine: false,
+                    order: 999
+                });
+            }
+            
+            comparisonChart = new Chart(canvas, {
+                type: 'line',
+                data: { datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: { display: true, text: 'Temps depuis debut du tour (s)', font: { size: 14 } },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Vitesse (km/h)', font: { size: 14 } },
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { filter: function(item) { return item.text !== 'Position Actuelle'; } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.dataset.label === 'Position Actuelle') return null;
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(1)} km/h`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Comparaison des Vitesses (Recalees)',
+                            font: { size: 16, weight: 'bold' },
+                            color: '#1976d2'
+                        }
+                    },
+                    onClick: (event, elements, chart) => {
+                        const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
+                        const dataX = chart.scales.x.getValueForPixel(canvasPosition.x);
+                        
+                        const firstLap = lapSegments[parseInt(selectedLapIndexes[0])];
+                        if (firstLap) {
+                            const track = firstLap.points;
+                            const clickedIndex = Math.round((dataX / (firstLap.time / 1000)) * (track.length - 1));
+                            if (clickedIndex >= 0 && clickedIndex < track.length) {
+                                replayIndex = clickedIndex;
+                                updateReplayPosition();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function clearComparison() {
+            clearComparisonLayers();
+            document.getElementById('compare-lap2').value = '';
+            document.getElementById('comparison-legend').style.display = 'none';
+            if (comparisonChart) { comparisonChart.destroy(); comparisonChart = null; }
+            if (speedChart) { speedChart.destroy(); speedChart = null; }
+            isComparisonMode = false;
+            displayBestLap();
+        }
+        
+        function clearComparisonLayers() {
+            comparisonLayers.forEach(layer => { if (map && map.hasLayer(layer)) map.removeLayer(layer); });
+            comparisonLayers = [];
+        }
+        
+        
     </script>
 </body>
 </html>
