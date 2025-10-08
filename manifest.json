@@ -1,12 +1,13 @@
 {
-  "name": "GPS Race Analyzer Pro",
-  "short_name": "GPS Analyzer",
-  "description": "Analyse avancée de sessions de chronométrage GPS",
-  "start_url": "./",
+  "name": "GPS LapTimer Pro",
+  "short_name": "LapTimer",
+  "description": "Chronométrage GPS Professionnel - Analyse de sessions de course",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#1976d2",
+  "background_color": "#ffffff",
+  "theme_color": "#667eea",
   "orientation": "portrait-primary",
+  "scope": "./",
   "icons": [
     {
       "src": "./icon-192.png",
@@ -21,6 +22,30 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["sports", "utilities"],
-  "screenshots": []
+  "categories": ["sports", "utilities", "productivity"],
+  "screenshots": [
+    {
+      "src": "./screenshot1.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouvelle Session",
+      "short_name": "Session",
+      "description": "Démarrer une nouvelle session",
+      "url": "./index.html",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sessions Sauvegardées",
+      "short_name": "Historique",
+      "description": "Voir les sessions sauvegardées",
+      "url": "./index.html#stored",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "prefer_related_applications": false
 }
