@@ -256,6 +256,13 @@ if ('serviceWorker' in navigator) {
     border-left-color: #4caf50;
 }
 
+[data-theme="dark"] .file-item.selected { 
+    background: #2d2d2d !important;
+    border: 2px solid #4caf50 !important;
+    border-left: 4px solid #4caf50 !important;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); /* Légère lueur verte */
+}
+
 .file-item-header {
     display: flex;
     justify-content: space-between;
@@ -338,12 +345,8 @@ if ('serviceWorker' in navigator) {
         .session-date { color: #666; }
         
         .session-badge {
-            background: linear-gradient(45deg, #4CAF50, #8BC34A);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
+    display: none !important;
+}
         
         .stats-grid {
             display: grid;
@@ -353,12 +356,12 @@ if ('serviceWorker' in navigator) {
         }
         
         .stat-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(45deg, #1976d2, #42a5f5); /* Même dégradé que le tableau */
     color: white;
     padding: 25px;
     border-radius: 15px;
     text-align: center;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 25px rgba(25, 118, 210, 0.3); /* Ombre bleue au lieu de violette */
     transition: transform 0.3s ease;
 }
 
@@ -1561,12 +1564,9 @@ table tbody tr:hover {
         </div>
         
         <div style="max-width: 800px; margin: 0 auto 20px auto; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-            <button onclick="selectAllSessions()" style="padding: 10px 20px; background: #2196f3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
-                ☑️ Tout sélectionner
-            </button>
-            <button onclick="deselectAllSessions()" style="padding: 10px 20px; background: #9e9e9e; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
-                ☐ Tout désélectionner
-            </button>
+            <button id="toggle-select-btn" onclick="toggleSelectAll()" style="padding: 10px 20px; background: #2196f3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+    ☑️ Tout sélectionner
+</button>
             <button id="download-selected-btn" onclick="downloadSelectedSessions()" style="padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: none;">
                 📥 Télécharger (<span id="selected-count">0</span>)
             </button>
@@ -1674,7 +1674,7 @@ table tbody tr:hover {
                     <h2 id="session-title">Session Circuit</h2>
                     <div class="session-date" id="session-date"></div>
                 </div>
-                <div class="session-badge" id="session-badge"></div>
+                <div class="session-badge" id="session-badge"></div> 
             </div>
             
             <div class="stats-grid">
@@ -2842,30 +2842,54 @@ function readJSONFile(file) {
     reader.readAsText(file);
 }
 
-function selectAllSessions() {
+function toggleSelectAll() {
     const checkboxes = document.querySelectorAll('[id^="checkbox-"]');
-    checkboxes.forEach(cb => cb.checked = true);
-    updateSelectedCount();
-}
-
-function deselectAllSessions() {
-    const checkboxes = document.querySelectorAll('[id^="checkbox-"]');
-    checkboxes.forEach(cb => cb.checked = false);
+    const btn = document.getElementById('toggle-select-btn');
+    
+    // Vérifier si toutes sont cochées
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    
+    if (allChecked) {
+        // Tout décocher
+        checkboxes.forEach(cb => cb.checked = false);
+        btn.innerHTML = '☑️ Tout sélectionner';
+        btn.style.background = '#2196f3';
+    } else {
+        // Tout cocher
+        checkboxes.forEach(cb => cb.checked = true);
+        btn.innerHTML = '☐ Tout désélectionner';
+        btn.style.background = '#9e9e9e';
+    }
+    
     updateSelectedCount();
 }
 
 function updateSelectedCount() {
-    const checkboxes = document.querySelectorAll('[id^="checkbox-"]:checked');
-    const count = checkboxes.length;
-    const btn = document.getElementById('download-selected-btn');
+    const checkboxes = document.querySelectorAll('[id^="checkbox-"]');
+    const checkedBoxes = document.querySelectorAll('[id^="checkbox-"]:checked');
+    const count = checkedBoxes.length;
+    const btn = document.getElementById('toggle-select-btn');
     const countSpan = document.getElementById('selected-count');
+    const downloadBtn = document.getElementById('download-selected-btn');
     
-    if (btn && countSpan) {
+    // Mettre à jour le bouton de sélection
+    if (btn) {
+        if (count === checkboxes.length && count > 0) {
+            btn.innerHTML = '☐ Tout désélectionner';
+            btn.style.background = '#9e9e9e';
+        } else {
+            btn.innerHTML = '☑️ Tout sélectionner';
+            btn.style.background = '#2196f3';
+        }
+    }
+    
+    // Mettre à jour le bouton de téléchargement
+    if (downloadBtn && countSpan) {
         if (count > 0) {
-            btn.style.display = 'inline-block';
+            downloadBtn.style.display = 'inline-block';
             countSpan.textContent = count;
         } else {
-            btn.style.display = 'none';
+            downloadBtn.style.display = 'none';
         }
     }
     
