@@ -31,18 +31,48 @@ if ('serviceWorker' in navigator) {
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: white;
-    min-height: 100vh;
-    padding: 20px;
-    display: flex;
-    flex-direction: column; /* ← AJOUTÉ : colonne au lieu de ligne */
-    align-items: center;
+
+         /* ========== VARIABLES POUR MODE SOMBRE ========== */
+    :root {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8f9fa;
+        --bg-card: #ffffff;
+        --text-primary: #333333;
+        --text-secondary: #666666;
+        --border-color: #e0e0e0;
+        --shadow: rgba(0, 0, 0, 0.1);
+        --gradient-1: #667eea;
+        --gradient-2: #764ba2;
+        --accent: #1976d2;
+    }
     
-}
+    [data-theme="dark"] {
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --bg-card: #252525;
+        --text-primary: #e0e0e0;
+        --text-secondary: #b0b0b0;
+        --border-color: #404040;
+        --shadow: rgba(0, 0, 0, 0.5);
+        --gradient-1: #667eea;
+        --gradient-2: #764ba2;
+        --accent: #64b5f6;
+    }
+    /* ================================================= */
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: background 0.3s ease, color 0.3s ease;
+    }
         
+                
         .header {
             text-align: center;
             color: white;
@@ -56,25 +86,64 @@ if ('serviceWorker' in navigator) {
         .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 40px var(--shadow);
+    transition: background 0.3s ease, box-shadow 0.3s ease;    
+}
+
+/* Bouton mode sombre */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 50px;
+    padding: 10px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    z-index: 9999;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+
+
+.theme-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px var(--shadow);
+}
+
+.theme-toggle-icon {
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:active .theme-toggle-icon {
+    transform: rotate(180deg);
+}
+.theme-toggle.hidden {
+    display: none !important;
+}
         
         .upload-area {
-            border: 3px dashed #667eea;
-            border-radius: 15px;
-            padding: 60px 40px;
-            text-align: center;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 30px;
-            position: relative;
-        }
+    border: 3px dashed var(--accent);
+    border-radius: 15px;
+    padding: 60px 40px;
+    text-align: center;
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+    position: relative;
+}
 
        
 
@@ -85,17 +154,23 @@ if ('serviceWorker' in navigator) {
 }
 
 .connection-card {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: var(--bg-secondary);
     border-radius: 20px;
     padding: 30px;
-    margin: 20px 0; /* CHANGÉ : marges verticales seulement */
+    margin: 20px 0;
     cursor: pointer;
     transition: all 0.3s ease;
     border: 3px solid transparent;
-    text-align: left; /* AJOUTÉ : alignement à gauche du texte */
-    display: flex; /* AJOUTÉ : pour aligner icône + texte */
+    text-align: left;
+    display: flex;
     align-items: center;
     gap: 20px;
+}
+
+.connection-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px var(--shadow);
+    border-color: var(--accent);
 }
 
 .connection-icon {
@@ -105,13 +180,13 @@ if ('serviceWorker' in navigator) {
 }
 
 .connection-card h3 {
-    color: #1976d2;
-    margin-bottom: 5px; /* RÉDUIT */
+    color: var(--accent);
+    margin-bottom: 5px;
     font-size: 1.3rem;
 }
 
 .connection-card p {
-    color: #666;
+    color: var(--text-secondary);
     margin: 0;
     font-size: 0.95rem;
 }
@@ -140,18 +215,17 @@ if ('serviceWorker' in navigator) {
 .form-group label {
     display: block;
     font-weight: 500;
-    color: #333;
+    color: var(--text-primary);
     margin-bottom: 8px;
 }
-
 /* ===== STYLES POUR LA LISTE DES FICHIERS ===== */
 
 .file-item {
-    background: #f8f9fa;
+    background: var(--bg-secondary);
     padding: 15px;
     border-radius: 8px;
     margin: 10px 0;
-    border-left: 4px solid #1976d2;
+    border-left: 4px solid var(--accent);
     transition: all 0.2s ease;
     display: flex;
     gap: 15px;
@@ -159,7 +233,8 @@ if ('serviceWorker' in navigator) {
 }
 
 .file-item:hover {
-    background: #e3f2fd;
+    background: var(--bg-card);
+    box-shadow: 0 4px 12px var(--shadow);
 }
 
 .file-item-checkbox {
@@ -190,20 +265,18 @@ if ('serviceWorker' in navigator) {
 
 .file-item-title {
     font-weight: bold;
-    color: #1976d2;
+    color: var(--accent);
     font-size: 1.1rem;
 }
-
 .file-item-date {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 0.9rem;
 }
-
 .file-item-stats {
     display: flex;
     gap: 15px;
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .file-item-actions {
@@ -237,11 +310,10 @@ if ('serviceWorker' in navigator) {
 }
         
         .upload-area:hover {
-            border-color: #667eea;
-            background: #f0f0f0;
-            color: white;
-            transform: translateY(-5px);
-        }
+    border-color: var(--accent);
+    background: var(--bg-secondary);
+    transform: translateY(-5px);
+}
         
         .upload-area.drag-over {
             background: #f0f0f0;
@@ -311,24 +383,24 @@ if ('serviceWorker' in navigator) {
         }
         
         .tab {
-            padding: 12px 25px;
-            background: transparent;
-            border: none;
-            color: #666;
-            font-weight: 500;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-        }
-        
-        .tab:hover { color: #1976d2; }
-        
-        .tab.active {
-            color: #1976d2;
-            border-bottom-color: #1976d2;
-            font-weight: 600;
-        }
+    padding: 12px 25px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.tab:hover { color: var(--accent); }
+
+.tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+}
         
         .tab-content {
             display: none;
@@ -354,13 +426,30 @@ if ('serviceWorker' in navigator) {
         }
         
         table th, table td {
-            padding: 12px 10px;
-            text-align: center;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        table tbody tr:hover { background: #f8f9fa; }
-        table tbody tr.best-lap { background: #e8f5e9 !important; font-weight: bold; }
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+table tbody tr {
+    background: var(--bg-card);
+    transition: background 0.2s ease;
+}
+
+table tbody tr:hover { 
+    background: var(--bg-secondary); 
+}
+        table tbody tr.best-lap { 
+    background: #e8f5e9 !important; 
+    font-weight: bold; 
+}
+
+[data-theme="dark"] table tbody tr.best-lap { 
+    background: #2d2d2d !important;
+    border-left: 4px solid #4caf50 !important;
+    color: #4caf50 !important;
+    font-weight: bold;
+}
         
         .delta-positive { color: #d32f2f; font-weight: bold; }
         .delta-zero { color: #2e7d32; font-weight: bold; }
@@ -435,16 +524,17 @@ if ('serviceWorker' in navigator) {
         }
         
         .analysis-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .analysis-card h4 {
-            color: #1976d2;
-            margin-bottom: 15px;
-        }
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 4px solid var(--gradient-1);
+    transition: background 0.3s ease;
+}
+
+.analysis-card h4 {
+    color: var(--accent);
+    margin-bottom: 15px;
+}
         
         .progress-bars { margin: 20px 0; }
         
@@ -509,12 +599,13 @@ if ('serviceWorker' in navigator) {
         .export-btn:hover { transform: translateY(-2px); }
         
         .replay-controls {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    box-shadow: 0 2px 10px var(--shadow);
+    transition: background 0.3s ease;
+}
         
         .replay-slider {
             width: 100%;
@@ -600,12 +691,13 @@ if ('serviceWorker' in navigator) {
         }
         
         .chart-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    box-shadow: 0 2px 10px var(--shadow);
+    transition: background 0.3s ease;
+}
         
         .chart-container canvas {
             max-height: 400px;
@@ -756,6 +848,19 @@ if ('serviceWorker' in navigator) {
         font-size: 0.7rem;
     }
 
+    @media (max-width: 768px) {
+    .theme-toggle {
+        top: 10px;
+        right: 10px;
+        padding: 8px 15px;
+        font-size: 1rem;
+    }
+    
+    .theme-toggle-icon {
+        font-size: 1.3rem;
+    }
+}
+
     /* ===== STYLES PAGE ACCUEIL MODERNE ===== */
 .home-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -763,8 +868,11 @@ if ('serviceWorker' in navigator) {
     text-align: center;
     position: relative;
     overflow: hidden;
-     border-radius: 20px 20px 0 0; /* CHANGÉ : arrondi seulement en haut */
-    margin: -30px -30px 0 -30px; /* CHANGÉ : pour coller aux bords du container */
+    border-radius: 20px 20px 0 0; /* CHANGÉ : arrondi seulement en haut */
+    margin: -30px -30px 0 -30px;
+    display: flex;           /* ← AJOUTEZ */
+    justify-content: center; /* ← AJOUTEZ */
+    align-items: center; /* CHANGÉ : pour coller aux bords du container */
 }
 
 .home-header::before {
@@ -788,7 +896,7 @@ if ('serviceWorker' in navigator) {
     height: 100px; /* RÉDUIT de 120px */
     background: white;
     border-radius: 22px;
-    margin: 0 auto 20px;
+    margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1195,17 +1303,168 @@ if ('serviceWorker' in navigator) {
         word-break: break-all;
     }
 }
+@media (max-width: 768px) {
+    .theme-toggle:not(.hidden) {
+        top: 10px;
+        right: 10px;
+        padding: 8px 15px;
+        font-size: 1rem;
+    }
+    
+    .theme-toggle-icon {
+        font-size: 1.3rem;
+    }
+}
+/* Fix pour les options des selects sur mobile */
+@media (max-width: 768px) {
+    [data-theme="dark"] select {
+        color-scheme: dark;
+    }
+}
+
+/* ===== MODE SOMBRE - COMPARAISON DE TOURS ===== */
+
+.comparison-controls {
+    background: #fff3e0;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border-left: 4px solid #ff9800;
+}
+
+[data-theme="dark"] .comparison-controls {
+    background: #2d2d2d !important;
+    border-left-color: #ff9800 !important;
+}
+
+[data-theme="dark"] .comparison-controls h4 {
+    color: #ffb74d !important;
+}
+
+[data-theme="dark"] .comparison-controls p {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .comparison-controls label {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .comparison-controls select {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* ===== MODE SOMBRE - CIRCUIT NON IDENTIFIÉ ===== */
+
+.auto-detect-box {
+    background: #e3f2fd;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border-left: 4px solid #1976d2;
+}
+
+[data-theme="dark"] .auto-detect-box {
+    background: #2d2d2d !important;
+    border-left-color: #64b5f6 !important;
+}
+
+[data-theme="dark"] .auto-detect-box h4 {
+    color: #64b5f6 !important;
+}
+
+[data-theme="dark"] .auto-detect-box p {
+    color: var(--text-secondary) !important;
+}
+
+/* ===== MODE SOMBRE - LÉGENDE COMPARAISON ===== */
+
+#comparison-legend {
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+[data-theme="dark"] #comparison-legend {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] #comparison-legend strong {
+    color: var(--text-primary);
+}
+
+/* ===== MODE SOMBRE - BOUTONS REPLAY ===== */
+
+/* Les boutons replay gardent leurs couleurs vives en mode sombre */
+/* Mais on peut améliorer le contraste si nécessaire */
+
+[data-theme="dark"] .replay-btn {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .replay-btn:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
+}
+/* ===== MODE SOMBRE - MODAL CIRCUITS (CLASSES) ===== */
+.circuit-modal-content {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.circuit-modal-title {
+    color: var(--accent);
+}
+
+.circuit-modal-desc {
+    color: var(--text-secondary);
+}
+
+.circuit-section-title {
+    color: var(--accent);
+    border-bottom-color: var(--accent) !important;
+}
+
+.circuit-modal-item {
+    background: var(--bg-card);
+    border-color: var(--border-color) !important;
+    color: var(--text-primary);
+}
+
+.circuit-modal-item:hover {
+    background: var(--bg-secondary) !important;
+    border-color: var(--accent) !important;
+}
+
+.circuit-modal-location {
+    color: var(--text-secondary);
+}
+
+.circuit-modal-item.karting {
+    border-color: #ff9800 !important;
+}
+
+.circuit-modal-item.karting:hover {
+    background: var(--bg-secondary) !important;
+}
 }
             
     </style>
 </head>
 <body>
+     <!-- Bouton mode sombre -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Changer de thème">
+        <span class="theme-toggle-icon" id="theme-icon">🌙</span>
+        
+    </button>
+    
+    <div class="home-header">
     <div class="home-header">
     <div class="app-logo">
         <img src="./grthead.png" alt="GRT Logo">
-    </div>
-    <h1 class="home-title">GPS LapTimer Pro</h1>
-    <p class="home-subtitle">Chronométrage GPS Professionnel</p>
+    </div>   
 </div>
     
     <div class="container">
@@ -1241,6 +1500,16 @@ if ('serviceWorker' in navigator) {
                 <p id="stored-count">Aucune session</p>
             </div>
         </div>
+
+        <div class="connection-card" onclick="showSettingsPage()">
+        <div class="connection-icon">⚙️</div>
+        <div>
+            <h3>Paramètres</h3>
+            <p>Configurer le chronomètre GPS via Bluetooth</p>
+        </div>
+    </div>
+
+
     </div>
     
     <!-- MODE FICHIER LOCAL -->
@@ -1309,6 +1578,93 @@ if ('serviceWorker' in navigator) {
             <button onclick="clearAllSessions()" style="padding: 12px 25px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
                 🗑️ Supprimer Toutes les Sessions
             </button>
+        </div>
+    </div>
+
+
+    <div id="settings-page" style="display: none;">
+        <button class="back-button" onclick="returnToHome()">← Retour</button>
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #1976d2;">⚙️ Paramètres GPS LapTimer</h2>
+        </div>
+        
+        <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; margin: 0 auto;">
+            <!-- État connexion -->
+            <div id="settings-status" style="padding: 15px; border-radius: 8px; margin: 20px 0; display: none;"></div>
+            
+            <!-- Bouton connexion -->
+            <button id="settings-connect-btn" onclick="connectForSettings()" 
+                    style="width: 100%; padding: 15px; background: linear-gradient(45deg, #1976d2, #42a5f5); 
+                           color: white; border: none; border-radius: 8px; font-size: 1.1rem; 
+                           font-weight: bold; cursor: pointer; transition: all 0.3s; margin-bottom: 20px;">
+                🔗 Connexion Bluetooth
+            </button>
+            
+            <!-- Formulaire paramètres -->
+            <div id="settings-form" style="display: none;">
+                <h3 style="color: #1976d2; margin-bottom: 20px;">Configuration</h3>
+                
+                <div class="form-group">
+                    <label for="param-lineHalfWidth">
+                        <strong>Largeur ligne (m)</strong>
+                        <br><small style="color: #666;">Largeur de détection de la ligne d'arrivée</small>
+                    </label>
+                    <input type="number" id="param-lineHalfWidth" step="0.1" min="10" max="100"
+                           style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="param-defineLineSpeed">
+                        <strong>Vitesse déclenchement (km/h)</strong>
+                        <br><small style="color: #666;">Vitesse minimale pour définir la ligne de départ</small>
+                    </label>
+                    <input type="number" id="param-defineLineSpeed" step="0.1" min="10" max="100"
+                           style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="param-ctrlSpeed">
+                        <strong>Vitesse contrôle (km/h)</strong>
+                        <br><small style="color: #666;">Vitesse minimale pour détecter un passage de ligne</small>
+                    </label>
+                    <input type="number" id="param-ctrlSpeed" step="0.1" min="10" max="100"
+                           style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="param-stopSpeed">
+                        <strong>Vitesse arrêt (km/h)</strong>
+                        <br><small style="color: #666;">Vitesse en dessous de laquelle le chrono s'arrête</small>
+                    </label>
+                    <input type="number" id="param-stopSpeed" step="0.1" min="0" max="20"
+                           style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button onclick="saveSettings()" 
+                            style="flex: 1; padding: 12px; background: #4caf50; color: white; 
+                                   border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                        💾 Sauvegarder
+                    </button>
+                    <button onclick="loadCurrentSettings()" 
+                            style="flex: 1; padding: 12px; background: #ff9800; color: white; 
+                                   border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                        🔄 Recharger
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Instructions -->
+            <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #1976d2;">
+                <p style="margin: 0; font-size: 0.9rem; color: #1976d2;"><strong>Instructions :</strong></p>
+                <ol style="margin: 10px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: #666;">
+                    <li>Allumez le GPS LapTimer</li>
+                    <li>Activez le Bluetooth</li>
+                    <li>Cliquez sur "Connexion Bluetooth"</li>
+                    <li>Modifiez les paramètres souhaités</li>
+                    <li>Cliquez sur "Sauvegarder"</li>
+                </ol>
+            </div>
         </div>
     </div>
     
@@ -1397,7 +1753,7 @@ if ('serviceWorker' in navigator) {
                         <button class="replay-btn" style="background: linear-gradient(45deg, #f44336, #e91e63);" onclick="clearComparison()">Effacer la Comparaison</button>
                     </div>
                     
-                    <div id="comparison-legend" style="display: none; margin-top: 15px; padding: 10px; background: white; border-radius: 5px;">
+                    <div id="comparison-legend" style="display: none; margin-top: 15px; padding: 10px; background: var(--bg-card); border-radius: 5px;">
                         <strong>Legende:</strong>
                         <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 5px;" id="legend-items"></div>
                     </div>
@@ -1523,6 +1879,57 @@ if ('serviceWorker' in navigator) {
 
         const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
         const CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+
+        let settingsBluetoothDevice = null;
+        let settingsBluetoothCharacteristic = null;
+        let currentConfig = {};
+
+        
+
+// ========== GESTION MODE SOMBRE ==========
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    updateThemeIcon(newTheme);
+    applyPageTheme(); // ← AJOUTER CETTE LIGNE
+}
+
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    const text = document.getElementById('theme-text');
+    
+    if (theme === 'dark') {
+        icon.textContent = '☀️';
+        
+    } else {
+        icon.textContent = '🌙';
+        
+    }
+}
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+    applyPageTheme();
+}
+
+// Initialiser le thème au chargement
+window.addEventListener('DOMContentLoaded', () => {
+    initTheme(); // ← TRÈS IMPORTANT
+    updateStoredFilesCount();
+    updateThemeButtonVisibility(true);
+    
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    
+    
+});
+
 
         // BASE DE DONNÉES COMPLÈTE - 155 CIRCUITS OUTDOOR FRANCE
 const CIRCUITS_DATABASE = [
@@ -1994,25 +2401,46 @@ console.log(`- Moto: ${CIRCUITS_DATABASE.filter(c => c.type === 'moto').length}`
 function showLocalFileMode() {
     document.getElementById('home-page').style.display = 'none';
     document.getElementById('upload-area').style.display = 'block';
+    updateThemeButtonVisibility(false);
 }
 
 function showESP32Mode() {
     document.getElementById('home-page').style.display = 'none';
     document.getElementById('esp32-page').style.display = 'block';
+    updateThemeButtonVisibility(false);
 }
 
 function showStoredFiles() {
     document.getElementById('home-page').style.display = 'none';
     document.getElementById('stored-files-page').style.display = 'block';
     loadStoredFilesList();
+    updateThemeButtonVisibility(false);
 }
-
+// Fonction utilitaire pour gérer le bouton
+function updateThemeButtonVisibility(showOnHomePage) {
+    const themeBtn = document.querySelector('.theme-toggle');
+    if (themeBtn) {
+        if (showOnHomePage) {
+            themeBtn.classList.remove('hidden');
+        } else {
+            themeBtn.classList.add('hidden');
+        }
+    }
+}
 function returnToHome() {
     // Cacher toutes les pages
     document.getElementById('upload-area').style.display = 'none';
     document.getElementById('esp32-page').style.display = 'none';
     document.getElementById('stored-files-page').style.display = 'none';
+    document.getElementById('settings-page').style.display = 'none';
     document.getElementById('session-content').style.display = 'none';
+
+    // Déconnecter Bluetooth paramètres si connecté
+    if (settingsBluetoothDevice && settingsBluetoothDevice.gatt.connected) {
+        settingsBluetoothDevice.gatt.disconnect();
+    }
+    settingsBluetoothDevice = null;
+    settingsBluetoothCharacteristic = null;
     
     // Réinitialiser
     if (map) {
@@ -2025,6 +2453,8 @@ function returnToHome() {
     // Retour à l'accueil
     document.getElementById('home-page').style.display = 'block';
     updateStoredFilesCount();
+
+    updateThemeButtonVisibility(true);
 }
 
 function returnToFileSelection() {
@@ -2142,6 +2572,183 @@ function clearAllSessions() {
     localStorage.removeItem('gpsSessions');
     loadStoredFilesList();
     updateStoredFilesCount();
+}
+
+// Afficher la page paramètres
+function showSettingsPage() {
+    document.getElementById('home-page').style.display = 'none';
+    document.getElementById('settings-page').style.display = 'block';
+    updateThemeButtonVisibility(false);
+}
+
+// Connexion Bluetooth pour les paramètres
+async function connectForSettings() {
+    const status = document.getElementById('settings-status');
+    const connectBtn = document.getElementById('settings-connect-btn');
+    
+    status.style.display = 'block';
+    status.style.background = '#fff3cd';
+    status.style.color = '#856404';
+    status.innerHTML = '🔄 Connexion Bluetooth...';
+    connectBtn.disabled = true;
+    
+    try {
+        // Connexion Bluetooth
+        settingsBluetoothDevice = await navigator.bluetooth.requestDevice({
+            filters: [{ namePrefix: 'GPS_Chrono' }],
+            optionalServices: [SERVICE_UUID]
+        });
+        
+        status.innerHTML = '🔄 Connexion au service BLE...';
+        
+        const server = await settingsBluetoothDevice.gatt.connect();
+        const service = await server.getPrimaryService(SERVICE_UUID);
+        settingsBluetoothCharacteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+        
+        // Activer les notifications
+        await settingsBluetoothCharacteristic.startNotifications();
+        
+        status.style.background = '#d4edda';
+        status.style.color = '#155724';
+        status.innerHTML = `✅ Connecté à ${settingsBluetoothDevice.name}`;
+        
+        // Charger la configuration actuelle
+        await loadCurrentSettings();
+        
+        // Afficher le formulaire
+        document.getElementById('settings-form').style.display = 'block';
+        connectBtn.style.display = 'none';
+        
+    } catch (error) {
+        status.style.background = '#f8d7da';
+        status.style.color = '#721c24';
+        status.innerHTML = `❌ Erreur: ${error.message}`;
+        connectBtn.disabled = false;
+    }
+}
+
+// Charger la configuration actuelle
+async function loadCurrentSettings() {
+    if (!settingsBluetoothCharacteristic) return;
+    
+    const status = document.getElementById('settings-status');
+    status.style.background = '#fff3cd';
+    status.innerHTML = '📥 Chargement de la configuration...';
+    
+    try {
+        // Envoyer commande GET_CONFIG
+        const encoder = new TextEncoder();
+        await settingsBluetoothCharacteristic.writeValue(encoder.encode('GET_CONFIG\n'));
+        
+        // Attendre la réponse
+        await new Promise((resolve) => {
+            let responseBuffer = "";
+            
+            const handler = async (event) => {
+                const value = event.target.value;
+                const decoder = new TextDecoder('utf-8');
+                const text = decoder.decode(value);
+                
+                responseBuffer += text;
+                
+                // Vérifier si on a un JSON complet
+                if (responseBuffer.includes('{') && responseBuffer.includes('}')) {
+                    try {
+                        const jsonStart = responseBuffer.indexOf('{');
+                        const jsonEnd = responseBuffer.lastIndexOf('}') + 1;
+                        const jsonStr = responseBuffer.substring(jsonStart, jsonEnd);
+                        const response = JSON.parse(jsonStr);
+                        
+                        if (response.status === "OK" && response.config) {
+                            currentConfig = response.config;
+                            
+                            // Remplir les champs
+                            document.getElementById('param-lineHalfWidth').value = currentConfig.lineHalfWidth || 40;
+                            document.getElementById('param-defineLineSpeed').value = currentConfig.defineLineSpeed || 40;
+                            document.getElementById('param-ctrlSpeed').value = currentConfig.ctrlSpeed || 40;
+                            document.getElementById('param-stopSpeed').value = currentConfig.stopSpeed || 5;
+                            
+                            status.style.background = '#d4edda';
+                            status.style.color = '#155724';
+                            status.innerHTML = '✅ Configuration chargée';
+                            
+                            settingsBluetoothCharacteristic.removeEventListener('characteristicvaluechanged', handler);
+                            resolve();
+                        }
+                    } catch (e) {
+                        console.log('Parsing en cours...', e);
+                    }
+                }
+            };
+            
+            settingsBluetoothCharacteristic.addEventListener('characteristicvaluechanged', handler);
+            
+            // Timeout après 5 secondes
+            setTimeout(() => {
+                settingsBluetoothCharacteristic.removeEventListener('characteristicvaluechanged', handler);
+                
+                // Si pas de réponse, utiliser valeurs par défaut
+                if (Object.keys(currentConfig).length === 0) {
+                    document.getElementById('param-lineHalfWidth').value = 40;
+                    document.getElementById('param-defineLineSpeed').value = 40;
+                    document.getElementById('param-ctrlSpeed').value = 40;
+                    document.getElementById('param-stopSpeed').value = 5;
+                    
+                    status.style.background = '#fff3cd';
+                    status.innerHTML = '⚠️ Timeout - Valeurs par défaut chargées';
+                }
+                resolve();
+            }, 5000);
+        });
+        
+    } catch (error) {
+        status.style.background = '#f8d7da';
+        status.innerHTML = '❌ Erreur de chargement';
+        console.error(error);
+    }
+}
+
+// Sauvegarder les paramètres
+async function saveSettings() {
+    if (!settingsBluetoothCharacteristic) {
+        alert('Non connecté au GPS LapTimer');
+        return;
+    }
+    
+    const status = document.getElementById('settings-status');
+    status.style.background = '#fff3cd';
+    status.innerHTML = '💾 Sauvegarde en cours...';
+    
+    try {
+        // Récupérer les valeurs
+        const config = {
+            lineHalfWidth: parseFloat(document.getElementById('param-lineHalfWidth').value),
+            defineLineSpeed: parseFloat(document.getElementById('param-defineLineSpeed').value),
+            ctrlSpeed: parseFloat(document.getElementById('param-ctrlSpeed').value),
+            stopSpeed: parseFloat(document.getElementById('param-stopSpeed').value)
+        };
+        
+        // Envoyer commande SET_CONFIG
+        const command = 'SET_CONFIG:' + JSON.stringify(config) + '\n';
+        const encoder = new TextEncoder();
+        await settingsBluetoothCharacteristic.writeValue(encoder.encode(command));
+        
+        // Attendre confirmation
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        
+        status.style.background = '#d4edda';
+        status.style.color = '#155724';
+        status.innerHTML = '✅ Paramètres sauvegardés !';
+        
+        setTimeout(() => {
+            status.innerHTML = '✅ Connecté - Paramètres à jour';
+        }, 2000);
+        
+    } catch (error) {
+        status.style.background = '#f8d7da';
+        status.innerHTML = '❌ Erreur de sauvegarde';
+        console.error(error);
+    }
 }
 
 function updateStoredFilesCount() {
@@ -2736,8 +3343,9 @@ async function deleteESP32File(filename) {
 }
 
         function displaySession() {
-document.getElementById('upload-area').style.display = 'none';
-    document.getElementById('session-content').style.display = 'block';
+        document.getElementById('upload-area').style.display = 'none';
+        document.getElementById('session-content').style.display = 'block';
+        updateThemeButtonVisibility(false);
 
      if (!document.querySelector('#session-back-button')) {
         const backBtn = document.createElement('button');
@@ -2823,30 +3431,27 @@ document.getElementById('upload-area').style.display = 'none';
     `;
     
     let html = `
-        <div style="background: white; border-radius: 15px; padding: 30px; max-width: 600px; 
+        <div class="modal-content-circuits" style="border-radius: 15px; padding: 30px; max-width: 600px; 
                     width: 100%; max-height: 80vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="margin: 0; color: #1976d2;">🏁 Sélection du Circuit</h3>
+                <h3 class="modal-title-circuits" style="margin: 0;">🏁 Sélection du Circuit</h3>
                 <button onclick="document.getElementById('circuits-modal').remove()" 
                         style="background: #f44336; color: white; border: none; padding: 8px 15px; 
                                border-radius: 5px; cursor: pointer;">✕</button>
             </div>
-            <p style="color: #666; margin-bottom: 20px;">Circuit non détecté automatiquement. Veuillez sélectionner :</p>
+            <p class="modal-desc-circuits" style="margin-bottom: 20px;">Circuit non détecté automatiquement. Veuillez sélectionner :</p>
     `;
     
     // Circuits automobile
-    html += `<h3 style="color: #1976d2; border-bottom: 2px solid #1976d2; padding-bottom: 5px; margin: 20px 0 15px 0;">
+    html += `<h3 class="modal-section-title-auto" style="padding-bottom: 5px; margin: 20px 0 15px 0; border-bottom: 2px solid;">
              🏎️ Circuits Automobile</h3>`;
     
     CIRCUITS_DATABASE.filter(c => c.type === 'auto').forEach(circuit => {
         html += `
-            <div onclick="selectCircuitManually('${circuit.name}')" 
-                 style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 12px; 
-                        margin-bottom: 5px; cursor: pointer; transition: all 0.2s;"
-                 onmouseover="this.style.background='#e3f2fd'; this.style.borderColor='#1976d2'"
-                 onmouseout="this.style.background='white'; this.style.borderColor='#ddd'">
+            <div class="modal-circuit-item" onclick="selectCircuitManually('${circuit.name}')" 
+                 style="border-radius: 8px; padding: 12px; margin-bottom: 5px; cursor: pointer; transition: all 0.2s; border: 1px solid;">
                 <strong>${circuit.name}</strong><br>
-                <small style="color: #666;">${circuit.location} - ${circuit.length} km</small>
+                <small class="modal-circuit-location">${circuit.location} - ${circuit.length} km</small>
             </div>
         `;
     });
@@ -2857,24 +3462,164 @@ document.getElementById('upload-area').style.display = 'none';
     
     CIRCUITS_DATABASE.filter(c => c.type === 'karting').forEach(circuit => {
         html += `
-            <div onclick="selectCircuitManually('${circuit.name}')" 
-                 style="background: #fff8e1; border: 1px solid #ff9800; border-radius: 8px; padding: 12px; 
-                        margin-bottom: 5px; cursor: pointer; transition: all 0.2s;"
-                 onmouseover="this.style.background='#ffe0b2'"
-                 onmouseout="this.style.background='#fff8e1'">
+            <div class="modal-circuit-item modal-circuit-karting" onclick="selectCircuitManually('${circuit.name}')" 
+                 style="border-radius: 8px; padding: 12px; margin-bottom: 5px; cursor: pointer; transition: all 0.2s; border: 1px solid #ff9800;">
                 <strong>${circuit.name}</strong><br>
-                <small style="color: #666;">${circuit.location} - ${circuit.length} km</small>
+                <small class="modal-circuit-location">${circuit.location} - ${circuit.length} km</small>
             </div>
         `;
     });
     
-    
-    
     html += '</div>';
     modal.innerHTML = html;
     document.body.appendChild(modal);
+    
+    // APPLIQUER LES COULEURS APRÈS CRÉATION
+    applyModalTheme();
 }
 
+// Nouvelle fonction pour appliquer le thème
+function applyModalTheme() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    
+    console.log('🎨 applyModalTheme appelée, isDark =', isDark); // DEBUG
+    
+    if (isDark) {
+        const content = document.querySelector('.modal-content-circuits');
+        if (content) {
+            content.style.setProperty('background', '#252525', 'important');
+            content.style.setProperty('color', '#e0e0e0', 'important');
+            console.log('✅ Styles sombres appliqués au conteneur'); // DEBUG
+        }
+        
+        const title = document.querySelector('.modal-title-circuits');
+        if (title) title.style.setProperty('color', '#64b5f6', 'important');
+        
+        const desc = document.querySelector('.modal-desc-circuits');
+        if (desc) desc.style.setProperty('color', '#b0b0b0', 'important');
+        
+        const sectionTitle = document.querySelector('.modal-section-title-auto');
+        if (sectionTitle) {
+            sectionTitle.style.setProperty('color', '#64b5f6', 'important');
+            sectionTitle.style.setProperty('border-bottom-color', '#64b5f6', 'important');
+        }
+        
+        document.querySelectorAll('.modal-circuit-item').forEach(item => {
+            item.style.setProperty('background', '#252525', 'important');
+            item.style.setProperty('color', '#e0e0e0', 'important');
+            if (!item.classList.contains('modal-circuit-karting')) {
+                item.style.setProperty('border-color', '#404040', 'important');
+            }
+        });
+        
+        document.querySelectorAll('.modal-circuit-location').forEach(loc => {
+            loc.style.setProperty('color', '#b0b0b0', 'important');
+        });
+        
+    } else {
+        // Mode clair
+        const content = document.querySelector('.modal-content-circuits');
+        if (content) {
+            content.style.setProperty('background', '#ffffff', 'important');
+            content.style.setProperty('color', '#333333', 'important');
+        }
+        
+        const title = document.querySelector('.modal-title-circuits');
+        if (title) title.style.setProperty('color', '#1976d2', 'important');
+        
+        const desc = document.querySelector('.modal-desc-circuits');
+        if (desc) desc.style.setProperty('color', '#666666', 'important');
+        
+        const sectionTitle = document.querySelector('.modal-section-title-auto');
+        if (sectionTitle) {
+            sectionTitle.style.setProperty('color', '#1976d2', 'important');
+            sectionTitle.style.setProperty('border-bottom-color', '#1976d2', 'important');
+        }
+        
+        document.querySelectorAll('.modal-circuit-item').forEach(item => {
+            item.style.setProperty('background', '#ffffff', 'important');
+            item.style.setProperty('color', '#333333', 'important');
+            if (!item.classList.contains('modal-circuit-karting')) {
+                item.style.setProperty('border-color', '#e0e0e0', 'important');
+            }
+        });
+        
+        document.querySelectorAll('.modal-circuit-location').forEach(loc => {
+            loc.style.setProperty('color', '#666666', 'important');
+        });
+    }
+}
+function applyPageTheme() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    
+    // Boîte comparaison
+    const comparisonBox = document.querySelector('.comparison-controls');
+    if (comparisonBox) {
+        if (isDark) {
+            comparisonBox.style.background = '#2d2d2d';
+            comparisonBox.style.borderLeftColor = '#ff9800';
+            
+            const h4 = comparisonBox.querySelector('h4');
+            if (h4) h4.style.color = '#ffb74d';
+            
+            const p = comparisonBox.querySelector('p');
+            if (p) p.style.color = '#b0b0b0';
+            
+            comparisonBox.querySelectorAll('label').forEach(label => {
+                label.style.color = '#e0e0e0';
+            });
+            
+            comparisonBox.querySelectorAll('select').forEach(select => {
+                select.style.background = '#252525';
+                select.style.color = '#e0e0e0';
+                select.style.borderColor = '#404040';
+            });
+        } else {
+            comparisonBox.style.background = '#fff3e0';
+            comparisonBox.style.borderLeftColor = '#ff9800';
+            
+            const h4 = comparisonBox.querySelector('h4');
+            if (h4) h4.style.color = '#ff6f00';
+            
+            const p = comparisonBox.querySelector('p');
+            if (p) p.style.color = '#666';
+            
+            comparisonBox.querySelectorAll('label').forEach(label => {
+                label.style.color = '#333';
+            });
+            
+            comparisonBox.querySelectorAll('select').forEach(select => {
+                select.style.background = '#fff';
+                select.style.color = '#333';
+                select.style.borderColor = '#ddd';
+            });
+        }
+    }
+    
+    // Boîte circuit non identifié
+    const autoDetectBox = document.querySelector('.auto-detect-box');
+    if (autoDetectBox) {
+        if (isDark) {
+            autoDetectBox.style.background = '#2d2d2d';
+            autoDetectBox.style.borderLeftColor = '#64b5f6';
+            
+            const h4 = autoDetectBox.querySelector('h4');
+            if (h4) h4.style.color = '#64b5f6';
+            
+            const p = autoDetectBox.querySelector('p');
+            if (p) p.style.color = '#b0b0b0';
+        } else {
+            autoDetectBox.style.background = '#e3f2fd';
+            autoDetectBox.style.borderLeftColor = '#1976d2';
+            
+            const h4 = autoDetectBox.querySelector('h4');
+            if (h4) h4.style.color = '#1976d2';
+            
+            const p = autoDetectBox.querySelector('p');
+            if (p) p.style.color = '#666';
+        }
+    }
+}
 function selectCircuitManually(circuitName) {
     // Chercher uniquement dans la base de données
 const allCircuits = CIRCUITS_DATABASE;
@@ -3018,7 +3763,8 @@ const allCircuits = CIRCUITS_DATABASE;
         } else {
             map.invalidateSize();
         }
-        showCircuitDetection(); // Détection circuit séparée (info bonus)
+        showCircuitDetection();
+        applyPageTheme(); // Détection circuit séparée (info bonus)
     }, 100);
 }
             
@@ -3811,17 +4557,17 @@ detectAndDisplaySpeedMarkers(points, lapLayer);
         }
         
         function displayComparisonLegend(items) {
-            const legend = document.getElementById('comparison-legend');
-            const itemsContainer = document.getElementById('legend-items');
-            
-            itemsContainer.innerHTML = items.map(item => `
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 40px; height: 3px; background: ${item.color}; ${item.dashArray ? 'background: repeating-linear-gradient(90deg, ' + item.color + ' 0px, ' + item.color + ' 10px, transparent 10px, transparent 15px);' : ''}"></div>
-                    <span style="font-size: 0.9rem;">${item.label}</span>
-                </div>
-            `).join('');
-            legend.style.display = 'block';
-        }
+    const legend = document.getElementById('comparison-legend');
+    const itemsContainer = document.getElementById('legend-items');
+    
+    itemsContainer.innerHTML = items.map(item => `
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 40px; height: 3px; background: ${item.color}; ${item.dashArray ? 'background: repeating-linear-gradient(90deg, ' + item.color + ' 0px, ' + item.color + ' 10px, transparent 10px, transparent 15px);' : ''}"></div>
+            <span style="font-size: 0.9rem; color: var(--text-primary);">${item.label}</span>
+        </div>
+    `).join('');
+    legend.style.display = 'block';
+}
         
         function createComparisonSpeedChart(selectedLapIndexes) {
             const container = document.getElementById('speed-chart-container');
