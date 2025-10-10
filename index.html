@@ -1452,6 +1452,266 @@ table tbody tr:hover {
 .circuit-modal-item.karting:hover {
     background: var(--bg-secondary) !important;
 }
+
+/* ===== RESPONSIVE PAGE CIRCUIT ===== */
+
+@media (max-width: 768px) {
+    /* Boîte de comparaison de tours */
+    .comparison-controls {
+        padding: 15px;
+    }
+    
+    .comparison-controls h4 {
+        font-size: 1rem;
+    }
+    
+    .comparison-controls p {
+        font-size: 0.85rem;
+    }
+    
+    /* Grille des selects en colonne sur mobile */
+    .comparison-controls > div[style*="grid"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+    
+    .comparison-controls select {
+        font-size: 0.9rem !important;
+        padding: 10px !important;
+    }
+    
+    /* Boutons de comparaison */
+    .comparison-controls > div:last-of-type {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .comparison-controls .replay-btn {
+        width: 100%;
+        padding: 12px !important;
+        font-size: 0.9rem;
+    }
+    
+    /* Légende comparaison */
+    #comparison-legend {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+    
+    #legend-items {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    
+    /* Circuit info */
+    .circuit-info {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px;
+        gap: 10px;
+    }
+    
+    .circuit-icon {
+        font-size: 2.5rem;
+    }
+    
+    .circuit-details h4 {
+        font-size: 1.1rem;
+    }
+    
+    .circuit-details p {
+        font-size: 0.9rem;
+    }
+    
+    /* Boîte auto-detect */
+    .auto-detect-box {
+        padding: 15px;
+    }
+    
+    .auto-detect-box h4 {
+        font-size: 1rem;
+    }
+    
+    .auto-detect-box p {
+        font-size: 0.85rem;
+    }
+    
+    .auto-detect-box .replay-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+    
+    /* Contrôles carte */
+    .map-controls {
+        justify-content: center;
+    }
+    
+    .map-controls button {
+        flex: 1;
+        min-width: 120px;
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+    
+    /* Statistiques du tracé */
+    .track-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .track-stat-card {
+        padding: 12px;
+    }
+    
+    .track-stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .track-stat-label {
+        font-size: 0.8rem;
+    }
+    
+    /* Contrôles replay */
+    .replay-controls {
+        padding: 15px;
+    }
+    
+    .replay-info {
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+    }
+    
+    .replay-slider {
+        margin: 10px 0;
+    }
+    
+    .replay-buttons {
+        gap: 8px;
+    }
+    
+    .replay-btn {
+        padding: 10px 15px;
+        font-size: 0.85rem;
+        flex: 1;
+        min-width: 80px;
+    }
+}
+
+/* Très petits écrans */
+@media (max-width: 375px) {
+    .comparison-controls {
+        padding: 12px;
+    }
+    
+    .comparison-controls h4 {
+        font-size: 0.95rem;
+    }
+    
+    .circuit-info {
+        padding: 12px;
+    }
+    
+    .circuit-icon {
+        font-size: 2rem;
+    }
+    
+    .map-controls button {
+        min-width: 100px;
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .track-stats {
+        gap: 8px;
+    }
+    
+    .track-stat-card {
+        padding: 10px;
+    }
+    
+    .replay-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        min-width: 70px;
+    }
+}
+
+/* Mode paysage mobile */
+@media (max-width: 900px) and (orientation: landscape) {
+    .comparison-controls {
+        padding: 10px;
+    }
+    
+    .comparison-controls h4 {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .comparison-controls p {
+        font-size: 0.75rem;
+        margin-bottom: 10px;
+    }
+    
+    .comparison-controls > div[style*="grid"] {
+        gap: 10px !important;
+    }
+    
+    .circuit-info {
+        padding: 10px;
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .circuit-icon {
+        font-size: 2rem;
+    }
+    
+    .circuit-details h4 {
+        font-size: 0.95rem;
+        margin-bottom: 3px;
+    }
+    
+    .circuit-details p {
+        font-size: 0.8rem;
+    }
+    
+    .map-controls button {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .track-stats {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    
+    .track-stat-card {
+        padding: 8px;
+    }
+    
+    .track-stat-value {
+        font-size: 1rem;
+    }
+    
+    .track-stat-label {
+        font-size: 0.7rem;
+    }
+    
+    .replay-controls {
+        padding: 10px;
+    }
+    
+    .replay-info {
+        font-size: 0.8rem;
+    }
+    
+    .replay-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+}
 }
             
     </style>
