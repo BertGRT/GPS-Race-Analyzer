@@ -492,8 +492,6 @@ table tbody tr:hover {
             border-radius: 10px;
         }
         
-       
-        
         .track-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -717,623 +715,68 @@ table tbody tr:hover {
             margin: 15px 0;
             border-left: 4px solid #1976d2;
         }
-        
-        @media (max-width: 768px) {
-            .stats-grid { 
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px; /* Réduire l'espace */
-    }
-    
-    .stat-card {
-        padding: 15px; /* Réduire le padding */
-    }
-    
-    .stat-value {
-        font-size: 1.5rem; /* Réduire la taille */
-    }
-    
-    .stat-label {
-        font-size: 0.7rem; /* Réduire la taille */
-    }
-    
-    .session-header { 
-        flex-direction: column; 
-        text-align: center; 
-    }
-    
-    .session-info h2 {
-        font-size: 1.2rem; /* Réduire le titre */
-    }
-    
-    .header h1 { 
-        font-size: 1.8rem; 
-    }
-    
-    .container { 
-        padding: 15px; /* Réduire les marges */
-    }
-    
-    .map-container, #map { 
-        height: 400px; 
-        min-height: 400px; 
-    }
-    
-    /* Tableaux responsive */
-    table {
-        font-size: 0.75rem;
-    }
-    
-    table th, table td {
-        padding: 6px 4px;
-    }
-    
-    /* Onglets plus compacts */
-    .tab {
-        padding: 10px 12px;
-        font-size: 0.85rem;
-    }
-    
-    /* Cartes d'analyse plus petites */
-    .analysis-card {
-        padding: 15px;
-    }
-    
-    .analysis-card h4 {
-        font-size: 1rem;
-    }
-    
-    /* Grilles en 1 colonne sur mobile */
-    .analysis-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .track-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-    
-    .turns-grid {
-        grid-template-columns: 1fr;
-    }
-     .chart-container {
-        padding: 15px 10px;
-    }
-    
-    .chart-container canvas {
-        max-height: 300px;
-        min-height: 200px;
-    }
-    
-    .chart-container h4 {
-        font-size: 0.95rem;
-        margin-bottom: 10px;
-    }
+
+/* ===== STYLES DÉDIÉS COMPARAISON ===== */
+
+.comparison-selects {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
 }
 
-
-/* Mode paysage mobile */
-@media (max-width: 900px) and (orientation: landscape) {
-    .container {
-        padding: 10px;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-    }
-    
-    .stat-card {
-        padding: 10px;
-    }
-    
-    .stat-value {
-        font-size: 1.3rem;
-    }
-    
-    .stat-label {
-        font-size: 0.65rem;
-    }
-    
-    .map-container, #map {
-        height: 300px;
-        min-height: 300px;
-    }
-    
-    .header {
-        padding: 15px;
-    }
-    
-    .header h1 {
-        font-size: 1.5rem;
-    }
-    
-    table {
-        font-size: 0.7rem;
-    }
-
-    @media (max-width: 768px) {
-    .theme-toggle {
-        top: 10px;
-        right: 10px;
-        padding: 8px 15px;
-        font-size: 1rem;
-    }
-    
-    .theme-toggle-icon {
-        font-size: 1.3rem;
-    }
+.comparison-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--text-primary);
 }
 
-    /* ===== STYLES PAGE ACCUEIL MODERNE ===== */
-.home-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 40px 30px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    border-radius: 20px 20px 0 0; /* CHANGÉ : arrondi seulement en haut */
-    margin: -30px -30px 0 -30px;
-    display: flex;           /* ← AJOUTEZ */
-    justify-content: center; /* ← AJOUTEZ */
-    align-items: center; /* CHANGÉ : pour coller aux bords du container */
-}
-
-.home-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: pulse 4s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.app-logo {
-    width: 100px; /* RÉDUIT de 120px */
-    height: 100px; /* RÉDUIT de 120px */
-    background: white;
-    border-radius: 22px;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    position: relative;
-    z-index: 1;
-    padding: 12px;
-}
-
-.app-logo img {
+.comparison-select {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
+    padding: 8px;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    background: var(--bg-card);
+    color: var(--text-primary);
 }
 
-.home-title {
-    color: white;
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    position: relative;
-    z-index: 1;
-    text-align: center;
+.comparison-select-best {
+    border-color: #4caf50;
+    background: #e8f5e9;
 }
 
-.home-subtitle {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 15px;
-    font-weight: 400;
-    position: relative;
-    z-index: 1;
-    text-align: center;
+[data-theme="dark"] .comparison-select-best {
+    background: #1b4d1b;
 }
 
-.welcome-section {
-    text-align: center;
-    margin: 40px auto; /* CHANGÉ : centré avec auto */
-    max-width: 600px; /* AJOUTÉ : limite la largeur */
+.comparison-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-.welcome-section h2 {
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 10px;
+.replay-btn.btn-clear {
+    background: linear-gradient(45deg, #f44336, #e91e63);
 }
 
-.welcome-section p {
-    color: #666;
-    font-size: 16px;
+.comparison-legend {
+    display: none;
+    margin-top: 15px;
+    padding: 10px;
+    background: var(--bg-card);
+    border-radius: 5px;
 }
 
-/* ===== OPTIMISATION MOBILE PORTRAIT ===== */
-
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-        background: white;
-    }
-    
-    .container {
-        padding: 0;
-        border-radius: 0;
-        box-shadow: none;
-    }
-    
-    /* Header mobile */
-    .home-header {
-        padding: 30px 20px;
-        margin: 0;
-        border-radius: 0;
-    }
-    
-    .app-logo {
-        width: 80px;
-        height: 80px;
-        padding: 10px;
-        margin: 0 auto 15px;
-    }
-    
-    .home-title {
-        font-size: 22px;
-        margin-bottom: 5px;
-    }
-    
-    .home-subtitle {
-        font-size: 13px;
-    }
-    
-    /* Section bienvenue */
-    .welcome-section {
-        margin: 25px auto;
-        padding: 0 15px;
-    }
-    
-    .welcome-section h2 {
-        font-size: 20px;
-        margin-bottom: 8px;
-    }
-    
-    .welcome-section p {
-        font-size: 14px;
-    }
-    
-    /* Page d'accueil */
-    #home-page {
-        padding: 0 15px 20px 15px;
-        max-width: 100%;
-    }
-    
-    /* Cartes de connexion */
-    .connection-card {
-        padding: 20px;
-        margin: 15px 0;
-        border-radius: 15px;
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
-    }
-    
-    .connection-icon {
-        font-size: 3.5rem;
-        margin: 0;
-        min-width: auto;
-    }
-    
-    .connection-card h3 {
-        font-size: 1.2rem;
-        margin-bottom: 5px;
-    }
-    
-    .connection-card p {
-        font-size: 0.9rem;
-        line-height: 1.4;
-    }
-    
-    /* Animation hover désactivée sur mobile */
-    .connection-card:hover {
-        transform: none;
-    }
-    
-    .connection-card:active {
-        transform: scale(0.98);
-        transition: transform 0.1s;
-    }
+.legend-items {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 5px;
 }
 
-/* ===== TRÈS PETITS ÉCRANS (iPhone SE, etc.) ===== */
-@media (max-width: 375px) {
-    .home-header {
-        padding: 25px 15px;
-    }
-    
-    .app-logo {
-        width: 70px;
-        height: 70px;
-    }
-    
-    .home-title {
-        font-size: 20px;
-    }
-    
-    .home-subtitle {
-        font-size: 12px;
-    }
-    
-    .welcome-section h2 {
-        font-size: 18px;
-    }
-    
-    .connection-card {
-        padding: 18px;
-        margin: 12px 0;
-    }
-    
-    .connection-icon {
-        font-size: 3rem;
-    }
-    
-    .connection-card h3 {
-        font-size: 1.1rem;
-    }
-    
-    .connection-card p {
-        font-size: 0.85rem;
-    }
-}
-
-/* ===== MODE PAYSAGE MOBILE ===== */
-@media (max-width: 900px) and (orientation: landscape) {
-    .home-header {
-        padding: 20px;
-    }
-    
-    .app-logo {
-        width: 60px;
-        height: 60px;
-        margin: 0 auto 10px;
-    }
-    
-    .home-title {
-        font-size: 18px;
-    }
-    
-    .home-subtitle {
-        font-size: 12px;
-    }
-    
-    .welcome-section {
-        margin: 15px auto;
-    }
-    
-    .welcome-section h2 {
-        font-size: 18px;
-    }
-    
-    #home-page {
-        padding: 0 20px 15px 20px;
-    }
-    
-    .connection-card {
-        padding: 15px;
-        margin: 10px 0;
-        flex-direction: row;
-        text-align: left;
-    }
-    
-    .connection-icon {
-        font-size: 2.5rem;
-        min-width: 50px;
-    }
-    
-    .connection-card h3 {
-        font-size: 1rem;
-    }
-    
-    .connection-card p {
-        font-size: 0.8rem;
-    }
-}
-/* ===== AMÉLIORATION TACTILE MOBILE ===== */
-
-@media (max-width: 768px) {
-    /* Meilleure zone de touch */
-    .connection-card {
-        min-height: 100px;
-        -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
-    }
-    
-    /* Retour arrière */
-    .back-button {
-        padding: 12px 20px;
-        font-size: 0.95rem;
-        margin-bottom: 15px;
-        width: 100%;
-        max-width: 200px;
-    }
-    
-    /* Header normal (pas home-header) */
-    .header {
-        padding: 20px 15px;
-        margin-bottom: 20px;
-    }
-    
-    .header h1 {
-        font-size: 1.5rem;
-    }
-    
-    .header p {
-        font-size: 0.9rem;
-    }
-}
-/* ===== RESPONSIVE PAGES MANQUANTES ===== */
-
-@media (max-width: 768px) {
-    /* Page Upload Fichier Local */
-    .upload-area {
-        padding: 40px 20px;
-        border-width: 2px;
-    }
-    
-    .upload-icon {
-        font-size: 3rem;
-    }
-    
-    .upload-area h3 {
-        font-size: 1.1rem;
-    }
-    
-    .upload-area p {
-        font-size: 0.9rem;
-    }
-    
-    /* Page Connexion Bluetooth */
-    #esp32-page > div:first-of-type {
-        padding: 20px 15px;
-    }
-    
-    #esp32-page h2 {
-        font-size: 1.3rem;
-    }
-    
-    #esp32-page > div > div {
-        padding: 20px !important;
-        max-width: 100% !important;
-    }
-    
-    #esp32-page button {
-        padding: 12px !important;
-        font-size: 1rem !important;
-    }
-    
-    #esp32-page ol {
-        font-size: 0.8rem !important;
-        padding-left: 15px !important;
-    }
-    
-    /* Page Sessions Sauvegardées */
-    #stored-files-page > div:first-of-type {
-        padding: 20px 15px;
-    }
-    
-    #stored-files-page h2 {
-        font-size: 1.3rem;
-    }
-    
-    /* Boutons actions */
-    #stored-files-page > div:nth-of-type(2) {
-        flex-direction: column;
-        gap: 8px;
-    }
-    
-    #stored-files-page > div:nth-of-type(2) button {
-        width: 100%;
-        max-width: 300px;
-        margin: 0 auto;
-    }
-    
-    /* Liste des fichiers */
-    .file-item {
-        padding: 12px;
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .file-item-checkbox {
-        margin-top: 0;
-        display: flex;
-        justify-content: center;
-    }
-    
-    .file-item-header {
-        flex-direction: column;
-        gap: 5px;
-        text-align: center;
-    }
-    
-    .file-item-title {
-        font-size: 0.95rem;
-    }
-    
-    .file-item-date {
-        font-size: 0.8rem;
-    }
-    
-    .file-item-stats {
-        flex-wrap: wrap;
-        justify-content: center;
-        font-size: 0.75rem;
-    }
-    
-    .file-item-actions {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .file-action-btn {
-        width: 100%;
-        padding: 10px;
-    }
-    
-    /* Bouton supprimer toutes */
-    #stored-files-page > div:last-of-type button {
-        width: 100%;
-        max-width: 300px;
-    }
-}
-
-/* Très petits écrans */
-@media (max-width: 375px) {
-    .upload-area {
-        padding: 30px 15px;
-    }
-    
-    #esp32-page h2 {
-        font-size: 1.1rem;
-    }
-    
-    #stored-files-page h2 {
-        font-size: 1.1rem;
-    }
-    
-    .file-item-title {
-        font-size: 0.85rem;
-        word-break: break-all;
-    }
-}
-@media (max-width: 768px) {
-    .theme-toggle:not(.hidden) {
-        top: 10px;
-        right: 10px;
-        padding: 8px 15px;
-        font-size: 1rem;
-    }
-    
-    .theme-toggle-icon {
-        font-size: 1.3rem;
-    }
-}
-/* Fix pour les options des selects sur mobile */
-@media (max-width: 768px) {
-    [data-theme="dark"] select {
-        color-scheme: dark;
-    }
-}
-
-/* ===== MODE SOMBRE - COMPARAISON DE TOURS ===== */
-
-.comparison-controls {
-    background: #fff3e0;
-    padding: 15px;
-    border-radius: 8px;
-    margin: 15px 0;
-    border-left: 4px solid #ff9800;
-}
+/* ===== MODE SOMBRE ===== */
 
 [data-theme="dark"] .comparison-controls {
     background: #2d2d2d !important;
@@ -1358,16 +801,6 @@ table tbody tr:hover {
     border-color: var(--border-color) !important;
 }
 
-/* ===== MODE SOMBRE - CIRCUIT NON IDENTIFIÉ ===== */
-
-.auto-detect-box {
-    background: #e3f2fd;
-    padding: 15px;
-    border-radius: 8px;
-    margin: 15px 0;
-    border-left: 4px solid #1976d2;
-}
-
 [data-theme="dark"] .auto-detect-box {
     background: #2d2d2d !important;
     border-left-color: #64b5f6 !important;
@@ -1381,15 +814,6 @@ table tbody tr:hover {
     color: var(--text-secondary) !important;
 }
 
-/* ===== MODE SOMBRE - LÉGENDE COMPARAISON ===== */
-
-#comparison-legend {
-    background: white;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 15px;
-}
-
 [data-theme="dark"] #comparison-legend {
     background: var(--bg-secondary);
     color: var(--text-primary);
@@ -1399,11 +823,6 @@ table tbody tr:hover {
     color: var(--text-primary);
 }
 
-/* ===== MODE SOMBRE - BOUTONS REPLAY ===== */
-
-/* Les boutons replay gardent leurs couleurs vives en mode sombre */
-/* Mais on peut améliorer le contraste si nécessaire */
-
 [data-theme="dark"] .replay-btn {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
@@ -1411,7 +830,7 @@ table tbody tr:hover {
 [data-theme="dark"] .replay-btn:hover {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
 }
-/* ===== MODE SOMBRE - MODAL CIRCUITS (CLASSES) ===== */
+
 .circuit-modal-content {
     background: var(--bg-card);
     color: var(--text-primary);
@@ -1453,10 +872,107 @@ table tbody tr:hover {
     background: var(--bg-secondary) !important;
 }
 
-/* ===== RESPONSIVE PAGE CIRCUIT ===== */
-
+/* ===== RESPONSIVE MOBILE ===== */
+        
 @media (max-width: 768px) {
-    /* Boîte de comparaison de tours */
+    .stats-grid { 
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+    }
+    
+    .session-header { 
+        flex-direction: column; 
+        text-align: center; 
+    }
+    
+    .session-info h2 {
+        font-size: 1.2rem;
+    }
+    
+    .header h1 { 
+        font-size: 1.8rem; 
+    }
+    
+    .container { 
+        padding: 15px;
+    }
+    
+    .map-container, #map { 
+        height: 400px; 
+        min-height: 400px; 
+    }
+    
+    table {
+        font-size: 0.75rem;
+    }
+    
+    table th, table td {
+        padding: 6px 4px;
+    }
+    
+    .tab {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .analysis-card {
+        padding: 15px;
+    }
+    
+    .analysis-card h4 {
+        font-size: 1rem;
+    }
+    
+    .analysis-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .track-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .turns-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
+        padding: 15px 10px;
+    }
+    
+    .chart-container canvas {
+        max-height: 300px;
+        min-height: 200px;
+    }
+    
+    .chart-container h4 {
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+    }
+
+    .theme-toggle {
+        top: 10px;
+        right: 10px;
+        padding: 8px 15px;
+        font-size: 1rem;
+    }
+    
+    .theme-toggle-icon {
+        font-size: 1.3rem;
+    }
+
     .comparison-controls {
         padding: 15px;
     }
@@ -1468,43 +984,36 @@ table tbody tr:hover {
     .comparison-controls p {
         font-size: 0.85rem;
     }
-    
-    /* Grille des selects en colonne sur mobile */
-    .comparison-controls > div[style*="grid"] {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 15px !important;
+
+    .comparison-selects {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
     }
     
-    .comparison-controls select {
+    .comparison-select {
         font-size: 0.9rem !important;
         padding: 10px !important;
     }
     
-    /* Boutons de comparaison */
-    .comparison-controls > div:last-of-type {
-        flex-direction: column;
-        gap: 8px;
+    .comparison-buttons {
+        flex-direction: column !important;
+        gap: 8px !important;
     }
     
-    .comparison-controls .replay-btn {
-        width: 100%;
-        padding: 12px !important;
-        font-size: 0.9rem;
+    .comparison-buttons .replay-btn {
+        width: 100% !important;
     }
-    
-    /* Légende comparaison */
+
     #comparison-legend {
         padding: 10px;
         font-size: 0.85rem;
     }
     
-    #legend-items {
+    .legend-items {
         flex-direction: column !important;
-        gap: 8px !important;
+        gap: 10px !important;
     }
     
-    /* Circuit info */
     .circuit-info {
         flex-direction: column;
         text-align: center;
@@ -1524,7 +1033,6 @@ table tbody tr:hover {
         font-size: 0.9rem;
     }
     
-    /* Boîte auto-detect */
     .auto-detect-box {
         padding: 15px;
     }
@@ -1543,7 +1051,6 @@ table tbody tr:hover {
         font-size: 0.9rem;
     }
     
-    /* Contrôles carte */
     .map-controls {
         justify-content: center;
     }
@@ -1553,12 +1060,6 @@ table tbody tr:hover {
         min-width: 120px;
         padding: 10px 12px;
         font-size: 0.85rem;
-    }
-    
-    /* Statistiques du tracé */
-    .track-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
     }
     
     .track-stat-card {
@@ -1573,7 +1074,6 @@ table tbody tr:hover {
         font-size: 0.8rem;
     }
     
-    /* Contrôles replay */
     .replay-controls {
         padding: 15px;
     }
@@ -1597,9 +1097,33 @@ table tbody tr:hover {
         flex: 1;
         min-width: 80px;
     }
+
+    #track-content * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    #track-content .tab-content {
+        overflow-x: hidden;
+    }
+    
+    #track-content > * {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    #track-content .map-container {
+        padding: 0;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    [data-theme="dark"] select {
+        color-scheme: dark;
+    }
 }
 
-/* Très petits écrans */
+/* ===== TRÈS PETITS ÉCRANS ===== */
 @media (max-width: 375px) {
     .comparison-controls {
         padding: 12px;
@@ -1636,10 +1160,53 @@ table tbody tr:hover {
         font-size: 0.8rem;
         min-width: 70px;
     }
+
+    .comparison-select {
+        font-size: 0.85rem !important;
+        padding: 8px !important;
+    }
 }
 
-/* Mode paysage mobile */
+/* ===== MODE PAYSAGE MOBILE ===== */
 @media (max-width: 900px) and (orientation: landscape) {
+    .container {
+        padding: 10px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    
+    .stat-card {
+        padding: 10px;
+    }
+    
+    .stat-value {
+        font-size: 1.3rem;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem;
+    }
+    
+    .map-container, #map {
+        height: 300px;
+        min-height: 300px;
+    }
+    
+    .header {
+        padding: 15px;
+    }
+    
+    .header h1 {
+        font-size: 1.5rem;
+    }
+    
+    table {
+        font-size: 0.7rem;
+    }
+
     .comparison-controls {
         padding: 10px;
     }
@@ -1652,10 +1219,6 @@ table tbody tr:hover {
     .comparison-controls p {
         font-size: 0.75rem;
         margin-bottom: 10px;
-    }
-    
-    .comparison-controls > div[style*="grid"] {
-        gap: 10px !important;
     }
     
     .circuit-info {
@@ -1858,7 +1421,107 @@ table tbody tr:hover {
         margin-right: 10px;
     }
 }
+/* ===== STYLES DÉDIÉS COMPARAISON (remplace inline) ===== */
+
+.comparison-selects {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
 }
+
+.comparison-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.comparison-select {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.comparison-select-best {
+    border-color: #4caf50;
+    background: #e8f5e9;
+}
+
+[data-theme="dark"] .comparison-select-best {
+    background: #1b4d1b;
+}
+
+.comparison-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.replay-btn.btn-clear {
+    background: linear-gradient(45deg, #f44336, #e91e63);
+}
+
+/* ===== RESPONSIVE COMPARAISON ===== */
+@media (max-width: 768px) {
+    .comparison-selects {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+    
+    .comparison-select {
+        font-size: 0.9rem !important;
+        padding: 10px !important;
+    }
+    
+    .comparison-buttons {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    
+    .comparison-buttons .replay-btn {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 375px) {
+    .comparison-select {
+        font-size: 0.85rem !important;
+        padding: 8px !important;
+    }
+}
+/* Fix général pour éviter les débordements */
+@media (max-width: 768px) {
+    #track-content * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    #track-content .tab-content {
+        overflow-x: hidden;
+    }
+    
+    /* Padding latéral pour tout le contenu */
+    #track-content > * {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    /* Sauf la carte qui a déjà son conteneur */
+    #track-content .map-container {
+        padding: 0;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}
+
+            
+   
+
             
     </style>
 </head>
@@ -2139,30 +1802,32 @@ table tbody tr:hover {
                     <h4 style="margin-bottom: 10px; color: #ff6f00;">Comparaison de 2 Tours</h4>
                     <p style="margin-bottom: 15px; font-size: 0.9rem;">Comparez le meilleur tour avec un autre tour</p>
                     
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">
-                        <div>
-                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Meilleur Temps</label>
-                            <select id="compare-lap1" disabled style="width: 100%; padding: 8px; border: 2px solid #4caf50; border-radius: 5px; font-size: 1rem; background: #e8f5e9;">
-                                <option value="">-- Automatique --</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Tour comparé</label>
-                            <select id="compare-lap2" style="width: 100%; padding: 8px; border: 2px solid #1976d2; border-radius: 5px; font-size: 1rem;">
-                                <option value="">-- Selectionner --</option>
-                            </select>
-                        </div>
-                    </div>
                     
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button class="replay-btn" onclick="compareSelectedLaps()">Comparer les Tours</button>
-                        <button class="replay-btn" style="background: linear-gradient(45deg, #f44336, #e91e63);" onclick="clearComparison()">Effacer la Comparaison</button>
-                    </div>
+<div class="comparison-selects">
+    <div>
+        <label class="comparison-label">Meilleur Temps</label>
+        <select id="compare-lap1" disabled class="comparison-select comparison-select-best">
+            <option value="">-- Automatique --</option>
+        </select>
+    </div>
+    <div>
+        <label class="comparison-label">Tour comparé</label>
+        <select id="compare-lap2" class="comparison-select">
+            <option value="">-- Selectionner --</option>
+        </select>
+    </div>
+</div>
+
+<div class="comparison-buttons">
+    <button class="replay-btn" onclick="compareSelectedLaps()">Comparer les Tours</button>
+    <button class="replay-btn btn-clear" onclick="clearComparison()">Effacer la Comparaison</button>
+</div>
                     
-                    <div id="comparison-legend" style="display: none; margin-top: 15px; padding: 10px; background: var(--bg-card); border-radius: 5px;">
-                        <strong>Legende:</strong>
-                        <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 5px;" id="legend-items"></div>
-                    </div>
+                    
+<div id="comparison-legend" class="comparison-legend">
+    <strong>Legende:</strong>
+    <div id="legend-items" class="legend-items"></div>
+</div>
                 </div>
 
                 <div class="auto-detect-box" id="circuit-unknown" style="display: none;">
