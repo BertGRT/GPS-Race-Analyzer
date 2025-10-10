@@ -1712,6 +1712,152 @@ table tbody tr:hover {
         font-size: 0.8rem;
     }
 }
+/* ===== FIX SPÉCIFIQUE ONGLET CIRCUIT - MOBILE ===== */
+
+@media (max-width: 768px) {
+    /* FORCER la mise en page responsive pour la comparaison */
+    #track-content .comparison-controls > div[style] {
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: unset !important;
+        gap: 12px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* Forcer les boutons en colonne */
+    #track-content .comparison-controls > div[style*="flex"] {
+        flex-direction: column !important;
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
+    }
+    
+    /* S'assurer que les replay-btn prennent toute la largeur */
+    #track-content .comparison-controls .replay-btn {
+        width: 100% !important;
+        max-width: none !important;
+        flex: none !important;
+    }
+    
+    /* Selects en pleine largeur */
+    #track-content .comparison-controls select {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Labels en block */
+    #track-content .comparison-controls label {
+        display: block !important;
+        width: 100% !important;
+    }
+    
+    /* Conteneur parent des selects */
+    #track-content .comparison-controls > div > div {
+        width: 100% !important;
+    }
+    
+    /* Circuit info en colonne */
+    #track-content .circuit-info {
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+    
+    /* Auto detect box - bouton pleine largeur */
+    #track-content .auto-detect-box .replay-btn {
+        width: 100% !important;
+        max-width: none !important;
+    }
+    
+    /* Map controls */
+    #track-content .map-controls {
+        display: flex !important;
+        flex-wrap: wrap !important;
+    }
+    
+    #track-content .map-controls button {
+        flex: 1 1 calc(50% - 5px) !important;
+        min-width: 120px !important;
+    }
+    
+    /* Replay buttons */
+    #track-content .replay-buttons {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+    
+    #track-content .replay-buttons .replay-btn {
+        flex: 1 1 calc(50% - 4px) !important;
+        min-width: 100px !important;
+    }
+    
+    /* Legend items en colonne */
+    #track-content #legend-items {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    /* Track stats en 2 colonnes */
+    #track-content .track-stats {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+}
+
+/* Très petits écrans */
+@media (max-width: 375px) {
+    #track-content .replay-buttons .replay-btn {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+    }
+    
+    #track-content .map-controls button {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+    }
+}
+
+/* Mode paysage */
+@media (max-width: 900px) and (orientation: landscape) {
+    #track-content .comparison-controls > div[style] {
+        flex-direction: row !important;
+        gap: 10px !important;
+    }
+    
+    #track-content .comparison-controls > div[style] > div {
+        flex: 1 !important;
+    }
+    
+    #track-content .track-stats {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
+/* Fix général pour éviter les débordements */
+@media (max-width: 768px) {
+    #track-content * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    #track-content .tab-content {
+        overflow-x: hidden;
+    }
+    
+    /* Padding latéral pour tout le contenu */
+    #track-content > * {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    /* Sauf la carte qui a déjà son conteneur */
+    #track-content .map-container {
+        padding: 0;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}
 }
             
     </style>
