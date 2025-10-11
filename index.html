@@ -28,6 +28,9 @@ if ('serviceWorker' in navigator) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -588,12 +591,19 @@ table tbody tr:hover {
         }
         
         .export-section {
-            margin: 30px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-        
+    margin: 30px 0;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+}
+
+.export-section h3 {
+    color: var(--accent) !important;
+}
+
+.export-section p {
+    color: var(--text-secondary) !important;
+}
         .export-buttons {
             display: flex;
             gap: 10px;
@@ -1705,7 +1715,26 @@ div.replay-speed-tag,
 #settings-page p {
     color: var(--text-secondary);
 }
-      
+   .export-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    color: white;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.export-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.export-btn:active {
+    transform: translateY(-1px);
+}   
    
 }
             
@@ -2097,19 +2126,26 @@ div.replay-speed-tag,
             </div>
             
             <div id="export-content" class="tab-content">
-                <div class="export-section">
-                    <h3 style="margin-bottom: 15px; color: #1976d2;">Exporter les Donnees</h3>
-                    <p style="color: #666; margin-bottom: 20px;">Telechargez vos donnees dans differents formats</p>
-                    
-                    <div class="export-buttons">
-                        <button class="export-btn" style="background: #4caf50;" onclick="exportData('csv')">Export CSV</button>
-                        <button class="export-btn" style="background: #2196f3;" onclick="exportData('gpx')">Export GPX</button>                        
-                        <button class="export-btn" style="background: #9c27b0;" onclick="exportData('telemetry')">Telemetrie Complete</button>
-                    </div>
-                </div>
-            </div>
+    <div class="export-section">
+        <h3 style="margin-bottom: 15px; color: #1976d2;">Exporter les Données</h3>
+        <p style="color: #666; margin-bottom: 20px;">Téléchargez vos données dans différents formats</p>
+        
+        <div class="export-buttons">
+            <button class="export-btn" style="background: #4caf50;" onclick="exportData('csv')">
+                📊 Export CSV
+            </button>
+            <button class="export-btn" style="background: #2196f3;" onclick="exportData('gpx')">
+                📍 Export GPX
+            </button>
+            <button class="export-btn" style="background: #f44336;" onclick="exportToPDF()">
+                📄 Export PDF
+            </button>
+            <button class="export-btn" style="background: #9c27b0;" onclick="exportData('telemetry')">
+                📡 Télémétrie Complète
+            </button>
         </div>
-    </div>
+        
+        
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     
@@ -4984,5 +5020,372 @@ detectAndDisplaySpeedMarkers(points, lapLayer);
         
         
     </script>
+<script>
+// ==========================================
+// EXPORT PDF COMPLET - VERSION ROBUSTE
+// ==========================================
+// Cette version gère tous les cas de données manquantes
+
+function exportToPDF() {
+    if (!sessionData) {
+        alert('❌ Aucune session chargée');
+        return;
+    }
+
+    // Vérifier que jsPDF est chargé
+    if (typeof window.jspdf === 'undefined') {
+        alert('❌ Erreur: Bibliothèque jsPDF non chargée.\n\nAssurez-vous d\'avoir ajouté les scripts jsPDF.');
+        return;
+    }
+
+    try {
+        // Créer le document PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        
+        let yPosition = 20;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 15;
+
+        // ========== FONCTIONS AUXILIAIRES POUR DONNÉES SÉCURISÉES ==========
+        
+        function safeNumber(value, decimals = 1) {
+            if (value === undefined || value === null || isNaN(value)) return '-';
+            return Number(value).toFixed(decimals);
+        }
+        
+        function safeValue(value, fallback = '-') {
+            return value !== undefined && value !== null ? value : fallback;
+        }
+        
+        // Calculer les statistiques de manière sécurisée
+        const times = sessionData.times || [];
+        const bestTime = sessionData.best || (times.length > 0 ? Math.min(...times) : 0);
+        const totalTime = times.reduce((a, b) => a + b, 0);
+        
+        // Vitesse max - essayer plusieurs sources
+        let maxSpeed = sessionData.maxSpd || sessionData.maxSpeed;
+        if (!maxSpeed && sessionData.gpsTrack && sessionData.gpsTrack.length > 0) {
+            const speeds = sessionData.gpsTrack.map(p => p.spd || p.speed || 0);
+            maxSpeed = Math.max(...speeds);
+        }
+        if (!maxSpeed) maxSpeed = 0;
+        
+        // Vitesse moyenne - essayer plusieurs sources
+        let avgSpeed = sessionData.avgSpd || sessionData.avgSpeed;
+        if (!avgSpeed && sessionData.gpsTrack && sessionData.gpsTrack.length > 0) {
+            const speeds = sessionData.gpsTrack.map(p => p.spd || p.speed || 0).filter(s => s > 0);
+            avgSpeed = speeds.length > 0 ? speeds.reduce((a, b) => a + b, 0) / speeds.length : 0;
+        }
+        if (!avgSpeed) avgSpeed = 0;
+        
+        // Distance - essayer plusieurs sources
+        let distance = sessionData.dist || sessionData.distance || sessionData.trackLength;
+        if (!distance && sessionData.gpsTrack && sessionData.gpsTrack.length > 1) {
+            distance = calculateTotalDistance(sessionData.gpsTrack);
+        }
+        if (!distance) distance = 0;
+        
+        // Nombre de tours
+        const lapsCount = sessionData.laps || times.length || 0;
+
+        // ========== PAGE 1: EN-TÊTE ET STATISTIQUES ==========
+        
+        doc.setFontSize(24);
+        doc.setTextColor(25, 118, 210);
+        doc.text('GPS LapTimer', margin, yPosition);
+        
+        yPosition += 8;
+        doc.setFontSize(16);
+        doc.text('Rapport de Session', margin, yPosition);
+        
+        yPosition += 10;
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        const sessionDate = sessionData.date || sessionData.id || 'Session';
+        doc.text(`Session: ${sessionDate}`, margin, yPosition);
+        
+        yPosition += 15;
+        
+        // Statistiques principales
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont(undefined, 'bold');
+        doc.text('Statistiques Générales', margin, yPosition);
+        
+        yPosition += 8;
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        
+        const stats = [
+            ['Tours Terminés', lapsCount],
+            ['Meilleur Temps', times.length > 0 ? formatTime(bestTime) : '-'],
+            ['Vitesse Max', `${safeNumber(maxSpeed, 1)} km/h`],
+            ['Vitesse Moyenne', `${safeNumber(avgSpeed, 1)} km/h`],
+            ['Distance Totale', `${safeNumber(distance, 2)} km`],
+            ['Temps Total', times.length > 0 ? formatTime(totalTime) : '-']
+        ];
+        
+        stats.forEach(([label, value]) => {
+            doc.setFont(undefined, 'bold');
+            doc.text(`${label}:`, margin, yPosition);
+            doc.setFont(undefined, 'normal');
+            doc.text(String(value), margin + 60, yPosition);
+            yPosition += 7;
+        });
+        
+        // ========== TABLEAU DES TOURS ==========
+        
+        if (times.length > 0) {
+            yPosition += 10;
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(25, 118, 210);
+            doc.text('Détail des Tours', margin, yPosition);
+            yPosition += 5;
+            
+            const lapsData = times.map((time, index) => {
+                const delta = time - bestTime;
+                
+                // Récupérer les vitesses du tour si disponibles
+                let lapMaxSpeed = '-';
+                let lapAvgSpeed = '-';
+                
+                if (sessionData.lapsSpeed && sessionData.lapsSpeed[index]) {
+                    lapMaxSpeed = `${safeNumber(sessionData.lapsSpeed[index].max, 1)} km/h`;
+                    lapAvgSpeed = `${safeNumber(sessionData.lapsSpeed[index].avg, 1)} km/h`;
+                } else {
+                    lapMaxSpeed = `${safeNumber(maxSpeed, 1)} km/h`;
+                    lapAvgSpeed = `${safeNumber(avgSpeed, 1)} km/h`;
+                }
+                
+                return [
+                    `T${index + 1}`,
+                    formatTime(time),
+                    delta === 0 ? 'RECORD' : `+${(delta/1000).toFixed(3)}s`,
+                    lapMaxSpeed,
+                    lapAvgSpeed
+                ];
+            });
+            
+            doc.autoTable({
+                startY: yPosition,
+                head: [['Tour', 'Temps', 'Écart', 'V.Max', 'V.Moy']],
+                body: lapsData,
+                margin: { left: margin, right: margin },
+                styles: { 
+                    fontSize: 9, 
+                    cellPadding: 3,
+                    overflow: 'linebreak'
+                },
+                headStyles: { 
+                    fillColor: [25, 118, 210], 
+                    textColor: 255,
+                    fontStyle: 'bold'
+                },
+                alternateRowStyles: { 
+                    fillColor: [245, 245, 245] 
+                },
+                columnStyles: {
+                    0: { cellWidth: 20 },
+                    1: { cellWidth: 35 },
+                    2: { cellWidth: 35 },
+                    3: { cellWidth: 30 },
+                    4: { cellWidth: 30 }
+                }
+            });
+        }
+        
+        // ========== PAGE 2: ANALYSE ==========
+        
+        if (times.length > 0) {
+            doc.addPage();
+            yPosition = 20;
+            
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(25, 118, 210);
+            doc.text('Analyse de Performance', margin, yPosition);
+            yPosition += 10;
+            
+            // Calculs statistiques
+            const avg = times.reduce((a, b) => a + b, 0) / times.length;
+            const variance = times.reduce((sum, time) => sum + Math.pow(time - avg, 2), 0) / times.length;
+            const stdDev = Math.sqrt(variance);
+            const consistency = Math.max(0, 100 - (stdDev / avg) * 100);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            
+            const analysisData = [
+                ['Temps moyen', formatTime(avg)],
+                ['Écart-type', `${(stdDev/1000).toFixed(3)}s`],
+                ['Consistance', `${consistency.toFixed(1)}%`],
+                ['Premier tour', formatTime(times[0])],
+                ['Dernier tour', formatTime(times[times.length - 1])],
+                ['Amélioration', `${((times[0] - bestTime) / 1000).toFixed(3)}s`],
+                ['Points GPS', safeValue(sessionData.points || (sessionData.gpsTrack ? sessionData.gpsTrack.length : null))]
+            ];
+            
+            analysisData.forEach(([label, value]) => {
+                doc.setFont(undefined, 'bold');
+                doc.text(`${label}:`, margin, yPosition);
+                doc.setFont(undefined, 'normal');
+                doc.text(String(value), margin + 60, yPosition);
+                yPosition += 7;
+            });
+            
+            // Barre de consistance visuelle
+            yPosition += 5;
+            doc.setFillColor(224, 224, 224);
+            doc.rect(margin + 60, yPosition - 5, 100, 8, 'F');
+            doc.setFillColor(76, 175, 80);
+            doc.rect(margin + 60, yPosition - 5, consistency, 8, 'F');
+            
+            // ========== PROGRESSION ==========
+            
+            yPosition += 15;
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(25, 118, 210);
+            doc.text('Progression par Tour', margin, yPosition);
+            yPosition += 8;
+            
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            
+            times.forEach((time, index) => {
+                if (yPosition > pageHeight - 30) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                
+                const delta = time - bestTime;
+                const percentage = Math.min(100, Math.max(10, (delta / bestTime) * 100 + 85));
+                
+                // Texte du tour
+                doc.text(`T${index + 1}:`, margin, yPosition);
+                doc.text(formatTime(time), margin + 15, yPosition);
+                
+                const deltaText = delta === 0 ? '(RECORD)' : `(+${(delta/1000).toFixed(3)}s)`;
+                doc.text(deltaText, margin + 40, yPosition);
+                
+                // Barre de progression
+                const barWidth = 80;
+                const barHeight = 4;
+                const barX = margin + 90;
+                
+                // Fond
+                doc.setFillColor(224, 224, 224);
+                doc.rect(barX, yPosition - 3, barWidth, barHeight, 'F');
+                
+                // Barre colorée
+                const color = delta === 0 ? [76, 175, 80] : 
+                              delta < 1000 ? [33, 150, 243] : 
+                              delta < 2000 ? [255, 152, 0] : [244, 67, 54];
+                doc.setFillColor(...color);
+                doc.rect(barX, yPosition - 3, (barWidth * percentage / 100), barHeight, 'F');
+                
+                yPosition += 7;
+            });
+        }
+        
+        // ========== PAGE GPS ==========
+        
+        if (sessionData.gpsTrack && sessionData.gpsTrack.length > 0) {
+            doc.addPage();
+            yPosition = 20;
+            
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(25, 118, 210);
+            doc.text('Informations GPS', margin, yPosition);
+            yPosition += 10;
+            
+            const track = sessionData.gpsTrack;
+            const speeds = track.map(p => p.spd || p.speed || 0).filter(s => s > 0);
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            
+            const gpsData = [
+                ['Points GPS', track.length],
+                ['Distance parcourue', `${safeNumber(distance, 2)} km`],
+                ['Vitesse minimale', speeds.length > 0 ? `${safeNumber(Math.min(...speeds), 1)} km/h` : '-'],
+                ['Vitesse maximale', speeds.length > 0 ? `${safeNumber(Math.max(...speeds), 1)} km/h` : '-'],
+                ['Vitesse moyenne', speeds.length > 0 ? `${safeNumber(speeds.reduce((a,b) => a+b, 0) / speeds.length, 1)} km/h` : '-']
+            ];
+            
+            gpsData.forEach(([label, value]) => {
+                doc.setFont(undefined, 'bold');
+                doc.text(`${label}:`, margin, yPosition);
+                doc.setFont(undefined, 'normal');
+                doc.text(String(value), margin + 70, yPosition);
+                yPosition += 7;
+            });
+        }
+        
+        // ========== FOOTER SUR TOUTES LES PAGES ==========
+        
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(
+                `GPS LapTimer - Page ${i}/${pageCount}`,
+                pageWidth / 2,
+                pageHeight - 10,
+                { align: 'center' }
+            );
+        }
+        
+        // ========== TÉLÉCHARGER ==========
+        
+        const filename = `session_${sessionData.id || Date.now()}_rapport.pdf`;
+        doc.save(filename);
+        
+        console.log('✅ PDF généré avec succès:', filename);
+        
+    } catch (error) {
+        alert(`❌ Erreur lors de la génération du PDF:\n${error.message}\n\nVérifiez la console pour plus de détails.`);
+        console.error('Erreur complète PDF:', error);
+    }
+}
+
+// ========== FONCTION AUXILIAIRE: CALCULER LA DISTANCE ==========
+function calculateTotalDistance(track) {
+    if (!track || track.length < 2) return 0;
+    
+    let totalDistance = 0;
+    for (let i = 1; i < track.length; i++) {
+        const p1 = track[i - 1];
+        const p2 = track[i];
+        
+        if (p1.lat && p1.lng && p2.lat && p2.lng) {
+            totalDistance += haversineDistance(p1.lat, p1.lng, p2.lat, p2.lng);
+        }
+    }
+    return totalDistance;
+}
+
+// ========== FONCTION AUXILIAIRE: DISTANCE HAVERSINE ==========
+function haversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Rayon de la Terre en km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+</script>
+
+
 </body>
 </html>
