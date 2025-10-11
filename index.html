@@ -206,7 +206,7 @@ if ('serviceWorker' in navigator) {
 }
 
 .back-button {
-    background: #f44336;
+    background: #2196f3;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -218,7 +218,7 @@ if ('serviceWorker' in navigator) {
 }
 
 .back-button:hover {
-    background: #d32f2f;
+    background: #1976d2;
     transform: translateX(-3px);
 }
 
@@ -317,7 +317,7 @@ if ('serviceWorker' in navigator) {
 }
 
 .btn-load {
-    background: #4caf50;
+    background: #2196f3;
     color: white;
 }
 
@@ -719,97 +719,177 @@ table tbody tr:hover {
             min-height: 250px;
      }
         
-        /* Correction du curseur GPS */
-.replay-marker { 
-    background: transparent !important; 
-    border: none !important; 
-}
+        
 
-.replay-marker-container {
-    position: relative;
-    width: 80px;
-    height: 60px;
-}
+/* ==========================================
+   CURSEUR GPS - FORCER ABSOLUMENT TOUT
+   ========================================== */
 
-.replay-marker-dot {
-    width: 16px;
-    height: 16px;
-    background: #ff0000;
-    border: 3px solid white;
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.replay-speed-tag {
-    position: absolute;
-    top: -35px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #ff0000;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 13px;
-    white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-    display: none;
-    pointer-events: none;
-}
-
-/* Correction des étiquettes de vitesse */
-.speed-marker { 
-    background: transparent !important; 
+/* NIVEAU 1: Leaflet marker container */
+.leaflet-marker-icon.replay-marker,
+.leaflet-marker-icon.replay-marker *,
+div.replay-marker,
+div.replay-marker * {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
     border: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+}
+
+/* NIVEAU 2: Le conteneur replay-marker */
+.replay-marker,
+div[class*="replay-marker"] {
+    position: relative !important;
+    width: 18px !important;
+    height: 18px !important;
+    overflow: visible !important;
+}
+
+/* NIVEAU 3: Le point rouge - PRIORITÉ ABSOLUE */
+.replay-marker-dot,
+.replay-marker .replay-marker-dot,
+div.replay-marker-dot,
+.leaflet-marker-icon .replay-marker-dot {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+    background: #ff0000 !important;
+    background-color: #ff0000 !important;
+    border: 3px solid white !important;
+    border-radius: 50% !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.8) !important;
+    position: relative !important;
+    z-index: 1000 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+}
+
+/* NIVEAU 4: L'étiquette de vitesse */
+.replay-speed-tag,
+.replay-marker .replay-speed-tag,
+div.replay-speed-tag,
+#replay-speed-tag {
+    position: absolute !important;
+    bottom: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: #ff0000 !important;
+    background-color: #ff0000 !important;
+    color: white !important;
+    padding: 5px 12px !important;
+    border-radius: 15px !important;
+    font-weight: bold !important;
+    font-size: 14px !important;
+    white-space: nowrap !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.8) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    margin-bottom: 8px !important;
+    border: 2px solid white !important;
+    z-index: 1001 !important;
+    min-width: 65px !important;
+    text-align: center !important;
+    transition: opacity 0.2s ease, visibility 0.2s ease !important;
+}
+
+.replay-speed-tag.visible,
+#replay-speed-tag.visible {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Étiquettes de vitesse sur la carte */
+.speed-marker { 
+    background: transparent !important;
+    border: none !important;
+    overflow: visible !important;
     display: flex !important;
-    align-items: center;
-    justify-content: center;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
+/* NE PAS toucher au background des enfants (étiquettes) */
 .speed-marker > div {
-    display: inline-block;
-    min-width: max-content;
+    display: inline-block !important;
+    min-width: max-content !important;
+    /* Le background/border est géré par le JavaScript, ne pas écraser */
 }
 
-/* Responsive pour petits écrans */
+/* MOBILE */
 @media (max-width: 768px) {
+    .replay-marker,
+    div[class*="replay-marker"] {
+        width: 16px !important;
+        height: 16px !important;
+    }
+    
+    .replay-marker-dot,
+    .replay-marker .replay-marker-dot,
+    div.replay-marker-dot,
+    .leaflet-marker-icon .replay-marker-dot {
+        width: 16px !important;
+        height: 16px !important;
+        min-width: 16px !important;
+        min-height: 16px !important;
+        max-width: 16px !important;
+        max-height: 16px !important;
+        border: 3px solid white !important;
+    }
+    
+    .replay-speed-tag,
+    #replay-speed-tag {
+        font-size: 12px !important;
+        padding: 4px 10px !important;
+    }
+    
     .speed-marker > div {
         font-size: 11px !important;
         padding: 3px 8px !important;
     }
+}
+
+@media (max-width: 375px) {
+    .replay-marker,
+    div[class*="replay-marker"] {
+        width: 14px !important;
+        height: 14px !important;
+    }
     
-    .replay-speed-tag {
+    .replay-marker-dot,
+    .replay-marker .replay-marker-dot,
+    div.replay-marker-dot,
+    .leaflet-marker-icon .replay-marker-dot {
+        width: 14px !important;
+        height: 14px !important;
+        min-width: 14px !important;
+        min-height: 14px !important;
+        max-width: 14px !important;
+        max-height: 14px !important;
+        border: 2px solid white !important;
+    }
+    
+    .replay-speed-tag,
+    #replay-speed-tag {
         font-size: 11px !important;
         padding: 3px 8px !important;
     }
 }
-        /* FIX MOBILE CURSEUR GPS UNIQUEMENT */
-@media (max-width: 768px) {
-    /* Forcer le curseur à rester groupé sur mobile */
-    .leaflet-marker-icon.replay-marker {
-        overflow: visible !important;
-    }
-    
-    .leaflet-marker-icon.replay-marker .replay-marker-container {
-        overflow: visible !important;
-    }
-    
-    .leaflet-marker-icon.replay-marker .replay-marker-dot {
-        width: 14px !important;
-        height: 14px !important;
-        border: 2px solid white !important;
-    }
-    
-    .leaflet-marker-icon.replay-marker .replay-speed-tag {
-        top: -30px !important;
-        font-size: 10px !important;
-        padding: 2px 6px !important;
-    }
+
+/* Forcer overflow visible PARTOUT */
+.leaflet-marker-pane,
+.leaflet-marker-pane *,
+.leaflet-marker-icon,
+.leaflet-marker-icon * {
+    overflow: visible !important;
 }
+        
         .auto-detect-box {
             background: #e3f2fd;
             padding: 15px;
@@ -1585,7 +1665,46 @@ table tbody tr:hover {
         margin-right: 10px;
     }
 
+/* ===== CONTENEURS BLUETOOTH ===== */
+.bluetooth-container {
+    background: var(--bg-card);
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
 
+.instructions-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+}
+
+.instructions-title {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--accent);
+}
+
+.instructions-list {
+    margin: 10px 0 0 0;
+    padding-left: 20px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+/* Titres dans les pages Bluetooth */
+#esp32-page h2,
+#settings-page h2 {
+    color: var(--accent);
+}
+
+#esp32-page p,
+#settings-page p {
+    color: var(--text-secondary);
+}
       
    
 }
@@ -1670,16 +1789,16 @@ table tbody tr:hover {
             <p style="color: #666; margin-top: 10px;">Utilisez Chrome ou Edge</p>
         </div>
         
-        <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; margin: 0 auto;">
+        <div class="bluetooth-container">
             <div id="esp32-status" style="padding: 15px; border-radius: 8px; margin: 20px 0; display: none;"></div>
             
             <button onclick="connectESP32()" style="width: 100%; padding: 15px; background: linear-gradient(45deg, #1976d2, #42a5f5); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s;">
                 🔗 Connexion Bluetooth
             </button>
             
-            <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #1976d2;">
-                <p style="margin: 0; font-size: 0.9rem; color: #1976d2;"><strong>Instructions :</strong></p>
-                <ol style="margin: 10px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: #666;">
+            <div class="instructions-box">
+    <p class="instructions-title"><strong>Instructions :</strong></p>
+    <ol class="instructions-list">
                     <li>Allumez le GPS_LapTimer</li>
                     <li>Activez le Bluetooth sur votre appareil</li>
                     <li>Cliquez sur "Connexion Bluetooth"</li>
@@ -1726,7 +1845,7 @@ table tbody tr:hover {
             <h2 style="color: #1976d2;">⚙️ Paramètres GPS LapTimer</h2>
         </div>
         
-        <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; margin: 0 auto;">
+        <div class="bluetooth-container">
             <!-- État connexion -->
             <div id="settings-status" style="padding: 15px; border-radius: 8px; margin: 20px 0; display: none;"></div>
             
@@ -1793,9 +1912,9 @@ table tbody tr:hover {
             </div>
             
             <!-- Instructions -->
-            <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #1976d2;">
-                <p style="margin: 0; font-size: 0.9rem; color: #1976d2;"><strong>Instructions :</strong></p>
-                <ol style="margin: 10px 0 0 0; padding-left: 20px; font-size: 0.85rem; color: #666;">
+            <div class="instructions-box">
+    <p class="instructions-title"><strong>Instructions :</strong></p>
+    <ol class="instructions-list">
                     <li>Allumez le GPS LapTimer</li>
                     <li>Activez le Bluetooth</li>
                     <li>Cliquez sur "Connexion Bluetooth"</li>
@@ -3971,75 +4090,83 @@ const allCircuits = CIRCUITS_DATABASE;
             else return '#00ff00';                      // Vert: forte accélération
         }
         
-        function detectAndDisplaySpeedMarkers(points, layer) {
-            console.log('=== FONCTION UNIFIEE APPELEE ===');
-            console.log('Nombre de points:', points.length);
-            
-            let speedMarkers = [];
-            const windowSize = 8;
-            
-            // Détecter tous les extrema de la courbe
-            for (let j = windowSize; j < points.length - windowSize; j++) {
-                const speeds = [];
-                for (let k = j - windowSize; k <= j + windowSize; k++) {
-                    speeds.push(points[k].spd);
-                }
-                
-                const currentSpeed = points[j].spd;
-                const minSpeed = Math.min(...speeds);
-                const maxSpeed = Math.max(...speeds);
-                
-                // Creux
-                if (currentSpeed === minSpeed) {
-                    const prevSpeed = points[Math.max(0, j - 3)].spd;
-                    const nextSpeed = points[Math.min(points.length - 1, j + 3)].spd;
-                    
-                    if (prevSpeed > currentSpeed && nextSpeed > currentSpeed) {
-                        speedMarkers.push({
-                            pos: [points[j].lat, points[j].lng],
-                            speed: currentSpeed,
-                            type: 'min'
-                        });
-                        j += windowSize;
-                    }
-                }
-                
-                // Sommet
-                if (currentSpeed === maxSpeed) {
-                    const prevSpeed = points[Math.max(0, j - 3)].spd;
-                    const nextSpeed = points[Math.min(points.length - 1, j + 3)].spd;
-                    
-                    if (prevSpeed < currentSpeed && nextSpeed < currentSpeed) {
-                        speedMarkers.push({
-                            pos: [points[j].lat, points[j].lng],
-                            speed: currentSpeed,
-                            type: 'max'
-                        });
-                        j += windowSize;
-                    }
-                }
-            }
-            
-            console.log(`Etiquettes detectees: ${speedMarkers.length} (${speedMarkers.filter(m => m.type === 'min').length} creux, ${speedMarkers.filter(m => m.type === 'max').length} sommets)`);
-            
-            // Afficher les étiquettes
-            speedMarkers.forEach((marker, index) => {
-                const bgColor = marker.type === 'min' ? '#ff0000' : '#00ff00';
-                
-                console.log(`Etiquette ${index + 1}: ${marker.type}, vitesse ${marker.speed}, couleur ${bgColor}`);
-                
-                const icon = L.divIcon({
-                    className: 'speed-marker',
-                    html: `<div style="background: ${bgColor}; color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 13px; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.5); white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${Math.round(marker.speed)}</div>`,
-                    iconSize: [80, 30],
-                    iconAnchor: [40, 15]
-                });
-                
-                const markerObj = L.marker(marker.pos, { icon: icon, zIndexOffset: 1000 });
-                markerObj.addTo(layer);
-                console.log('Marker ajoute au layer');
-            });
+        function detectAndDisplaySpeedMarkers(points, layer, colors = null) {
+    console.log('=== FONCTION UNIFIEE APPELEE ===');
+    console.log('Nombre de points:', points.length);
+    
+    // Couleurs par défaut (meilleur tour)
+    const defaultColors = {
+        min: '#ff0000',  // Rouge pour creux
+        max: '#00ff00'   // Vert pour sommets
+    };
+    
+    const actualColors = colors || defaultColors;
+    
+    let speedMarkers = [];
+    const windowSize = 8;
+    
+    // Détecter tous les extrema de la courbe
+    for (let j = windowSize; j < points.length - windowSize; j++) {
+        const speeds = [];
+        for (let k = j - windowSize; k <= j + windowSize; k++) {
+            speeds.push(points[k].spd);
         }
+        
+        const currentSpeed = points[j].spd;
+        const minSpeed = Math.min(...speeds);
+        const maxSpeed = Math.max(...speeds);
+        
+        // Creux
+        if (currentSpeed === minSpeed) {
+            const prevSpeed = points[Math.max(0, j - 3)].spd;
+            const nextSpeed = points[Math.min(points.length - 1, j + 3)].spd;
+            
+            if (prevSpeed > currentSpeed && nextSpeed > currentSpeed) {
+                speedMarkers.push({
+                    pos: [points[j].lat, points[j].lng],
+                    speed: currentSpeed,
+                    type: 'min'
+                });
+                j += windowSize;
+            }
+        }
+        
+        // Sommet
+        if (currentSpeed === maxSpeed) {
+            const prevSpeed = points[Math.max(0, j - 3)].spd;
+            const nextSpeed = points[Math.min(points.length - 1, j + 3)].spd;
+            
+            if (prevSpeed < currentSpeed && nextSpeed < currentSpeed) {
+                speedMarkers.push({
+                    pos: [points[j].lat, points[j].lng],
+                    speed: currentSpeed,
+                    type: 'max'
+                });
+                j += windowSize;
+            }
+        }
+    }
+    
+    console.log(`Etiquettes detectees: ${speedMarkers.length} (${speedMarkers.filter(m => m.type === 'min').length} creux, ${speedMarkers.filter(m => m.type === 'max').length} sommets)`);
+    
+    // Afficher les étiquettes avec les couleurs appropriées
+    speedMarkers.forEach((marker, index) => {
+        const bgColor = marker.type === 'min' ? actualColors.min : actualColors.max;
+        
+        console.log(`Etiquette ${index + 1}: ${marker.type}, vitesse ${marker.speed}, couleur ${bgColor}`);
+        
+        const icon = L.divIcon({
+            className: 'speed-marker',
+            html: `<div style="background: ${bgColor}; color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 13px; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.5); white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${Math.round(marker.speed)}</div>`,
+            iconSize: [80, 30],
+            iconAnchor: [40, 15]
+        });
+        
+        const markerObj = L.marker(marker.pos, { icon: icon, zIndexOffset: 1000 });
+        markerObj.addTo(layer);
+        console.log('Marker ajoute au layer');
+    });
+}
         
         function displayBestLap() {
             if (!map || !lapSegments || lapSegments.length === 0) return;
@@ -4085,25 +4212,35 @@ const allCircuits = CIRCUITS_DATABASE;
             // Utiliser la fonction réutilisable pour les étiquettes
             detectAndDisplaySpeedMarkers(track, gpsLayer);
             
-            if (!replayMarker) {
+if (!replayMarker) {
     const markerIcon = L.divIcon({
         className: 'replay-marker',
         html: `
-            <div style="position: relative; width: 22px; height: 22px;">
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; background: #1565c0; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 1;"></div>
-                <div id="replay-speed-tag" style="position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: #2196f3; color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 13px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.5); display: none; pointer-events: none; z-index: 2; min-width: 60px; text-align: center;"></div>
-            </div>
+            <div class="replay-marker-dot" style="width: 18px; height: 18px; background: #ff0000; border: 3px solid white; border-radius: 50%; box-shadow: 0 3px 10px rgba(0,0,0,0.8); position: relative; z-index: 1000;"></div>
+            <div class="replay-speed-tag" id="replay-speed-tag" style="position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #ff0000; color: white; padding: 5px 12px; border-radius: 15px; font-weight: bold; font-size: 14px; white-space: nowrap; box-shadow: 0 3px 10px rgba(0,0,0,0.8); opacity: 0; visibility: hidden; pointer-events: none; margin-bottom: 8px; border: 2px solid white; z-index: 1001; min-width: 65px; text-align: center;"></div>
         `,
-        iconSize: [22, 22],
-        iconAnchor: [11, 11]
+        iconSize: [18, 18],
+        iconAnchor: [9, 9]
     });
     
     replayMarker = L.marker([track[0].lat, track[0].lng], { 
         icon: markerIcon, 
-        opacity: 0,
+        opacity: 1,
         zIndexOffset: 2000 
     }).addTo(gpsLayer);
-}
+    
+    // DEBUG: Vérifier le marker après création
+    setTimeout(() => {
+        const markerElement = document.querySelector('.replay-marker-dot');
+        if (markerElement) {
+            console.log('✅ Marker dot trouvé');
+            console.log('Couleur:', window.getComputedStyle(markerElement).backgroundColor);
+            console.log('Taille:', window.getComputedStyle(markerElement).width);
+        } else {
+            console.error('❌ Marker dot NON trouvé');
+        }
+    }, 500);
+}           
             
             const bounds = L.latLngBounds(track.map(p => [p.lat, p.lng]));
             map.fitBounds(bounds, { padding: [50, 50] });
@@ -4145,6 +4282,11 @@ const allCircuits = CIRCUITS_DATABASE;
             });
             
             replayIndex = 0;
+            updateReplayPosition();
+
+            if (replayMarker) {
+        replayMarker.setOpacity(1);
+    }
         }
         
         function updateReplayPosition() {
@@ -4674,8 +4816,12 @@ detectAndDisplaySpeedMarkers(points, lapLayer);
         polyline.addTo(lapLayer);
     }
     
-    // Ajouter les étiquettes de vitesse pour le tour comparé
-    detectAndDisplaySpeedMarkers(points, lapLayer);
+     // Ajouter les étiquettes de vitesse avec des couleurs différentes
+    const comparisonColors = {
+        min: '#ff8800',  
+        max: '#0F71D1'   
+    };
+    detectAndDisplaySpeedMarkers(points, lapLayer, comparisonColors);
 }
                 
                 const startIcon = L.divIcon({
