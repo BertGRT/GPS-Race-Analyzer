@@ -507,7 +507,7 @@ table tbody tr:hover {
         }
         
         .track-stats {
-            display: grid;
+            display: none !important;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin: 20px 0;
@@ -727,8 +727,8 @@ table tbody tr:hover {
 
 .replay-marker-container {
     position: relative;
-    width: 22px;
-    height: 22px;
+    width: 80px;
+    height: 60px;
 }
 
 .replay-marker-dot {
@@ -787,7 +787,29 @@ table tbody tr:hover {
         padding: 3px 8px !important;
     }
 }
-        
+        /* FIX MOBILE CURSEUR GPS UNIQUEMENT */
+@media (max-width: 768px) {
+    /* Forcer le curseur à rester groupé sur mobile */
+    .leaflet-marker-icon.replay-marker {
+        overflow: visible !important;
+    }
+    
+    .leaflet-marker-icon.replay-marker .replay-marker-container {
+        overflow: visible !important;
+    }
+    
+    .leaflet-marker-icon.replay-marker .replay-marker-dot {
+        width: 14px !important;
+        height: 14px !important;
+        border: 2px solid white !important;
+    }
+    
+    .leaflet-marker-icon.replay-marker .replay-speed-tag {
+        top: -30px !important;
+        font-size: 10px !important;
+        padding: 2px 6px !important;
+    }
+}
         .auto-detect-box {
             background: #e3f2fd;
             padding: 15px;
@@ -1019,10 +1041,7 @@ table tbody tr:hover {
         grid-template-columns: 1fr;
     }
     
-    .track-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
+    
     
     .turns-grid {
         grid-template-columns: 1fr;
@@ -1141,18 +1160,9 @@ table tbody tr:hover {
         padding: 10px 12px;
         font-size: 0.85rem;
     }
+      
     
-    .track-stat-card {
-        padding: 12px;
-    }
     
-    .track-stat-value {
-        font-size: 1.2rem;
-    }
-    
-    .track-stat-label {
-        font-size: 0.8rem;
-    }
     
     .replay-controls {
         padding: 15px;
@@ -1325,23 +1335,7 @@ table tbody tr:hover {
         font-size: 0.8rem;
     }
     
-    .track-stats {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-    }
-    
-    .track-stat-card {
-        padding: 8px;
-    }
-    
-    .track-stat-value {
-        font-size: 1rem;
-    }
-    
-    .track-stat-label {
-        font-size: 0.7rem;
-    }
-    
+        
     .replay-controls {
         padding: 10px;
     }
@@ -1441,12 +1435,7 @@ table tbody tr:hover {
         gap: 10px !important;
     }
     
-    /* Track stats en 2 colonnes */
-    #track-content .track-stats {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 10px !important;
-    }
+    
 }
 
 /* Très petits écrans */
@@ -1473,9 +1462,7 @@ table tbody tr:hover {
         flex: 1 !important;
     }
     
-    #track-content .track-stats {
-        grid-template-columns: repeat(4, 1fr) !important;
-    }
+   
 }
 /* Fix général pour éviter les débordements */
 @media (max-width: 768px) {
@@ -1597,11 +1584,11 @@ table tbody tr:hover {
         margin-left: 10px;
         margin-right: 10px;
     }
-}
 
-            
+
+      
    
-
+}
             
     </style>
 </head>
@@ -4102,9 +4089,9 @@ const allCircuits = CIRCUITS_DATABASE;
     const markerIcon = L.divIcon({
         className: 'replay-marker',
         html: `
-            <div class="replay-marker-container">
-                <div class="replay-marker-dot"></div>
-                <div class="replay-speed-tag" id="replay-speed-tag">0 km/h</div>
+            <div style="position: relative; width: 22px; height: 22px;">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; background: #1565c0; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.5); z-index: 1;"></div>
+                <div id="replay-speed-tag" style="position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background: #2196f3; color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 13px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.5); display: none; pointer-events: none; z-index: 2; min-width: 60px; text-align: center;"></div>
             </div>
         `,
         iconSize: [22, 22],
@@ -4114,9 +4101,9 @@ const allCircuits = CIRCUITS_DATABASE;
     replayMarker = L.marker([track[0].lat, track[0].lng], { 
         icon: markerIcon, 
         opacity: 0,
-                    zIndexOffset: 2000 
-                }).addTo(gpsLayer);
-            }
+        zIndexOffset: 2000 
+    }).addTo(gpsLayer);
+}
             
             const bounds = L.latLngBounds(track.map(p => [p.lat, p.lng]));
             map.fitBounds(bounds, { padding: [50, 50] });
@@ -4288,12 +4275,7 @@ const allCircuits = CIRCUITS_DATABASE;
                                 }
                             }
                         },
-                        title: {
-                            display: true,
-                            text: 'Evolution de la Vitesse - Meilleur Tour',
-                            font: { size: 16, weight: 'bold' },
-                            color: '#1976d2'
-                        }
+                        
                     },
                     onClick: (event, elements, chart) => {
                         const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
@@ -4819,12 +4801,7 @@ detectAndDisplaySpeedMarkers(points, lapLayer);
                                 }
                             }
                         },
-                        title: {
-                            display: true,
-                            text: 'Comparaison des Vitesses (Recalees)',
-                            font: { size: 16, weight: 'bold' },
-                            color: '#1976d2'
-                        }
+                        
                     },
                     onClick: (event, elements, chart) => {
                         const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
