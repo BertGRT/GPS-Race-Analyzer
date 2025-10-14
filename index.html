@@ -4076,6 +4076,12 @@ const allCircuits = CIRCUITS_DATABASE;
     const bestTime = sessionData.best;
     const worstTime = Math.max(...times);
     
+    // Détecter mobile
+    const isMobile = window.innerWidth <= 768;
+    const containerWidth = isMobile ? 300 : 500;
+    const fontSize = isMobile ? '0.75rem' : '0.85rem';
+    const charWidth = isMobile ? 6 : 7;
+    
     container.innerHTML = times.map((time, index) => {
         const delta = time - bestTime;
         const realPercentage = ((worstTime - time) / (worstTime - bestTime)) * 100;
@@ -4089,11 +4095,15 @@ const allCircuits = CIRCUITS_DATABASE;
         
         const timeText = formatTime(time);
         const deltaText = delta === 0 ? '(RECORD)' : `(+${(delta/1000).toFixed(3)}s)`;
-        const fullText = `${timeText} ${deltaText}`;
+        
+        // ✅ VERSION COURTE POUR MOBILE
+        const fullText = isMobile ? 
+            (delta === 0 ? `${timeText} ⭐` : `${timeText} +${(delta/1000).toFixed(2)}`) :
+            `${timeText} ${deltaText}`;
         
         const textLength = fullText.length;
-        const textWidth = textLength * 7;
-        const barWidth = (500 * displayPercentage) / 100;
+        const textWidth = textLength * charWidth;
+        const barWidth = (containerWidth * displayPercentage) / 100;
         const textFitsInside = barWidth > (textWidth + 20);
         
         return `
@@ -4102,11 +4112,11 @@ const allCircuits = CIRCUITS_DATABASE;
                 <div style="position: relative; flex: 1; display: flex; align-items: center;">
                     <div class="progress-bar-container" style="overflow: visible !important;">
                         <div class="progress-bar" style="width: ${displayPercentage}%; background: ${color}; display: flex; align-items: center; justify-content: center;">
-                            ${textFitsInside ? `<span style="color: #ffffff !important; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.5); z-index: 1;">${fullText}</span>` : ''}
+                            ${textFitsInside ? `<span style="color: #ffffff !important; font-weight: bold; font-size: ${fontSize}; text-shadow: 0 1px 3px rgba(0,0,0,0.5); z-index: 1; white-space: nowrap;">${fullText}</span>` : ''}
                         </div>
                     </div>
                     ${!textFitsInside ? `
-                        <span style="color: #000000 !important; background: transparent !important; position: absolute; left: calc(${displayPercentage}% + 18px); font-size: 0.85rem; font-weight: bold; white-space: nowrap; z-index: 10;">${fullText}</span>
+                        <span style="color: #000000 !important; background: transparent !important; position: absolute; left: calc(${displayPercentage}% + ${isMobile ? 8 : 18}px); font-size: ${fontSize}; font-weight: bold; white-space: nowrap; z-index: 10;">${fullText}</span>
                     ` : ''}
                 </div>
             </div>
