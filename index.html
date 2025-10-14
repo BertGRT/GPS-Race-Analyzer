@@ -573,8 +573,7 @@ table tbody tr:hover {
             height: 30px;
             background: #e0e0e0;
             border-radius: 15px;
-            margin: 0 10px;
-            overflow: hidden;
+            margin: 0 10px;            
             position: relative;
         }
         
@@ -1438,6 +1437,15 @@ div.replay-speed-tag,
         padding: 6px 12px;
         font-size: 0.8rem;
     }
+
+    .comparison-select option:disabled {
+    color: #999;
+    font-style: italic;
+}
+
+[data-theme="dark"] .comparison-select option:disabled {
+    color: #666;
+}
 }
 /* ===== FIX SPÉCIFIQUE ONGLET CIRCUIT - MOBILE ===== */
 
@@ -1735,7 +1743,27 @@ div.replay-speed-tag,
 .export-btn:active {
     transform: translateY(-1px);
 }   
-   
+
+/* Texte DANS la barre colorée (toujours blanc) */
+.progress-bar-text-inside {
+    color: white !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    position: relative;
+    z-index: 1;
+}
+
+/* Texte HORS de la barre colorée (toujours noir) */
+.progress-bar-text-outside {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.85rem;
+    font-weight: bold;
+    white-space: nowrap;
+    color: #333333 !important;
+}
+
+
 }
             
     </style>
@@ -2015,37 +2043,56 @@ div.replay-speed-tag,
             </div>
             
             <div id="track-content" class="tab-content">
-                <div class="comparison-controls">
-                    <h4 style="margin-bottom: 10px; color: #ff6f00;">Comparaison de 2 Tours</h4>
-                    <p style="margin-bottom: 15px; font-size: 0.9rem;">Comparez le meilleur tour avec un autre tour</p>
-                    
-                    
-<div class="comparison-selects">
-    <div>
-        <label class="comparison-label">Meilleur Temps</label>
-        <select id="compare-lap1" disabled class="comparison-select comparison-select-best">
-            <option value="">-- Automatique --</option>
-        </select>
+             <div class="comparison-controls">
+    <h4 style="margin-bottom: 10px; color: #ff6f00;">Visualisation des Tours</h4>
+    
+    <!-- MODE AFFICHAGE SIMPLE -->
+    <div id="single-lap-mode" style="margin-bottom: 20px;">
+        <p style="margin-bottom: 10px; font-size: 0.9rem;">Afficher un tour individuel</p>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+                <label class="comparison-label">Sélectionner un tour</label>
+                <select id="single-lap-selector" class="comparison-select">
+                    <option value="">-- Sélectionner --</option>
+                </select>
+            </div>
+            <button class="replay-btn" onclick="displaySelectedSingleLap()" style="margin-top: 20px;">
+                📊 Afficher ce Tour
+            </button>
+        </div>
     </div>
-    <div>
-        <label class="comparison-label">Tour comparé</label>
-        <select id="compare-lap2" class="comparison-select">
-            <option value="">-- Selectionner --</option>
-        </select>
-    </div>
-</div>
+    
+    <div style="border-top: 2px solid var(--border-color); margin: 20px 0;"></div>
+    
+    <!-- MODE COMPARAISON -->
+    <div id="comparison-mode">
+        <p style="margin-bottom: 10px; font-size: 0.9rem;">Comparer deux tours</p>
+        <div class="comparison-selects">
+            <div>
+                <label class="comparison-label">Tour 1</label>
+                <select id="compare-lap1" class="comparison-select">
+                    <option value="">-- Sélectionner --</option>
+                </select>
+            </div>
+            <div>
+                <label class="comparison-label">Tour 2</label>
+                <select id="compare-lap2" class="comparison-select">
+                    <option value="">-- Sélectionner --</option>
+                </select>
+            </div>
+        </div>
 
-<div class="comparison-buttons">
-    <button class="replay-btn" onclick="compareSelectedLaps()">Comparer les Tours</button>
-    <button class="replay-btn btn-clear" onclick="clearComparison()">Effacer la Comparaison</button>
-</div>
-                    
-                    
-<div id="comparison-legend" class="comparison-legend">
-    <strong>Legende:</strong>
-    <div id="legend-items" class="legend-items"></div>
-</div>
-                </div>
+        <div class="comparison-buttons">
+            <button class="replay-btn" onclick="compareSelectedLaps()">Comparer les Tours</button>
+            <button class="replay-btn btn-clear" onclick="clearComparison()">Réinitialiser</button>
+        </div>
+    </div>
+    
+    <div id="comparison-legend" class="comparison-legend">
+        <strong>Légende:</strong>
+        <div id="legend-items" class="legend-items"></div>
+    </div>
+</div>   
 
                 <div class="auto-detect-box" id="circuit-unknown" style="display: none;">
     <h4 style="margin-bottom: 10px;">Circuit Non Identifié</h4>
@@ -4023,7 +4070,7 @@ const allCircuits = CIRCUITS_DATABASE;
             `;
         }
         
-        function displayProgression() {
+    function displayProgression() {
     const container = document.getElementById('progress-bars');
     const times = sessionData.times;
     const bestTime = sessionData.best;
@@ -4031,7 +4078,8 @@ const allCircuits = CIRCUITS_DATABASE;
     
     container.innerHTML = times.map((time, index) => {
         const delta = time - bestTime;
-        const percentage = ((worstTime - time) / (worstTime - bestTime)) * 100;
+        const realPercentage = ((worstTime - time) / (worstTime - bestTime)) * 100;
+        const displayPercentage = Math.max(realPercentage, 8);
         
         let color = '';
         if (time === bestTime) color = 'linear-gradient(90deg, #4caf50, #8bc34a)';
@@ -4039,21 +4087,27 @@ const allCircuits = CIRCUITS_DATABASE;
         else if (delta < 2000) color = 'linear-gradient(90deg, #ff9800, #ffb74d)';
         else color = 'linear-gradient(90deg, #f44336, #ef5350)';
         
-        const displayPercentage = Math.max(percentage, 20);
         const timeText = formatTime(time);
-        const deltaText = delta === 0 ? '(RECORD)' : `(+${(delta/1000).toFixed(3)})`;
+        const deltaText = delta === 0 ? '(RECORD)' : `(+${(delta/1000).toFixed(3)}s)`;
+        const fullText = `${timeText} ${deltaText}`;
         
-        // Si la barre est trop petite (< 30%), afficher le texte à l'extérieur
-        const isSmallBar = displayPercentage < 30;
+        const textLength = fullText.length;
+        const textWidth = textLength * 7;
+        const barWidth = (500 * displayPercentage) / 100;
+        const textFitsInside = barWidth > (textWidth + 20);
         
         return `
             <div class="progress-item">
                 <div class="progress-label">T${index + 1}</div>
-                <div class="progress-bar-container" style="position: relative;">
-                    <div class="progress-bar" style="width: ${displayPercentage}%; background: ${color};">
-                        ${!isSmallBar ? `${timeText} ${deltaText}` : ''}
+                <div style="position: relative; flex: 1; display: flex; align-items: center;">
+                    <div class="progress-bar-container" style="overflow: visible !important;">
+                        <div class="progress-bar" style="width: ${displayPercentage}%; background: ${color}; display: flex; align-items: center; justify-content: center;">
+                            ${textFitsInside ? `<span style="color: #ffffff !important; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.5); z-index: 1;">${fullText}</span>` : ''}
+                        </div>
                     </div>
-                    ${isSmallBar ? `<div style="position: absolute; left: ${displayPercentage + 2}%; top: 50%; transform: translateY(-50%); color: #333; font-size: 0.85rem; font-weight: bold; white-space: nowrap;">${timeText} ${deltaText}</div>` : ''}
+                    ${!textFitsInside ? `
+                        <span style="color: #000000 !important; background: transparent !important; position: absolute; left: calc(${displayPercentage}% + 18px); font-size: 0.85rem; font-weight: bold; white-space: nowrap; z-index: 10;">${fullText}</span>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -4204,87 +4258,73 @@ const allCircuits = CIRCUITS_DATABASE;
     });
 }
         
-        function displayBestLap() {
-            if (!map || !lapSegments || lapSegments.length === 0) return;
-            
-            const bestLap = lapSegments.find(lap => lap.isBestLap);
-            if (!bestLap) return;
-            
-            if (gpsLayer) map.removeLayer(gpsLayer);
-            gpsLayer = L.layerGroup().addTo(map);
-            
-            const track = bestLap.points;
-            currentReplayData = { lap: bestLap, track: track };
-            
-            // Dessiner d'abord la trajectoire avec les couleurs d'accélération
-            for (let i = 0; i < track.length - 1; i++) {
-                const prevPoint = i > 0 ? track[i - 1] : track[i];
-                const p1 = track[i];
-                const p2 = track[i + 1];
-                const nextPoint = i < track.length - 2 ? track[i + 2] : p2;
-                
-                const color = getAccelerationColor(prevPoint.spd, p1.spd, nextPoint.spd);
-                
-                const segment = L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], {
-                    color: color,
-                    weight: 5,
-                    opacity: 0.9
-                });
-                
-                const accel = p2.spd - p1.spd;
-                const accelText = accel > 0 ? `+${accel.toFixed(1)}` : accel.toFixed(1);
-                
-                segment.bindPopup(`
-                    <strong>MEILLEUR TOUR ${bestLap.lapNumber}</strong><br>
-                    Temps: ${formatTime(bestLap.time)}<br>
-                    Vitesse: ${p1.spd.toFixed(1)} km/h<br>
-                    Acceleration: ${accelText} km/h<br>
-                    Position: ${(p1.t / 1000).toFixed(1)}s
-                `);
-                
-                segment.addTo(gpsLayer);
-            }
-            
-            // Utiliser la fonction réutilisable pour les étiquettes
-            detectAndDisplaySpeedMarkers(track, gpsLayer);
-            
-if (!replayMarker) {
-    const markerIcon = L.divIcon({
-        className: 'replay-marker',
-        html: `
-            <div class="replay-marker-dot" style="width: 18px; height: 18px; background: #ff0000; border: 3px solid white; border-radius: 50%; box-shadow: 0 3px 10px rgba(0,0,0,0.8); position: relative; z-index: 1000;"></div>
-            <div class="replay-speed-tag" id="replay-speed-tag" style="position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #ff0000; color: white; padding: 5px 12px; border-radius: 15px; font-weight: bold; font-size: 14px; white-space: nowrap; box-shadow: 0 3px 10px rgba(0,0,0,0.8); opacity: 0; visibility: hidden; pointer-events: none; margin-bottom: 8px; border: 2px solid white; z-index: 1001; min-width: 65px; text-align: center;"></div>
-        `,
-        iconSize: [18, 18],
-        iconAnchor: [9, 9]
-    });
+       function displayBestLap() {
+    if (!map || !lapSegments || lapSegments.length === 0) return;
     
-    replayMarker = L.marker([track[0].lat, track[0].lng], { 
-        icon: markerIcon, 
-        opacity: 1,
-        zIndexOffset: 2000 
-    }).addTo(gpsLayer);
+    const bestLap = lapSegments.find(lap => lap.isBestLap);
+    if (!bestLap) return;
     
-    // DEBUG: Vérifier le marker après création
-    setTimeout(() => {
-        const markerElement = document.querySelector('.replay-marker-dot');
-        if (markerElement) {
-            console.log('✅ Marker dot trouvé');
-            console.log('Couleur:', window.getComputedStyle(markerElement).backgroundColor);
-            console.log('Taille:', window.getComputedStyle(markerElement).width);
-        } else {
-            console.error('❌ Marker dot NON trouvé');
-        }
-    }, 500);
-}           
-            
-            const bounds = L.latLngBounds(track.map(p => [p.lat, p.lng]));
-            map.fitBounds(bounds, { padding: [50, 50] });
-            
-            displayBestLapStats(bestLap);
-            initReplayControlsForBestLap(bestLap);
-            createBestLapSpeedChart(bestLap);
-        }
+    console.log('=== AFFICHAGE MEILLEUR TOUR ===');
+    
+    // ✅ Nettoyer complètement
+    clearComparisonLayers();
+    if (gpsLayer && map.hasLayer(gpsLayer)) {
+        map.removeLayer(gpsLayer);
+    }
+    if (replayMarker && map.hasLayer(replayMarker)) {
+        map.removeLayer(replayMarker);
+        replayMarker = null;
+    }
+    
+    gpsLayer = L.layerGroup().addTo(map);
+    
+    const track = bestLap.points;
+    currentReplayData = { lap: bestLap, track: track };
+    
+    // Dessiner d'abord la trajectoire avec les couleurs d'accélération
+    for (let i = 0; i < track.length - 1; i++) {
+        const prevPoint = i > 0 ? track[i - 1] : track[i];
+        const p1 = track[i];
+        const p2 = track[i + 1];
+        const nextPoint = i < track.length - 2 ? track[i + 2] : p2;
+        
+        const color = getAccelerationColor(prevPoint.spd, p1.spd, nextPoint.spd);
+        
+        const segment = L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], {
+            color: color,
+            weight: 5,
+            opacity: 0.9
+        });
+        
+        const accel = p2.spd - p1.spd;
+        const accelText = accel > 0 ? `+${accel.toFixed(1)}` : accel.toFixed(1);
+        
+        segment.bindPopup(`
+            <strong>MEILLEUR TOUR ${bestLap.lapNumber}</strong><br>
+            Temps: ${formatTime(bestLap.time)}<br>
+            Vitesse: ${p1.spd.toFixed(1)} km/h<br>
+            Acceleration: ${accelText} km/h<br>
+            Position: ${(p1.t / 1000).toFixed(1)}s
+        `);
+        
+        segment.addTo(gpsLayer);
+    }
+    
+    // Utiliser la fonction réutilisable pour les étiquettes
+    detectAndDisplaySpeedMarkers(track, gpsLayer);
+    
+    // ✅ UTILISER la nouvelle fonction pour créer le curseur
+    createReplayMarker(track[0]);
+    
+    const bounds = L.latLngBounds(track.map(p => [p.lat, p.lng]));
+    map.fitBounds(bounds, { padding: [50, 50] });
+    
+    displayBestLapStats(bestLap);
+    initReplayControlsForBestLap(bestLap);
+    createBestLapSpeedChart(bestLap);
+    
+    console.log('✅ Meilleur tour affiché avec curseur');
+} 
         
         function displayBestLapStats(bestLap) {
             const track = bestLap.points;
@@ -4325,51 +4365,62 @@ if (!replayMarker) {
     }
         }
         
-        function updateReplayPosition() {
-            if (!currentReplayData) return;
-            
-            const track = currentReplayData.track;
-            const point = track[Math.floor(replayIndex)];
-            if (!point) return;
-            
-            if (replayMarker) {
-                replayMarker.setOpacity(1);
-                replayMarker.setLatLng([point.lat, point.lng]);
-                map.panTo([point.lat, point.lng], {animate: false});
-                
-                const speedTag = document.getElementById('replay-speed-tag');
-                if (speedTag) {
-                    speedTag.style.display = 'block';
-                    speedTag.textContent = `${Math.round(point.spd)} km/h`;
-                    
-                }
-            }
-            
-            document.getElementById('replay-time-circuit').textContent = (point.t / 1000).toFixed(1) + 's';
-            document.getElementById('replay-speed-circuit').textContent = point.spd.toFixed(1) + ' km/h';
-            document.getElementById('replay-position-circuit').textContent = `${Math.floor(replayIndex) + 1}/${track.length}`;
-            document.getElementById('replay-slider-circuit').value = replayIndex;
-            
-            if (speedChart) {
-                const datasetIndex = isComparisonMode ? speedChart.data.datasets.length - 1 : 1;
-                if (speedChart.data.datasets[datasetIndex]) {
-                    speedChart.data.datasets[datasetIndex].data = [{ x: point.t / 1000, y: point.spd }];
-                    speedChart.update('none');
-                }
-            }
-            
-            if (comparisonChart) {
-                const cursorDatasetIndex = comparisonChart.data.datasets.length - 1;
-                if (comparisonChart.data.datasets[cursorDatasetIndex]) {
-                    const startTime = currentReplayData.lap.points[0].t;
-                    comparisonChart.data.datasets[cursorDatasetIndex].data = [{ 
-                        x: (point.t - startTime) / 1000, 
-                        y: point.spd 
-                    }];
-                    comparisonChart.update('none');
-                }
-            }
+       function updateReplayPosition() {
+    if (!currentReplayData) {
+        console.warn('Pas de données de replay');
+        return;
+    }
+    
+    const track = currentReplayData.track;
+    const point = track[Math.floor(replayIndex)];
+    if (!point) {
+        console.warn('Point invalide:', replayIndex);
+        return;
+    }
+    
+    // ✅ Si le marker n'existe pas, le recréer
+    if (!replayMarker) {
+        console.log('⚠️ Curseur manquant, recréation...');
+        createReplayMarker(point);
+    }
+    
+    if (replayMarker) {
+        replayMarker.setOpacity(1);
+        replayMarker.setLatLng([point.lat, point.lng]);
+        map.panTo([point.lat, point.lng], {animate: false});
+        
+        const speedTag = document.getElementById('replay-speed-tag');
+        if (speedTag) {
+            speedTag.style.display = 'block';
+            speedTag.textContent = `${Math.round(point.spd)} km/h`;
         }
+    }
+    
+    document.getElementById('replay-time-circuit').textContent = (point.t / 1000).toFixed(1) + 's';
+    document.getElementById('replay-speed-circuit').textContent = point.spd.toFixed(1) + ' km/h';
+    document.getElementById('replay-position-circuit').textContent = `${Math.floor(replayIndex) + 1}/${track.length}`;
+    document.getElementById('replay-slider-circuit').value = replayIndex;
+    
+    if (speedChart) {
+        const datasetIndex = isComparisonMode ? speedChart.data.datasets.length - 1 : 1;
+        if (speedChart.data.datasets[datasetIndex]) {
+            speedChart.data.datasets[datasetIndex].data = [{ x: point.t / 1000, y: point.spd }];
+            speedChart.update('none');
+        }
+    }
+    
+    if (comparisonChart) {
+        const cursorDatasetIndex = comparisonChart.data.datasets.length - 1;
+        if (comparisonChart.data.datasets[cursorDatasetIndex]) {
+            const startTime = currentReplayData.lap.points[0].t;
+            comparisonChart.data.datasets[cursorDatasetIndex].data = [{ 
+                x: (point.t - startTime) / 1000, 
+                y: point.spd 
+            }];
+            comparisonChart.update('none');
+        }
+    }
+} 
         
         function createBestLapSpeedChart(bestLap) {
             const ctx = document.getElementById('speed-chart');
@@ -4743,153 +4794,543 @@ if (!replayMarker) {
         }
         
         function populateLapSelectors() {
-            const selector1 = document.getElementById('compare-lap1');
-            const selector2 = document.getElementById('compare-lap2');
-            if (!selector1 || !selector2) return;
-            
-            const bestLap = lapSegments.find(lap => lap.isBestLap);
-            if (bestLap) {
-                selector1.innerHTML = `<option value="${lapSegments.indexOf(bestLap)}">Tour ${bestLap.lapNumber} - ${formatTime(bestLap.time)} (Meilleur)</option>`;
-            }
-            
-            selector2.innerHTML = '<option value="">-- Selectionner --</option>';
-            lapSegments.forEach((lap, i) => {
-                if (!lap.isBestLap) {
-                    const option = document.createElement('option');
-                    option.value = i;
-                    option.textContent = `Tour ${lap.lapNumber} - ${formatTime(lap.time)}`;
-                    selector2.appendChild(option);
-                }
-            });
+    const selector1 = document.getElementById('compare-lap1');
+    const selector2 = document.getElementById('compare-lap2');
+    if (!selector1 || !selector2) return;
+    
+    console.log('Remplissage des sélecteurs avec', lapSegments.length, 'tours');
+    
+    // Supprimer les anciens event listeners
+    const newSelector1 = selector1.cloneNode(false);
+    const newSelector2 = selector2.cloneNode(false);
+    selector1.parentNode.replaceChild(newSelector1, selector1);
+    selector2.parentNode.replaceChild(newSelector2, selector2);
+    
+    const bestLapIndex = lapSegments.findIndex(lap => lap.isBestLap);
+    
+    // Remplir sélecteur 1
+    newSelector1.innerHTML = '<option value="">-- Sélectionner --</option>';
+    lapSegments.forEach((lap, i) => {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Tour ${lap.lapNumber} - ${formatTime(lap.time)}${lap.isBestLap ? ' ⭐' : ''}`;
+        newSelector1.appendChild(option);
+    });
+    
+    // Remplir sélecteur 2
+    newSelector2.innerHTML = '<option value="">-- Sélectionner --</option>';
+    lapSegments.forEach((lap, i) => {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Tour ${lap.lapNumber} - ${formatTime(lap.time)}${lap.isBestLap ? ' ⭐' : ''}`;
+        newSelector2.appendChild(option);
+    });
+    
+    // Pré-sélectionner le meilleur tour
+    if (bestLapIndex !== -1) {
+        newSelector1.value = bestLapIndex;
+    }
+    
+    // Event listeners
+    newSelector1.addEventListener('change', function() {
+        console.log('Selector 1 changé:', this.value);
+        updateSelector2Options();
+    });
+    
+    newSelector2.addEventListener('change', function() {
+        console.log('Selector 2 changé:', this.value);
+        updateSelector1Options();
+    });
+    
+    // ✅ NOUVEAU : Remplir aussi le sélecteur tour unique
+    populateSingleLapSelector();
+    
+    console.log('✅ Tous les sélecteurs configurés');
+}
+
+// ✅ NOUVELLE FONCTION : Mettre à jour les options du sélecteur 1
+function updateSelector1Options() {
+    const selector1 = document.getElementById('compare-lap1');
+    const selector2 = document.getElementById('compare-lap2');
+    const selected2 = selector2.value;
+    
+    // Désactiver l'option déjà sélectionnée dans selector2
+    Array.from(selector1.options).forEach(option => {
+        if (option.value === selected2 && option.value !== '') {
+            option.disabled = true;
+            option.textContent = option.textContent.replace(' ❌', '') + ' ❌';
+        } else {
+            option.disabled = false;
+            option.textContent = option.textContent.replace(' ❌', '');
         }
+    });
+}
         
+function populateSingleLapSelector() {
+    const selector = document.getElementById('single-lap-selector');
+    if (!selector) return;
+    
+    console.log('Remplissage sélecteur tour unique');
+    
+    // Supprimer les anciens event listeners
+    const newSelector = selector.cloneNode(false);
+    selector.parentNode.replaceChild(newSelector, selector);
+    
+    const bestLapIndex = lapSegments.findIndex(lap => lap.isBestLap);
+    
+    // Remplir le sélecteur
+    newSelector.innerHTML = '<option value="">-- Sélectionner --</option>';
+    lapSegments.forEach((lap, i) => {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Tour ${lap.lapNumber} - ${formatTime(lap.time)}${lap.isBestLap ? ' ⭐ (Meilleur)' : ''}`;
+        newSelector.appendChild(option);
+    });
+    
+    // Pré-sélectionner le meilleur tour
+    if (bestLapIndex !== -1) {
+        newSelector.value = bestLapIndex;
+    }
+    
+    console.log('✅ Sélecteur tour unique configuré');
+}
+
         function compareSelectedLaps() {
-            const lap1Index = document.getElementById('compare-lap1').value;
-            const lap2Index = document.getElementById('compare-lap2').value;
-            
-            if (lap1Index === '' || lap2Index === '') {
-                alert('Veuillez selectionner un tour a comparer');
-                return;
-            }
-            
-            const selectedLaps = [lap1Index, lap2Index];
-            
-            if (!map) {
-                initMap();
-                setTimeout(() => displayComparisonOnMap(selectedLaps), 500);
-            } else {
-                displayComparisonOnMap(selectedLaps);
-            }
-            
-            createComparisonSpeedChart(selectedLaps);
-            isComparisonMode = true;
+    const lap1Index = document.getElementById('compare-lap1').value;
+    const lap2Index = document.getElementById('compare-lap2').value;
+    
+    // ✅ VALIDATION AMÉLIORÉE
+    if (lap1Index === '' || lap2Index === '') {
+        alert('⚠️ Veuillez sélectionner deux tours à comparer');
+        return;
+    }
+    
+    if (lap1Index === lap2Index) {
+        alert('⚠️ Veuillez sélectionner deux tours différents');
+        return;
+    }
+    
+    const selectedLaps = [lap1Index, lap2Index];
+    
+    if (!map) {
+        initMap();
+        setTimeout(() => displayComparisonOnMap(selectedLaps), 500);
+    } else {
+        displayComparisonOnMap(selectedLaps);
+    }
+    
+    createComparisonSpeedChart(selectedLaps);
+    isComparisonMode = true;
+}
+        
+     function displayComparisonOnMap(selectedLapIndexes) {
+    if (!map) return;
+    
+    console.log('=== AFFICHAGE COMPARAISON ===');
+    console.log('Tours à comparer:', selectedLapIndexes);
+    
+    // ✅ NETTOYAGE COMPLET : supprimer TOUS les layers
+    clearComparisonLayers();
+    
+    // ✅ IMPORTANT : Supprimer aussi le layer GPS principal
+    if (gpsLayer && map.hasLayer(gpsLayer)) {
+        map.removeLayer(gpsLayer);
+        console.log('Layer GPS principal supprimé');
+    }
+    
+    // ✅ SUPPRIMER le marker de replay existant
+    if (replayMarker && map.hasLayer(replayMarker)) {
+        map.removeLayer(replayMarker);
+        replayMarker = null;
+        console.log('Marker de replay supprimé');
+    }
+    
+    const colors = ['#4caf50', '#1976d2'];
+    const legendItems = [];
+    
+    selectedLapIndexes.forEach((lapIndex, i) => {
+        const lap = lapSegments[parseInt(lapIndex)];
+        if (!lap) {
+            console.warn('Tour introuvable:', lapIndex);
+            return;
         }
         
-        function displayComparisonOnMap(selectedLapIndexes) {
-            if (!map) return;
-            clearComparisonLayers();
-            
-            const colors = ['#4caf50', '#1976d2'];
-            const legendItems = [];
-            
-            selectedLapIndexes.forEach((lapIndex, i) => {
-                const lap = lapSegments[parseInt(lapIndex)];
-                if (!lap) return;
-                
-                const color = colors[i];
-                const points = lap.points;
-                const lapLayer = L.layerGroup().addTo(map);
-                comparisonLayers.push(lapLayer);
-                
-                if (i === 0) {
-                    // Trajectoire du meilleur tour avec couleurs d'accélération
-                    for (let j = 0; j < points.length - 1; j++) {
-                        const prevPoint = j > 0 ? points[j - 1] : points[j];
-                        const p1 = points[j];
-                        const p2 = points[j + 1];
-                        const nextPoint = j < points.length - 2 ? points[j + 2] : p2;
-                        
-                        const segmentColor = getAccelerationColor(prevPoint.spd, p1.spd, nextPoint.spd);
-                        const polyline = L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], { 
-                            color: segmentColor, 
-                            weight: 5, 
-                            opacity: 0.9 
-                        });
-                        polyline.bindPopup(`<strong>Tour ${lap.lapNumber}</strong><br>Temps: ${formatTime(lap.time)}<br>Vitesse: ${p1.spd.toFixed(1)} km/h`);
-                        polyline.addTo(lapLayer);
-                    }
-                    
-                 // Utiliser la fonction réutilisable pour afficher les étiquettes
-detectAndDisplaySpeedMarkers(points, lapLayer);   
-                } else {
-    // Tour de comparaison avec couleurs d'accélération
-    for (let j = 0; j < points.length - 1; j++) {
-        const prevPoint = j > 0 ? points[j - 1] : points[j];
-        const p1 = points[j];
-        const p2 = points[j + 1];
-        const nextPoint = j < points.length - 2 ? points[j + 2] : p2;
+        console.log(`Affichage tour ${lap.lapNumber} (couleur: ${colors[i]})`);
         
-        const segmentColor = getAccelerationColor(prevPoint.spd, p1.spd, nextPoint.spd);
+        const color = colors[i];
+        const points = lap.points;
+        const lapLayer = L.layerGroup().addTo(map);
+        comparisonLayers.push(lapLayer);
         
-        const polyline = L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], { 
-            color: segmentColor, 
-            weight: 4, 
-            opacity: 0.7,  // Légèrement transparent pour différencier
-            dashArray: '10, 5'  // Pointillé pour différencier du meilleur tour
+        if (i === 0) {
+            // Premier tour (généralement le meilleur) avec couleurs d'accélération
+            for (let j = 0; j < points.length - 1; j++) {
+                const prevPoint = j > 0 ? points[j - 1] : points[j];
+                const p1 = points[j];
+                const p2 = points[j + 1];
+                const nextPoint = j < points.length - 2 ? points[j + 2] : p2;
+                
+                const segmentColor = getAccelerationColor(prevPoint.spd, p1.spd, nextPoint.spd);
+                const polyline = L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], { 
+                    color: segmentColor, 
+                    weight: 5, 
+                    opacity: 0.9 
+                });
+                polyline.bindPopup(`<strong>Tour ${lap.lapNumber}</strong><br>Temps: ${formatTime(lap.time)}<br>Vitesse: ${p1.spd.toFixed(1)} km/h`);
+                polyline.addTo(lapLayer);
+            }
+            
+            detectAndDisplaySpeedMarkers(points, lapLayer);
+        } else {
+            // Deuxième tour avec couleurs d'accélération et pointillés
+            for (let j = 0; j < points.length - 1; j++) {
+                const prevPoint = j > 0 ? points[j - 1] : points[j];
+                const p1 = points[j];
+                const p2 = points[j + 1];
+                const nextPoint = j < points.length - 2 ? points[j + 2] : p2;
+                
+                const segmentColor = getAccelerationColor(prevPoint.spd, p1.spd, nextPoint.spd);
+                
+                const polyline = L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], { 
+                    color: segmentColor, 
+                    weight: 4, 
+                    opacity: 0.7,
+                    dashArray: '10, 5'
+                });
+                
+                const accel = p2.spd - p1.spd;
+                const accelText = accel > 0 ? `+${accel.toFixed(1)}` : accel.toFixed(1);
+                
+                polyline.bindPopup(`
+                    <strong>Tour ${lap.lapNumber}</strong><br>
+                    Temps: ${formatTime(lap.time)}<br>
+                    Vitesse: ${p1.spd.toFixed(1)} km/h<br>
+                    Accélération: ${accelText} km/h<br>
+                    Position: ${(p1.t / 1000).toFixed(1)}s
+                `);
+                
+                polyline.addTo(lapLayer);
+            }
+            
+            const comparisonColors = {
+                min: '#ff8800',  
+                max: '#0F71D1'   
+            };
+            detectAndDisplaySpeedMarkers(points, lapLayer, comparisonColors);
+        }
+        
+        // Marqueur de départ
+        const startIcon = L.divIcon({
+            className: 'speed-marker',
+            html: `<div style="background: ${color}; color: white; padding: 3px 8px; border-radius: 10px; font-weight: bold; font-size: 11px; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">${lap.isBestLap ? '★' : 'T' + lap.lapNumber}</div>`,
+            iconSize: [30, 20],
+            iconAnchor: [15, 10]
+        });
+        L.marker([points[0].lat, points[0].lng], { icon: startIcon }).addTo(lapLayer);
+        
+        legendItems.push({ 
+            color: color, 
+            label: `${lap.isBestLap ? '★ ' : ''}Tour ${lap.lapNumber} - ${formatTime(lap.time)}`, 
+            dashArray: i === 0 ? null : '10, 5' 
+        });
+    });
+    
+    displayComparisonLegend(legendItems);
+    
+    // Ajuster la vue sur les deux tours
+    const allPoints = selectedLapIndexes
+        .map(idx => lapSegments[parseInt(idx)])
+        .filter(lap => lap)
+        .flatMap(lap => lap.points)
+        .map(p => [p.lat, p.lng]);
+    
+    if (allPoints.length > 0) {
+        const bounds = L.latLngBounds(allPoints);
+        map.fitBounds(bounds, { padding: [50, 50] });
+    }
+    
+    // ✅ RECRÉER le curseur rouge pour le premier tour
+    const firstLap = lapSegments[parseInt(selectedLapIndexes[0])];
+    if (firstLap) {
+        currentReplayData = { lap: firstLap, track: firstLap.points };
+        
+        // Créer un nouveau marker de replay
+        createReplayMarker(firstLap.points[0]);
+        
+        document.getElementById('replay-controls-circuit').style.display = 'block';
+        initReplayControlsForBestLap(firstLap);
+    }
+    
+    console.log('✅ Comparaison affichée - 2 tours seulement');
+}   
+function createReplayMarker(initialPoint) {
+    console.log('🔴 Création du curseur rouge...');
+    
+    // Supprimer l'ancien marker s'il existe
+    if (replayMarker && map.hasLayer(replayMarker)) {
+        map.removeLayer(replayMarker);
+        replayMarker = null;
+    }
+    
+    const markerIcon = L.divIcon({
+        className: 'replay-marker',
+        html: `
+            <div class="replay-marker-dot" style="width: 18px; height: 18px; background: #ff0000; border: 3px solid white; border-radius: 50%; box-shadow: 0 3px 10px rgba(0,0,0,0.8); position: relative; z-index: 1000;"></div>
+            <div class="replay-speed-tag" id="replay-speed-tag" style="position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #ff0000; color: white; padding: 5px 12px; border-radius: 15px; font-weight: bold; font-size: 14px; white-space: nowrap; box-shadow: 0 3px 10px rgba(0,0,0,0.8); opacity: 0; visibility: hidden; pointer-events: none; margin-bottom: 8px; border: 2px solid white; z-index: 1001; min-width: 65px; text-align: center;"></div>
+        `,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9]
+    });
+    
+    replayMarker = L.marker([initialPoint.lat, initialPoint.lng], { 
+        icon: markerIcon, 
+        opacity: 1,
+        zIndexOffset: 2000 
+    }).addTo(map);
+    
+    console.log('✅ Curseur rouge créé');
+    return replayMarker;
+}
+        function displaySelectedSingleLap() {
+    console.log('=== AFFICHAGE TOUR UNIQUE ===');
+    
+    const selector = document.getElementById('single-lap-selector');
+    if (!selector) {
+        console.error('❌ Sélecteur introuvable');
+        return;
+    }
+    
+    const lapIndex = selector.value;
+    console.log('Tour sélectionné:', lapIndex);
+    
+    if (lapIndex === '') {
+        alert('⚠️ Veuillez sélectionner un tour à afficher');
+        return;
+    }
+    
+    // Afficher le tour sélectionné
+    displaySingleLap(parseInt(lapIndex));
+}
+
+function displaySingleLap(lapIndex) {
+    if (!map || !lapSegments || lapIndex < 0 || lapIndex >= lapSegments.length) {
+        console.error('❌ Index de tour invalide');
+        return;
+    }
+    
+    const selectedLap = lapSegments[lapIndex];
+    console.log('=== AFFICHAGE TOUR UNIQUE ===');
+    console.log('Tour', selectedLap.lapNumber);
+    
+    // ✅ Nettoyer TOUS les layers
+    clearComparisonLayers();
+    if (gpsLayer && map.hasLayer(gpsLayer)) {
+        map.removeLayer(gpsLayer);
+    }
+    if (replayMarker && map.hasLayer(replayMarker)) {
+        map.removeLayer(replayMarker);
+        replayMarker = null;
+    }
+    
+    // Créer un nouveau layer
+    gpsLayer = L.layerGroup().addTo(map);
+    
+    const track = selectedLap.points;
+    currentReplayData = { lap: selectedLap, track: track };
+    
+    // Dessiner la trajectoire avec couleurs d'accélération
+    for (let i = 0; i < track.length - 1; i++) {
+        const prevPoint = i > 0 ? track[i - 1] : track[i];
+        const p1 = track[i];
+        const p2 = track[i + 1];
+        const nextPoint = i < track.length - 2 ? track[i + 2] : p2;
+        
+        const color = getAccelerationColor(prevPoint.spd, p1.spd, nextPoint.spd);
+        
+        const segment = L.polyline([[p1.lat, p1.lng], [p2.lat, p2.lng]], {
+            color: color,
+            weight: 5,
+            opacity: 0.9
         });
         
         const accel = p2.spd - p1.spd;
         const accelText = accel > 0 ? `+${accel.toFixed(1)}` : accel.toFixed(1);
         
-        polyline.bindPopup(`
-            <strong>Tour ${lap.lapNumber}</strong><br>
-            Temps: ${formatTime(lap.time)}<br>
+        segment.bindPopup(`
+            <strong>TOUR ${selectedLap.lapNumber}${selectedLap.isBestLap ? ' ⭐' : ''}</strong><br>
+            Temps: ${formatTime(selectedLap.time)}<br>
             Vitesse: ${p1.spd.toFixed(1)} km/h<br>
-            Acceleration: ${accelText} km/h<br>
+            Accélération: ${accelText} km/h<br>
             Position: ${(p1.t / 1000).toFixed(1)}s
         `);
         
-        polyline.addTo(lapLayer);
+        segment.addTo(gpsLayer);
     }
     
-     // Ajouter les étiquettes de vitesse avec des couleurs différentes
-    const comparisonColors = {
-        min: '#ff8800',  
-        max: '#0F71D1'   
-    };
-    detectAndDisplaySpeedMarkers(points, lapLayer, comparisonColors);
+    // Afficher les étiquettes de vitesse
+    detectAndDisplaySpeedMarkers(track, gpsLayer);
+    
+    // ✅ UTILISER la nouvelle fonction pour créer le curseur
+    createReplayMarker(track[0]);
+    
+    // Ajuster la vue
+    const bounds = L.latLngBounds(track.map(p => [p.lat, p.lng]));
+    map.fitBounds(bounds, { padding: [50, 50] });
+    
+    // Afficher les statistiques du tour
+    displayLapStats(selectedLap);
+    
+    // Initialiser les contrôles de replay
+    initReplayControlsForLap(selectedLap);
+    
+    // Créer le graphique de vitesse
+    createLapSpeedChart(selectedLap);
+    
+    // Masquer la légende de comparaison
+    document.getElementById('comparison-legend').style.display = 'none';
+    
+    isComparisonMode = false;
+    
+    console.log('✅ Tour unique affiché avec curseur');
 }
+
+function displayLapStats(lap) {
+    const track = lap.points;
+    document.getElementById('track-points').textContent = track.length;
+    
+    let totalDistance = 0;
+    for (let i = 0; i < track.length - 1; i++) {
+        totalDistance += calculateDistance(track[i], track[i + 1]);
+    }
+    document.getElementById('track-distance').textContent = (totalDistance / 1000).toFixed(2) + ' km';
+    
+    const speeds = track.map(p => p.spd);
+    document.getElementById('track-minspeed').textContent = Math.min(...speeds).toFixed(1) + ' km/h';
+    document.getElementById('track-maxspeed').textContent = Math.max(...speeds).toFixed(1) + ' km/h';
+}
+
+function initReplayControlsForLap(lap) {
+    const track = lap.points;
+    document.getElementById('replay-controls-circuit').style.display = 'block';
+    
+    const slider = document.getElementById('replay-slider-circuit');
+    slider.max = track.length - 1;
+    slider.value = 0;
+    
+    const newSlider = slider.cloneNode(true);
+    slider.parentNode.replaceChild(newSlider, slider);
+    
+    newSlider.addEventListener('input', (e) => {
+        replayIndex = parseInt(e.target.value);
+        updateReplayPosition();
+    });
+    
+    replayIndex = 0;
+    updateReplayPosition();
+
+    if (replayMarker) {
+        replayMarker.setOpacity(1);
+    }
+}
+
+function createLapSpeedChart(lap) {
+    const ctx = document.getElementById('speed-chart');
+    if (!ctx) return;
+    
+    const track = lap.points;
+    document.getElementById('speed-chart-container').style.display = 'block';
+    
+    if (speedChart) speedChart.destroy();
+    if (comparisonChart) comparisonChart.destroy();
+    comparisonChart = null;
+    
+    speedChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label: `Tour ${lap.lapNumber} - ${formatTime(lap.time)}${lap.isBestLap ? ' ⭐' : ''}`,
+                    data: track.map(p => ({ x: p.t / 1000, y: p.spd })),
+                    borderColor: lap.isBestLap ? '#4caf50' : '#1976d2',
+                    backgroundColor: lap.isBestLap ? 'rgba(76, 175, 80, 0.1)' : 'rgba(25, 118, 210, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0,
+                    borderWidth: 3
+                },
+                {
+                    label: 'Position',
+                    data: [{ x: track[0].t / 1000, y: track[0].spd }],
+                    borderColor: '#ff0000',
+                    backgroundColor: '#ff0000',
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    pointBorderWidth: 3,
+                    pointBorderColor: '#ffffff',
+                    showLine: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 2,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: {
+                    type: 'linear',
+                    title: { display: true, text: 'Temps (s)', font: { size: 12 } },
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                    ticks: { font: { size: 10 } }
+                },
+                y: {
+                    title: { display: false },
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                    ticks: { 
+                        font: { size: 10 },
+                        callback: function(value) {
+                            return value + ' km/h';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { filter: function(item) { return item.text !== 'Position'; } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            if (context.datasetIndex === 0) return `Vitesse: ${context.parsed.y.toFixed(1)} km/h`;
+                            return null;
+                        }
+                    }
+                }
+            },
+            onClick: (event, elements, chart) => {
+                const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
+                const dataX = chart.scales.x.getValueForPixel(canvasPosition.x);
                 
-                const startIcon = L.divIcon({
-                    className: 'speed-marker',
-                    html: `<div style="background: ${color}; color: white; padding: 3px 8px; border-radius: 10px; font-weight: bold; font-size: 11px; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">${lap.isBestLap ? '★' : 'T' + lap.lapNumber}</div>`,
-                    iconSize: [30, 20],
-                    iconAnchor: [15, 10]
-                });
-                L.marker([points[0].lat, points[0].lng], { icon: startIcon }).addTo(lapLayer);
+                let closestIndex = 0;
+                let minDiff = Math.abs(track[0].t / 1000 - dataX);
                 
-                legendItems.push({ 
-                    color: color, 
-                    label: `${lap.isBestLap ? '★ ' : ''}Tour ${lap.lapNumber} - ${formatTime(lap.time)}`, 
-                    dashArray: i === 0 ? null : '10, 5' 
-                });
-            });
-            
-            displayComparisonLegend(legendItems);
-            
-            const allPoints = selectedLapIndexes.map(idx => lapSegments[parseInt(idx)]).filter(lap => lap).flatMap(lap => lap.points).map(p => [p.lat, p.lng]);
-            if (allPoints.length > 0) {
-                const bounds = L.latLngBounds(allPoints);
-                map.fitBounds(bounds, { padding: [50, 50] });
-            }
-            
-            const bestLap = lapSegments[parseInt(selectedLapIndexes[0])];
-            if (bestLap) {
-                currentReplayData = { lap: bestLap, track: bestLap.points };
-                document.getElementById('replay-controls-circuit').style.display = 'block';
-                initReplayControlsForBestLap(bestLap);
+                for (let i = 1; i < track.length; i++) {
+                    const diff = Math.abs(track[i].t / 1000 - dataX);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closestIndex = i;
+                    }
+                }
+                
+                replayIndex = closestIndex;
+                updateReplayPosition();
             }
         }
+    });
+}
         
         function displayComparisonLegend(items) {
     const legend = document.getElementById('comparison-legend');
@@ -5003,21 +5444,73 @@ detectAndDisplaySpeedMarkers(points, lapLayer);
             });
         }
         
+function clearComparisonLayers() {
+    console.log('Nettoyage des layers de comparaison...');
+    
+    if (comparisonLayers && comparisonLayers.length > 0) {
+        comparisonLayers.forEach(layer => {
+            if (map && map.hasLayer(layer)) {
+                map.removeLayer(layer);
+            }
+        });
+        comparisonLayers = [];
+        console.log('✅ Layers nettoyés');
+    } else {
+        console.log('Aucun layer à nettoyer');
+    }
+}
+
         function clearComparison() {
-            clearComparisonLayers();
-            document.getElementById('compare-lap2').value = '';
-            document.getElementById('comparison-legend').style.display = 'none';
-            if (comparisonChart) { comparisonChart.destroy(); comparisonChart = null; }
-            if (speedChart) { speedChart.destroy(); speedChart = null; }
-            isComparisonMode = false;
-            displayBestLap();
-        }
-        
-        function clearComparisonLayers() {
-            comparisonLayers.forEach(layer => { if (map && map.hasLayer(layer)) map.removeLayer(layer); });
-            comparisonLayers = [];
-        }
-        
+    console.log('=== RÉINITIALISATION ===');
+    
+    clearComparisonLayers();
+    
+    const selector1 = document.getElementById('compare-lap1');
+    const selector2 = document.getElementById('compare-lap2');
+    const singleSelector = document.getElementById('single-lap-selector');
+    
+    // Réinitialiser tous les sélecteurs
+    if (selector1) {
+        Array.from(selector1.options).forEach(option => {
+            option.disabled = false;
+            option.textContent = option.textContent.replace(' ❌', '');
+        });
+        const bestLapIndex = lapSegments.findIndex(lap => lap.isBestLap);
+        if (bestLapIndex !== -1) selector1.value = bestLapIndex;
+    }
+    
+    if (selector2) {
+        Array.from(selector2.options).forEach(option => {
+            option.disabled = false;
+            option.textContent = option.textContent.replace(' ❌', '');
+        });
+        selector2.value = '';
+    }
+    
+    if (singleSelector) {
+        const bestLapIndex = lapSegments.findIndex(lap => lap.isBestLap);
+        if (bestLapIndex !== -1) singleSelector.value = bestLapIndex;
+    }
+    
+    document.getElementById('comparison-legend').style.display = 'none';
+    
+    if (comparisonChart) {
+        comparisonChart.destroy();
+        comparisonChart = null;
+    }
+    
+    if (speedChart) {
+        speedChart.destroy();
+        speedChart = null;
+    }
+    
+    isComparisonMode = false;
+    
+    console.log('Réaffichage du meilleur tour...');
+    displayBestLap();
+    
+    console.log('✅ Réinitialisation effectuée');
+}    
         
     </script>
 <script>
