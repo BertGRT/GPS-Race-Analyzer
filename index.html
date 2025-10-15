@@ -2882,6 +2882,7 @@ function loadStoredFilesList() {
 
 function loadStoredSession(index) {
     const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    sessions.sort((a, b) => b.savedAt - a.savedAt);
     if (sessions[index]) {
         currentSessionId = sessions[index].id;
         sessionData = sessions[index].data;
@@ -2894,6 +2895,7 @@ function deleteStoredSession(index) {
     if (!confirm('Supprimer cette session ?')) return;
     
     const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
+    sessions.sort((a, b) => b.savedAt - a.savedAt);
     sessions.splice(index, 1);
     localStorage.setItem('gpsSessions', JSON.stringify(sessions));
     loadStoredFilesList();
@@ -4268,6 +4270,96 @@ const allCircuits = CIRCUITS_DATABASE;
     });
 }
         
+// ==========================================
+// AFFICHAGE DE LA LIGNE DE CHRONOMÉTRAGE
+// ==========================================
+
+function displayChronoLine(lapPoints, map, lineHalfWidth = 40) {
+    if (!lapPoints || lapPoints.length < 3) {
+        console.warn('Pas assez de points GPS pour afficher la ligne de chrono');
+        return null;
+    }
+    
+    // ⭐ LE POINT DE DÉCLENCHEMENT EST LE DÉBUT DU TOUR
+    const M0 = lapPoints[0];  // Premier point du tour = passage de ligne
+    const M1 = lapPoints[1];  // Deuxième point pour calculer la direction
+    
+    console.log(`🏁 Ligne de chrono au début du tour`);
+    console.log(`   Point M0: lat=${M0.lat.toFixed(6)}, lng=${M0.lng.toFixed(6)}, spd=${M0.spd.toFixed(1)} km/h`);
+    
+    // 1. CALCULER LE VECTEUR DE DÉPLACEMENT (M0 -> M1)
+    const M01_x = (M1.lng - M0.lng) * Math.cos(M0.lat * Math.PI / 180) * 111320;
+    const M01_y = (M1.lat - M0.lat) * 111320;
+    
+    // Normaliser
+    const norm = Math.sqrt(M01_x * M01_x + M01_y * M01_y);
+    if (norm < 0.1) {
+        console.warn('Déplacement trop faible entre les 2 premiers points');
+        return null;
+    }
+    
+    const u_x = M01_x / norm;
+    const u_y = M01_y / norm;
+    
+    // 2. VECTEUR PERPENDICULAIRE (rotation 90°)
+    const v_x = -u_y;
+    const v_y = u_x;
+    
+    // 3. EXTRÉMITÉS DE LA LIGNE
+    const P1_lat = M0.lat + (v_y * lineHalfWidth) / 111320;
+    const P1_lng = M0.lng + (v_x * lineHalfWidth) / (111320 * Math.cos(M0.lat * Math.PI / 180));
+    
+    const P2_lat = M0.lat - (v_y * lineHalfWidth) / 111320;
+    const P2_lng = M0.lng - (v_x * lineHalfWidth) / (111320 * Math.cos(M0.lat * Math.PI / 180));
+    
+    // 4. AFFICHER LA LIGNE EN ROUGE
+    const chronoLine = L.polyline(
+        [[P1_lat, P1_lng], [P2_lat, P2_lng]], 
+        {
+            color: '#ff0000',
+            weight: 5,
+            opacity: 0.95,
+            dashArray: '10, 5',
+            className: 'chrono-line'
+        }
+    );
+    
+    chronoLine.addTo(map);
+    
+    chronoLine.bindPopup(`
+        <div style="text-align: center;">
+            <strong style="color: #ff0000;">🏁 LIGNE DE CHRONOMÉTRAGE</strong><br>
+            <small>Vitesse au passage: ${M0.spd.toFixed(1)} km/h</small><br>
+            <small>Largeur: ±${lineHalfWidth}m</small>
+        </div>
+    `);
+    
+    // 5. MARQUEUR CENTRAL
+    const centerMarker = L.circleMarker([M0.lat, M0.lng], {
+        radius: 7,
+        fillColor: '#ff0000',
+        color: '#ffffff',
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 0.9
+    }).addTo(map);
+    
+    centerMarker.bindPopup(`
+        <strong style="color: #ff0000;">🚩 Passage de ligne</strong><br>
+        Vitesse: ${M0.spd.toFixed(1)} km/h<br>
+        Début du tour
+    `);
+    
+    console.log('✅ Ligne de chronométrage affichée au début du tour');
+    
+    return {
+        line: chronoLine,
+        marker: centerMarker,
+        center: { lat: M0.lat, lng: M0.lng },
+        triggerPoint: 0
+    };
+}
+
        function displayBestLap() {
     if (!map || !lapSegments || lapSegments.length === 0) return;
     
@@ -4322,6 +4414,9 @@ const allCircuits = CIRCUITS_DATABASE;
     
     // Utiliser la fonction réutilisable pour les étiquettes
     detectAndDisplaySpeedMarkers(track, gpsLayer);
+
+    // ⭐ AFFICHER LA LIGNE DE CHRONOMÉTRAGE
+displayChronoLine(track, map, 40);
     
     // ✅ UTILISER la nouvelle fonction pour créer le curseur
     createReplayMarker(track[0]);
