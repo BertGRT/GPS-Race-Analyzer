@@ -1022,6 +1022,29 @@ div.replay-speed-tag,
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8);
 }
 
+/* ===== CARTES DE VIRAGES - MODE SOMBRE ===== */
+[data-theme="dark"] .turn-card {
+    background: var(--bg-card);
+    border-left-color: #ff9800;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .turn-card h4 {
+    color: #ff9800;
+}
+
+[data-theme="dark"] .turn-stat {
+    border-bottom-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .turn-stat span {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .turn-stat strong {
+    color: var(--text-primary);
+}
 .circuit-modal-content {
     background: var(--bg-card);
     color: var(--text-primary);
@@ -2226,7 +2249,13 @@ div.replay-speed-tag,
         let settingsBluetoothCharacteristic = null;
         let currentConfig = {};
 
-        
+   // ==========================================
+// CONFIGURATION DÉTECTION CIRCUITS
+// ==========================================
+
+// Multiplicateur du rayon de détection (2.0 = double le rayon)
+// Exemple : si rayon = 2000m, détection jusqu'à 4000m
+const DETECTION_RADIUS_MULTIPLIER = 2.0;     
 
 
 // ========== GESTION MODE SOMBRE ==========
@@ -2276,8 +2305,7 @@ const CIRCUITS_DATABASE = [
     // ==========================================
     
     // Île-de-France (3)
-    { name: "Circuit Carole", location: "Aulnay-sous-Bois, Île-de-France", 
-      lat: 48.9534, lng: 2.4847, radius: 2000, length: 1.814, type: "auto" },
+    
     { name: "Autodrome de Linas-Montlhéry", location: "Linas, Île-de-France", 
       lat: 48.6428, lng: 2.2669, radius: 3000, length: 2.548, type: "auto" },
     { name: "La Ferté-Gaucher", location: "La Ferté-Gaucher, Île-de-France", 
@@ -2604,7 +2632,7 @@ const CIRCUITS_DATABASE = [
     // ==========================================
     
     { name: "Carole Moto", location: "Aulnay-sous-Bois, Île-de-France", 
-      lat: 48.9534, lng: 2.4847, radius: 2000, length: 1.814, type: "moto" },
+      lat: 48.9798, lng: 2.5216, radius: 2000, length: 1.814, type: "auto" },
     { name: "Magny-Cours Moto", location: "Nevers, Bourgogne-Franche-Comté", 
       lat: 46.8642, lng: 3.1633, radius: 3000, length: 4.411, type: "moto" },
     { name: "Paul Ricard Moto", location: "Le Castellet, PACA", 
@@ -2668,6 +2696,7 @@ let detectedCircuit = null;
 
 function detectCircuitFromGPS() {
     if (!sessionData || !sessionData.gpsTrack || sessionData.gpsTrack.length === 0) {
+        console.warn('❌ Pas de données GPS disponibles');
         return null;
     }
     
@@ -2676,27 +2705,59 @@ function detectCircuitFromGPS() {
     const centerLat = track.reduce((sum, p) => sum + p.lat, 0) / track.length;
     const centerLng = track.reduce((sum, p) => sum + p.lng, 0) / track.length;
     
-    console.log(`Centre GPS: ${centerLat.toFixed(6)}, ${centerLng.toFixed(6)}`);
+    console.log(`📍 Centre GPS calculé: ${centerLat.toFixed(6)}, ${centerLng.toFixed(6)}`);
+    console.log(`📊 Nombre de points GPS: ${track.length}`);
+    console.log(`🎯 Rayon de détection: x${DETECTION_RADIUS_MULTIPLIER}`);
     
-    // Chercher dans tous les circuits (base + custom)
-    // Chercher uniquement dans la base de données
-const allCircuits = CIRCUITS_DATABASE;
+    const allCircuits = CIRCUITS_DATABASE;
+    let closestCircuit = null;
+    let closestDistance = Infinity;
     
+    // Parcourir tous les circuits
     for (const circuit of allCircuits) {
         const distance = calculateDistance(
             { lat: centerLat, lng: centerLng },
             { lat: circuit.lat, lng: circuit.lng }
         );
         
-        console.log(`Distance ${circuit.name}: ${distance.toFixed(0)}m (rayon: ${circuit.radius}m)`);
+        // Garder trace du circuit le plus proche
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestCircuit = circuit;
+        }
         
-        if (distance < circuit.radius) {
-            console.log(`✓ Circuit détecté: ${circuit.name}`);
+        // Calculer le rayon de détection étendu
+        const detectionRadius = circuit.radius * DETECTION_RADIUS_MULTIPLIER;
+        
+        // Log seulement les circuits proches (dans un rayon raisonnable)
+        if (distance < detectionRadius * 1.5) {
+            const status = distance < circuit.radius ? '✅' : 
+                          distance < detectionRadius ? '⚠️' : '❌';
+            console.log(`${status} ${circuit.name}: ${distance.toFixed(0)}m (rayon: ${circuit.radius}m, détection: ${detectionRadius}m)`);
+        }
+        
+        // Détection avec rayon étendu
+        if (distance < detectionRadius) {
+            if (distance < circuit.radius) {
+                console.log(`✅ Circuit détecté (rayon normal): ${circuit.name}`);
+            } else {
+                console.log(`⚠️ Circuit détecté (rayon étendu): ${circuit.name}`);
+            }
             return circuit;
         }
     }
     
-    console.log('Aucun circuit reconnu');
+    // Aucun circuit trouvé
+    if (closestCircuit) {
+        const maxRadius = closestCircuit.radius * DETECTION_RADIUS_MULTIPLIER;
+        console.log(`❌ Aucun circuit dans le rayon de détection`);
+        console.log(`   Circuit le plus proche: ${closestCircuit.name} à ${closestDistance.toFixed(0)}m`);
+        console.log(`   Rayon max de détection: ${maxRadius}m`);
+        console.log(`   💡 Augmentez DETECTION_RADIUS_MULTIPLIER (actuellement: ${DETECTION_RADIUS_MULTIPLIER})`);
+    } else {
+        console.log('❌ Aucun circuit reconnu');
+    }
+    
     return null;
 }
 
@@ -2852,8 +2913,8 @@ function loadStoredFilesList() {
         return `
             <div class="file-item" id="file-item-${index}">
                 <div class="file-item-checkbox">
-                    <input type="checkbox" id="checkbox-${index}" onchange="updateSelectedCount()">
-                </div>
+    <input type="checkbox" id="checkbox-${index}" data-session-id="${session.id}" onchange="updateSelectedCount()">
+</div>
                 <div class="file-item-content">
                         <div class="file-item-header">
                         <div class="file-item-title">${session.name}</div>
@@ -2865,12 +2926,12 @@ function loadStoredFilesList() {
                         <span>🚀 ${data.maxSpd.toFixed(1)} km/h</span>
                     </div>
                     <div class="file-item-actions">
-                        <button class="file-action-btn btn-load" onclick="loadStoredSession(${index})">
-                            📊 Analyser
-                        </button>
-                        <button class="file-action-btn btn-delete" onclick="deleteStoredSession(${index})">
-                            🗑️ Supprimer
-                        </button>
+                        <button class="file-action-btn btn-load" onclick="loadStoredSession('${session.id}')">
+    📊 Analyser
+</button>
+<button class="file-action-btn btn-delete" onclick="deleteStoredSession('${session.id}')">
+    🗑️ Supprimer
+</button>
                     </div>
                 </div>
             </div>
@@ -2880,27 +2941,41 @@ function loadStoredFilesList() {
     updateSelectedCount();
 }
 
-function loadStoredSession(index) {
+function loadStoredSession(sessionId) {
     const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
-    sessions.sort((a, b) => b.savedAt - a.savedAt);
-    if (sessions[index]) {
-        currentSessionId = sessions[index].id;
-        sessionData = sessions[index].data;
+    const session = sessions.find(s => s.id === sessionId);
+    
+    if (session) {
+        currentSessionId = session.id;
+        sessionData = session.data;
         document.getElementById('stored-files-page').style.display = 'none';
         displaySession();
+        console.log('✅ Session chargée:', session.name);
+    } else {
+        console.error('❌ Session introuvable:', sessionId);
+        alert('Erreur : Session introuvable');
     }
 }
 
-function deleteStoredSession(index) {
+function deleteStoredSession(sessionId) {
     if (!confirm('Supprimer cette session ?')) return;
     
     const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
-    sessions.sort((a, b) => b.savedAt - a.savedAt);
-    sessions.splice(index, 1);
-    localStorage.setItem('gpsSessions', JSON.stringify(sessions));
-    loadStoredFilesList();
-    updateStoredFilesCount();
+    const sessionIndex = sessions.findIndex(s => s.id === sessionId);
+    
+    if (sessionIndex !== -1) {
+        const deletedSession = sessions[sessionIndex];
+        sessions.splice(sessionIndex, 1);
+        localStorage.setItem('gpsSessions', JSON.stringify(sessions));
+        console.log('✅ Session supprimée:', deletedSession.name);
+        loadStoredFilesList();
+        updateStoredFilesCount();
+    } else {
+        console.error('❌ Session introuvable:', sessionId);
+        alert('Erreur : Session introuvable');
+    }
 }
+
 
 function clearAllSessions() {
     if (!confirm('Supprimer TOUTES les sessions sauvegardées ? Cette action est irréversible.')) return;
@@ -3243,22 +3318,37 @@ function updateSelectedCount() {
 async function downloadSelectedSessions() {
     const sessions = JSON.parse(localStorage.getItem('gpsSessions') || '[]');
     const checkboxes = document.querySelectorAll('[id^="checkbox-"]:checked');
-    const selectedIndices = Array.from(checkboxes).map(cb => parseInt(cb.id.replace('checkbox-', '')));
     
-    if (selectedIndices.length === 0) {
+    // ✅ RÉCUPÉRER LES IDs au lieu des index
+    const selectedSessionIds = Array.from(checkboxes).map(cb => cb.getAttribute('data-session-id'));
+    
+    console.log('📥 Téléchargement de', selectedSessionIds.length, 'session(s)');
+    console.log('   IDs sélectionnés:', selectedSessionIds);
+    
+    if (selectedSessionIds.length === 0) {
         alert('Aucune session sélectionnée');
         return;
     }
     
-    if (selectedIndices.length === 1) {
+    // ✅ TROUVER LES SESSIONS PAR ID
+    const selectedSessions = sessions.filter(s => selectedSessionIds.includes(s.id));
+    
+    if (selectedSessions.length !== selectedSessionIds.length) {
+        console.error('❌ Certaines sessions sont introuvables');
+        alert('Erreur : Certaines sessions sont introuvables');
+        return;
+    }
+    
+    if (selectedSessions.length === 1) {
         // Télécharger un seul fichier JSON
-        const session = sessions[selectedIndices[0]];
+        const session = selectedSessions[0];
         const json = JSON.stringify(session.data, null, 2);
         const filename = `session_${session.data.id || 'export'}.json`;
+        console.log('✅ Téléchargement:', filename);
         downloadFile(json, filename, 'application/json');
     } else {
         // Télécharger plusieurs fichiers en ZIP
-        await downloadMultipleSessionsAsZip(sessions, selectedIndices);
+        await downloadMultipleSessionsAsZip(selectedSessions);
     }
 }
 
@@ -3982,14 +4072,30 @@ function applyPageTheme() {
 }
 function selectCircuitManually(circuitName) {
     // Chercher uniquement dans la base de données
-const allCircuits = CIRCUITS_DATABASE;
+    const allCircuits = CIRCUITS_DATABASE;
     detectedCircuit = allCircuits.find(c => c.name === circuitName);
     
+    // Fermer la modale
     document.getElementById('circuits-modal').remove();
-    showCircuitDetection();
     
-    console.log('Circuit sélectionné manuellement:', detectedCircuit.name);
+    // Afficher directement SANS rappeler detectCircuitFromGPS()
+    const circuitInfo = document.getElementById('circuit-info');
+    const circuitUnknown = document.getElementById('circuit-unknown');
+    
+    if (detectedCircuit) {
+        circuitInfo.style.display = 'flex';
+        circuitUnknown.style.display = 'none';
+        
+        document.querySelector('#circuit-info .circuit-icon').textContent = 
+            detectedCircuit.type === 'auto' ? '🏎️' : '🏍';
+        document.getElementById('circuit-name').textContent = detectedCircuit.name;
+        document.getElementById('circuit-location').textContent = 
+            `${detectedCircuit.location} - ${detectedCircuit.length} km`;
+        
+        console.log('✅ Circuit sélectionné manuellement:', detectedCircuit.name);
+    }
 }
+
         
         function displayLapsTable() {
     const tbody = document.querySelector('#laps-table tbody');
@@ -4274,45 +4380,92 @@ const allCircuits = CIRCUITS_DATABASE;
 // AFFICHAGE DE LA LIGNE DE CHRONOMÉTRAGE
 // ==========================================
 
-function displayChronoLine(lapPoints, map, lineHalfWidth = 40) {
+function displayChronoLine(lapPoints, map, lineHalfWidth = 40, triggerSpeed = 80) {
     if (!lapPoints || lapPoints.length < 3) {
         console.warn('Pas assez de points GPS pour afficher la ligne de chrono');
         return null;
     }
     
-    // ⭐ LE POINT DE DÉCLENCHEMENT EST LE DÉBUT DU TOUR
-    const M0 = lapPoints[0];  // Premier point du tour = passage de ligne
-    const M1 = lapPoints[1];  // Deuxième point pour calculer la direction
+    // 🎯 TROUVER LE POINT DE DÉCLENCHEMENT DU CHRONO
+    // = Premier point où vitesse > seuil de déclenchement
+    let M0 = null;
+    let M0_index = 0;
     
-    console.log(`🏁 Ligne de chrono au début du tour`);
+    for (let i = 0; i < lapPoints.length; i++) {
+        if (lapPoints[i].spd >= triggerSpeed) {
+            M0 = lapPoints[i];
+            M0_index = i;
+            console.log(`🏁 Point de déclenchement trouvé à l'index ${i}`);
+            console.log(`   Vitesse: ${M0.spd.toFixed(1)} km/h (seuil: ${triggerSpeed} km/h)`);
+            break;
+        }
+    }
+    
+    if (!M0) {
+        console.warn(`Aucun point trouvé avec vitesse ≥ ${triggerSpeed} km/h`);
+        // Fallback : utiliser le point avec la vitesse max dans les 20 premiers points
+        let maxSpeed = 0;
+        for (let i = 0; i < Math.min(20, lapPoints.length); i++) {
+            if (lapPoints[i].spd > maxSpeed) {
+                maxSpeed = lapPoints[i].spd;
+                M0 = lapPoints[i];
+                M0_index = i;
+            }
+        }
+        if (!M0) {
+            console.error('Impossible de déterminer le point de déclenchement');
+            return null;
+        }
+        console.log(`   Utilisation du point le plus rapide: ${maxSpeed.toFixed(1)} km/h à l'index ${M0_index}`);
+    }
+    
     console.log(`   Point M0: lat=${M0.lat.toFixed(6)}, lng=${M0.lng.toFixed(6)}, spd=${M0.spd.toFixed(1)} km/h`);
     
-    // 1. CALCULER LE VECTEUR DE DÉPLACEMENT (M0 -> M1)
-    const M01_x = (M1.lng - M0.lng) * Math.cos(M0.lat * Math.PI / 180) * 111320;
-    const M01_y = (M1.lat - M0.lat) * 111320;
+    // 1. TROUVER UN POINT SUFFISAMMENT ÉLOIGNÉ POUR CALCULER LA DIRECTION
+    let M1 = null;
+    let M1_index = M0_index + 1;
+    let norm = 0;
     
-    // Normaliser
-    const norm = Math.sqrt(M01_x * M01_x + M01_y * M01_y);
-    if (norm < 0.1) {
-        console.warn('Déplacement trop faible entre les 2 premiers points');
+    // Chercher parmi les points suivants
+    for (let i = M0_index + 1; i < Math.min(M0_index + 10, lapPoints.length); i++) {
+        const testPoint = lapPoints[i];
+        const dx = (testPoint.lng - M0.lng) * Math.cos(M0.lat * Math.PI / 180) * 111320;
+        const dy = (testPoint.lat - M0.lat) * 111320;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance >= 2.0) {  // Minimum 2 mètres
+            M1 = testPoint;
+            M1_index = i;
+            norm = distance;
+            console.log(`   Point M${i} utilisé pour direction: distance=${distance.toFixed(1)}m`);
+            break;
+        }
+    }
+    
+    if (!M1) {
+        console.warn('Aucun point suffisamment éloigné trouvé pour calculer la direction');
         return null;
     }
+    
+    // 2. CALCULER LE VECTEUR DE DÉPLACEMENT (M0 -> M1)
+    const M01_x = (M1.lng - M0.lng) * Math.cos(M0.lat * Math.PI / 180) * 111320;
+    const M01_y = (M1.lat - M0.lat) * 111320;
     
     const u_x = M01_x / norm;
     const u_y = M01_y / norm;
     
-    // 2. VECTEUR PERPENDICULAIRE (rotation 90°)
+    // 3. VECTEUR PERPENDICULAIRE (rotation 90°)
     const v_x = -u_y;
     const v_y = u_x;
     
-    // 3. EXTRÉMITÉS DE LA LIGNE
+    // 4. EXTRÉMITÉS DE LA LIGNE
     const P1_lat = M0.lat + (v_y * lineHalfWidth) / 111320;
     const P1_lng = M0.lng + (v_x * lineHalfWidth) / (111320 * Math.cos(M0.lat * Math.PI / 180));
     
     const P2_lat = M0.lat - (v_y * lineHalfWidth) / 111320;
     const P2_lng = M0.lng - (v_x * lineHalfWidth) / (111320 * Math.cos(M0.lat * Math.PI / 180));
     
-    // 4. AFFICHER LA LIGNE EN ROUGE
+    // 5. AFFICHER LA LIGNE EN ROUGE
     const chronoLine = L.polyline(
         [[P1_lat, P1_lng], [P2_lat, P2_lng]], 
         {
@@ -4330,34 +4483,26 @@ function displayChronoLine(lapPoints, map, lineHalfWidth = 40) {
         <div style="text-align: center;">
             <strong style="color: #ff0000;">🏁 LIGNE DE CHRONOMÉTRAGE</strong><br>
             <small>Vitesse au passage: ${M0.spd.toFixed(1)} km/h</small><br>
+            <small>Seuil de déclenchement: ${triggerSpeed} km/h</small><br>
             <small>Largeur: ±${lineHalfWidth}m</small>
         </div>
     `);
     
-    // 5. MARQUEUR CENTRAL
+    // 6. MARQUEUR CENTRAL
     const centerMarker = L.circleMarker([M0.lat, M0.lng], {
         radius: 7,
         fillColor: '#ff0000',
         color: '#ffffff',
-        weight: 3,
+        weight: 2,
         opacity: 1,
         fillOpacity: 0.9
-    }).addTo(map);
+    });
     
-    centerMarker.bindPopup(`
-        <strong style="color: #ff0000;">🚩 Passage de ligne</strong><br>
-        Vitesse: ${M0.spd.toFixed(1)} km/h<br>
-        Début du tour
-    `);
+    centerMarker.addTo(map);
     
-    console.log('✅ Ligne de chronométrage affichée au début du tour');
+    console.log('✅ Ligne de chrono affichée');
     
-    return {
-        line: chronoLine,
-        marker: centerMarker,
-        center: { lat: M0.lat, lng: M0.lng },
-        triggerPoint: 0
-    };
+    return { line: chronoLine, marker: centerMarker };
 }
 
        function displayBestLap() {
@@ -4825,52 +4970,154 @@ displayChronoLine(track, map, 40);
         function changeReplaySpeed(speed) { replaySpeed = speed; }
         
         function analyzeTurns() {
-            if (!sessionData || !sessionData.gpsTrack) {
-                document.getElementById('turns-grid').innerHTML = '<p style="text-align: center; padding: 50px; color: #999;">Aucune donnee GPS disponible</p>';
-                return;
-            }
-            
-            const track = sessionData.gpsTrack;
-            const turns = detectTurns(track);
-            const turnsGrid = document.getElementById('turns-grid');
-            turnsGrid.innerHTML = '';
-            
-            turns.forEach((turn, index) => {
-                const card = document.createElement('div');
-                card.className = 'turn-card';
-                card.innerHTML = `
-                    <h4>Virage ${index + 1}</h4>
-                    <div class="turn-stat"><span>Vitesse d'entree</span><strong>${turn.entrySpeed.toFixed(1)} km/h</strong></div>
-                    <div class="turn-stat"><span>Vitesse a l'apex</span><strong>${turn.apexSpeed.toFixed(1)} km/h</strong></div>
-                    <div class="turn-stat"><span>Vitesse de sortie</span><strong>${turn.exitSpeed.toFixed(1)} km/h</strong></div>
-                    <div class="turn-stat"><span>Perte de vitesse</span><strong>${(turn.entrySpeed - turn.apexSpeed).toFixed(1)} km/h</strong></div>
-                `;
-                turnsGrid.appendChild(card);
-            });
+    console.log('🔄 Analyse des virages...');
+    
+    if (!sessionData || !sessionData.gpsTrack) {
+        console.warn('❌ Pas de données GPS');
+        document.getElementById('turns-grid').innerHTML = '<p style="text-align: center; padding: 50px; color: #999;">Aucune donnee GPS disponible</p>';
+        return;
+    }
+    
+    const track = sessionData.gpsTrack;
+    console.log(`📊 Points GPS disponibles: ${track.length}`);
+    
+    // Vérifier que les données GPS ont bien un champ vitesse
+    const firstPoint = track[0];
+    console.log('📍 Premier point GPS:', firstPoint);
+    
+    if (!firstPoint.spd && firstPoint.spd !== 0) {
+        console.error('❌ Les points GPS n\'ont pas de champ "spd" (vitesse)');
+        document.getElementById('turns-grid').innerHTML = '<p style="text-align: center; padding: 50px; color: #f44336;">❌ Données de vitesse manquantes</p>';
+        return;
+    }
+    
+    // Analyser les vitesses pour comprendre la plage
+    const speeds = track.map(p => p.spd || 0).filter(s => s > 0);
+    const minSpeed = Math.min(...speeds);
+    const maxSpeed = Math.max(...speeds);
+    const avgSpeed = speeds.reduce((a, b) => a + b, 0) / speeds.length;
+    
+    console.log(`📊 Statistiques de vitesse:`);
+    console.log(`   Min: ${minSpeed.toFixed(1)} km/h`);
+    console.log(`   Max: ${maxSpeed.toFixed(1)} km/h`);
+    console.log(`   Moyenne: ${avgSpeed.toFixed(1)} km/h`);
+    console.log(`   Plage: ${(maxSpeed - minSpeed).toFixed(1)} km/h`);
+    
+    const turns = detectTurns(track, minSpeed, maxSpeed, avgSpeed);
+    console.log(`✅ Virages détectés: ${turns.length}`);
+    
+    const turnsGrid = document.getElementById('turns-grid');
+    
+    if (turns.length === 0) {
+        turnsGrid.innerHTML = `
+            <div style="text-align: center; padding: 50px;">
+                <p style="color: #ff9800; font-size: 1.2rem; margin-bottom: 10px;">⚠️ Aucun virage détecté</p>
+                <p style="color: #666; font-size: 0.9rem;">
+                    Plage de vitesse: ${minSpeed.toFixed(1)} - ${maxSpeed.toFixed(1)} km/h<br>
+                    Les variations de vitesse sont peut-être trop faibles pour ce circuit.
+                </p>
+            </div>
+        `;
+        return;
+    }
+    
+    turnsGrid.innerHTML = '';
+    
+    turns.forEach((turn, index) => {
+        const speedLoss = turn.entrySpeed - turn.apexSpeed;
+        const speedGain = turn.exitSpeed - turn.apexSpeed;
+        const efficiency = ((speedGain / speedLoss) * 100).toFixed(0);
+        
+        const card = document.createElement('div');
+        card.className = 'turn-card';
+        card.innerHTML = `
+            <h4>🏁 Virage ${index + 1}</h4>
+            <div class="turn-stat"><span>📍 Position</span><strong>Point ${turn.index}</strong></div>
+            <div class="turn-stat"><span>🚀 Entrée</span><strong>${turn.entrySpeed.toFixed(1)} km/h</strong></div>
+            <div class="turn-stat"><span>🎯 Apex</span><strong>${turn.apexSpeed.toFixed(1)} km/h</strong></div>
+            <div class="turn-stat"><span>💨 Sortie</span><strong>${turn.exitSpeed.toFixed(1)} km/h</strong></div>
+            <div class="turn-stat"><span>📉 Freinage</span><strong style="color: #f44336;">${speedLoss.toFixed(1)} km/h</strong></div>
+            <div class="turn-stat"><span>📈 Accélération</span><strong style="color: #4caf50;">${speedGain.toFixed(1)} km/h</strong></div>
+            <div class="turn-stat"><span>⚡ Efficacité</span><strong style="color: ${efficiency > 80 ? '#4caf50' : efficiency > 60 ? '#ff9800' : '#f44336'};">${efficiency}%</strong></div>
+        `;
+        turnsGrid.appendChild(card);
+    });
+    
+    console.log('✅ Affichage terminé');
+}
+
+function detectTurns(track, minSpeed, maxSpeed, avgSpeed) {
+    const turns = [];
+    
+    // Calcul d'un seuil adaptatif basé sur la plage de vitesse
+    const speedRange = maxSpeed - minSpeed;
+    const adaptiveThreshold = Math.max(10, speedRange * 0.15); // 15% de la plage ou 10 km/h minimum
+    
+    console.log(`🔍 Détection adaptative:`);
+    console.log(`   Seuil calculé: ${adaptiveThreshold.toFixed(1)} km/h`);
+    console.log(`   Fenêtre d'analyse: 20 points avant/après`);
+    
+    // Analyse avec une fenêtre glissante plus large
+    const windowSize = 20; // Fenêtre d'analyse
+    
+    for (let i = windowSize; i < track.length - windowSize; i++) {
+        // Calculer la vitesse moyenne avant et après le point
+        let speedBefore = 0;
+        let speedAfter = 0;
+        
+        for (let j = 1; j <= windowSize; j++) {
+            speedBefore += (track[i - j].spd || 0);
+            speedAfter += (track[i + j].spd || 0);
         }
         
-        function detectTurns(track) {
-            const turns = [];
-            const minSpeedDrop = 40;
-            
-            for (let i = 10; i < track.length - 10; i++) {
-                const prevSpeed = track[i - 5].spd;
-                const currentSpeed = track[i].spd;
-                const nextSpeed = track[i + 5].spd;
-                
-                if (prevSpeed - currentSpeed > minSpeedDrop && nextSpeed > currentSpeed) {
-                    turns.push({
-                        index: i,
-                        entrySpeed: prevSpeed,
-                        apexSpeed: currentSpeed,
-                        exitSpeed: nextSpeed,
-                        position: { lat: track[i].lat, lng: track[i].lng }
-                    });
-                    i += 15;
+        speedBefore /= windowSize;
+        speedAfter /= windowSize;
+        const currentSpeed = track[i].spd || 0;
+        
+        // Détection : point bas (apex) entre deux zones plus rapides
+        const isApex = currentSpeed < speedBefore && currentSpeed < speedAfter;
+        const speedDrop = Math.max(speedBefore - currentSpeed, speedAfter - currentSpeed);
+        
+        if (isApex && speedDrop > adaptiveThreshold) {
+            // Chercher la vraie vitesse d'entrée (max dans les 15 points avant)
+            let maxEntrySpeed = currentSpeed;
+            for (let j = 1; j <= 15; j++) {
+                if (i - j >= 0) {
+                    maxEntrySpeed = Math.max(maxEntrySpeed, track[i - j].spd || 0);
                 }
             }
-            return turns.slice(0, 8);
+            
+            // Chercher la vraie vitesse de SORTIE (max dans les 30 points APRÈS - augmenté!)
+            // Plus loin pour capturer la vraie accélération de sortie
+            let maxExitSpeed = currentSpeed;
+            for (let j = 1; j <= 30; j++) {
+                if (i + j < track.length) {
+                    maxExitSpeed = Math.max(maxExitSpeed, track[i + j].spd || 0);
+                }
+            }
+            
+            turns.push({
+                index: i,
+                entrySpeed: maxEntrySpeed,
+                apexSpeed: currentSpeed,
+                exitSpeed: maxExitSpeed,
+                position: { lat: track[i].lat, lng: track[i].lng }
+            });
+            
+            console.log(`  🏁 Virage ${turns.length} - Index ${i}`);
+            console.log(`     Entrée: ${maxEntrySpeed.toFixed(1)} → Apex: ${currentSpeed.toFixed(1)} → Sortie: ${maxExitSpeed.toFixed(1)} km/h`);
+            
+            // Sauter pour éviter de détecter le même virage plusieurs fois
+            i += windowSize;
         }
+    }
+    
+    console.log(`📊 Total: ${turns.length} virages détectés`);
+    
+    // Trier par importance (plus grosse chute de vitesse) et garder les 8 meilleurs
+    turns.sort((a, b) => (b.entrySpeed - b.apexSpeed) - (a.entrySpeed - a.apexSpeed));
+    return turns.slice(0, 8); // ✅ LIMITÉ À 8 VIRAGES
+}
         
         function segmentLapsFromGPSTrack() {
             if (!sessionData || !sessionData.gpsTrack || !sessionData.times) return;
